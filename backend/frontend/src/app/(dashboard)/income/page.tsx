@@ -259,8 +259,8 @@ export default function IncomePage() {
                     outerRadius={50}
                     paddingAngle={5}
                     dataKey="amount"
-                    label={({ name, percent }: any) => window.innerWidth > 768 ? `${name} ${(percent * 100).toFixed(0)}%` : null}
-                    labelLine={window.innerWidth > 768}
+                    label={({ name, percent }: any) => (typeof window !== 'undefined' && window.innerWidth > 768) ? `${name} ${(percent * 100).toFixed(0)}%` : null}
+                    labelLine={typeof window !== 'undefined' && window.innerWidth > 768}
                   >
                     {summary.income_by_category.map((entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={2} stroke="currentColor" className="stroke-background" />
