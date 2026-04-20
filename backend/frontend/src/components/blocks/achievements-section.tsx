@@ -46,7 +46,7 @@ export const AchievementsSection = () => {
             incrementY={40}
             index={index + 2}
             className="flex h-80 w-full max-w-[440px] flex-col place-content-center justify-evenly rounded-3xl border border-white/10 p-12 shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-[1.02]"
-            style={{ rotate: index + 2, background: achievement.bg }}
+            style={{ rotate: `${index + 2}deg`, background: achievement.bg }}
           >
             <h1 className="text-left text-7xl font-bold opacity-90 drop-shadow-md">
               {achievement.title}
