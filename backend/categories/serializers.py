@@ -2,10 +2,12 @@ from rest_framework import serializers
 from .models import Category
 
 class CategorySerializer(serializers.ModelSerializer):
+    transaction_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Category
-        fields = ['id', 'name', 'icon', 'color', 'created_at']
-        read_only_fields = ['id', 'created_at']
+        fields = ['id', 'name', 'icon', 'color', 'category_type', 'created_at', 'transaction_count']
+        read_only_fields = ['id', 'created_at', 'transaction_count']
 
     def validate_name(self, value):
         request = self.context.get('request')

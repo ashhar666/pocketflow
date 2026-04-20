@@ -1,74 +1,140 @@
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import (
-    RegisterSerializer, 
-    UserSerializer, 
+    RegisterSerializer,
+    UserSerializer,
     ChangePasswordSerializer,
-    LoginSerializer
+    LoginSerializer,
+    ForgotPasswordRequestSerializer,
+    ResetPasswordConfirmSerializer,
 )
+from .cookie_utils import set_jwt_cookies, clear_jwt_cookies
 
 User = get_user_model()
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+    throttle_classes = [AnonRateThrottle]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         refresh = RefreshToken.for_user(user)
-        return Response({
+        access_token = refresh.access_token
+
+        response = Response({
             "user": UserSerializer(user).data,
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
+
+        set_jwt_cookies(response, access_token, refresh)
+        return response
+
 
 class LoginView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
+    throttle_classes = [AnonRateThrottle]
+
+    def get_throttles(self):
+        """Use 'login' rate for POST, default anon for other methods."""
+        if self.request.method == 'POST':
+            from rest_framework.throttling import SimpleRateThrottle
+            class LoginThrottle(SimpleRateThrottle):
+                scope = 'login'
+                def get_cache_key(self, request, view):
+                    return self.get_ident(request)
+            return [LoginThrottle()]
+        return super().get_throttles()
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         email = serializer.validated_data['email'].lower()
         password = serializer.validated_data['password']
-        
+
         user = authenticate(request, username=email, password=password)
-        
+
         if user is not None:
             refresh = RefreshToken.for_user(user)
-            return Response({
+            access_token = refresh.access_token
+
+            response = Response({
                 "user": UserSerializer(user).data,
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
             }, status=status.HTTP_200_OK)
+
+            set_jwt_cookies(response, access_token, refresh)
+            return response
         else:
-            # Check if user exists just to give a better error message (optional, but good for debugging)
-            user_exists = User.objects.filter(email=email).exists()
-            detail = "Invalid credentials and account not found." if not user_exists else "Invalid password."
             return Response(
-                {"detail": detail},
+                {"detail": "Invalid email or password."},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
 
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         try:
-            refresh_token = request.data["refresh"]
+            refresh_token = request.COOKIES.get("refresh_token")
+            if not refresh_token:
+                return Response({"detail": "Missing refresh token."}, status=status.HTTP_400_BAD_REQUEST)
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({"detail": "Successfully logged out."}, status=status.HTTP_205_RESET_CONTENT)
-        except Exception as e:
-            return Response({"detail": "Invalid or missing token."}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            pass  # Gracefully handle already-expired tokens
+
+        response = Response({"detail": "Successfully logged out."}, status=status.HTTP_205_RESET_CONTENT)
+        clear_jwt_cookies(response)
+        return response
+
+
+class CustomTokenRefreshView(APIView):
+    """
+    Refresh JWT tokens using the HTTP-only refresh token cookie.
+    Returns new tokens in new HTTP-only cookies (token rotation).
+    """
+    permission_classes = (AllowAny,)
+    throttle_classes = [AnonRateThrottle]
+
+    def post(self, request):
+        refresh_token = request.COOKIES.get("refresh_token")
+        if not refresh_token:
+            return Response({"detail": "Missing refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+        from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+
+        serializer = TokenRefreshSerializer(data={"refresh": refresh_token})
+
+        try:
+            try:
+                serializer.is_valid(raise_exception=True)
+            except (TokenError, InvalidToken) as e:
+                raise Exception(str(e))
+
+            data = serializer.validated_data
+            access_token = data.get("access")
+            new_refresh_token = data.get("refresh") or refresh_token
+
+            response = Response({"user": {}}, status=status.HTTP_200_OK)
+            set_jwt_cookies(response, access_token, new_refresh_token)
+            return response
+        except Exception:
+            response = Response({"detail": "Invalid or expired refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
+            clear_jwt_cookies(response)
+            return response
+
 
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
@@ -91,6 +157,7 @@ class ChangePasswordView(generics.UpdateAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
@@ -98,3 +165,39 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+
+class ForgotPasswordRequestView(APIView):
+    """
+    POST /api/auth/forgot-password/
+    Accepts { email }. Sends a password reset link via email (or prints to console in dev).
+    """
+    permission_classes = (AllowAny,)
+    throttle_classes = [AnonRateThrottle]
+
+    def post(self, request):
+        serializer = ForgotPasswordRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # Always return success to prevent email enumeration
+        return Response(
+            {"message": "If an account exists with that email, a password reset link has been sent."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class ResetPasswordConfirmView(APIView):
+    """
+    POST /api/auth/reset-password/
+    Accepts { email, token, new_password, confirm_password }.
+    Validates the token and resets the password.
+    """
+    permission_classes = (AllowAny,)
+    throttle_classes = [AnonRateThrottle]
+
+    def post(self, request):
+        serializer = ResetPasswordConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {"message": "Password updated successfully. You can now log in."},
+            status=status.HTTP_200_OK,
+        )

@@ -1,4 +1,12 @@
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Cookie Policy",
+  description: "Read PocketFlow's Cookie Policy. Learn how we use essential, performance, and functional cookies on our platform.",
+};
+
+
 
 export default function CookiePolicyPage() {
   return (
@@ -53,7 +61,7 @@ export default function CookiePolicyPage() {
         <p className="leading-relaxed">
           You can choose to disable cookies through your individual browser
           options. However, please note that disabling certain cookies may
-          affect the functionality of Expense Tracker.
+          affect the functionality of PocketFlow.
         </p>
       </section>
 

@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import api from '@/lib/api';
-import { Plus, Edit2, Trash2, Loader2, PiggyBank, Award, ArrowUp, Vault, Gem, Milestone, Trophy, Rocket, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 export default function SavingsPage() {
   const [savings, setSavings] = useState<any[]>([]);
@@ -143,21 +143,20 @@ export default function SavingsPage() {
             Track your progress towards financial milestones
           </p>
         </div>
-        <Button variant="primary" size="lg" leftIcon={<Rocket className="w-5 h-5" />} onClick={() => openModal()}>
+        <Button variant="primary" size="lg" onClick={() => openModal()}>
           Add Goal
         </Button>
       </div>
 
       {loading ? (
         <div className="flex justify-center p-12">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+          <LoadingSpinner size={32} />
         </div>
       ) : savings.length === 0 ? (
         <Card glass className="flex flex-col items-center justify-center p-24 text-center border-dashed border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01]">
-          <Trophy className="w-16 h-16 text-zinc-800 mb-6" />
-          <h2 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">Zero Targets Set</h2>
-          <p className="text-zinc-500 max-w-md mt-4 mb-10 text-sm font-medium uppercase tracking-tight">Deploy capital into long-term growth instruments to ensure total asset sovereignty.</p>
-          <Button variant="primary" size="lg" onClick={() => openModal()}>Activate Reserve</Button>
+          <h2 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">No savings goals yet</h2>
+          <p className="text-zinc-500 max-w-md mt-4 mb-10 text-sm font-medium uppercase tracking-tight">Add your first savings goal to start tracking your milestones.</p>
+          <Button variant="primary" size="lg" onClick={() => openModal()}>Create Goal</Button>
         </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -167,45 +166,36 @@ export default function SavingsPage() {
             const percentage = Math.min((current / target) * 100, 100);
             const isCompleted = percentage >= 100;
             
-            const goalIcons = [Vault, Gem, Milestone, Trophy];
-            const GoalIcon = goalIcons[idx % goalIcons.length];
+
             
             return (
               <Card key={goal.id} glass className="relative overflow-hidden group border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 transition-all duration-500">
-                <div className="absolute top-0 right-0 p-8 z-10 pointer-events-none opacity-5 group-hover:opacity-10 transition-opacity">
-                   <GoalIcon className="size-24" />
-                </div>
-                
-                {isCompleted && (
-                  <div className="absolute -bottom-10 -left-10 p-8 z-10 pointer-events-none opacity-10 group-hover:opacity-20 transition-opacity rotate-12">
-                    <Trophy className="size-40 text-emerald-500" />
-                  </div>
-                )}
+
                 
                 <div className="flex justify-between items-start mb-10 relative z-20">
                   <div className="flex items-center gap-5">
-                    <div className="size-14 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5 flex items-center justify-center text-zinc-400 group-hover:text-foreground transition-all group-hover:scale-110 duration-500">
-                       <GoalIcon className="w-6 h-6" />
+                    <div className="size-14 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5 flex items-center justify-center text-zinc-500 group-hover:text-foreground transition-all group-hover:scale-110 duration-500 text-xs font-black uppercase italic">
+                       SAVE
                     </div>
                     <div className="pr-12">
-                       <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 italic mb-1">Reserve ID / {goal.id.toString().padStart(4, '0')}</h5>
+                       <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 italic mb-1">Goal ID / {goal.id.toString().padStart(4, '0')}</h5>
                       <h3 className="text-2xl font-black text-foreground uppercase italic tracking-tighter flex items-center gap-3">
                         {goal.title}
                         {isCompleted && <div className="size-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />}
                       </h3>
                       {goal.deadline && (
                         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 italic mt-2">
-                          System Deadline: {new Date(goal.deadline).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase()}
+                          Target Date: {new Date(goal.deadline).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase()}
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <button onClick={() => openModal(goal)} className="p-2.5 text-zinc-500 hover:text-foreground bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 transition-all">
-                      <Edit2 className="w-4 h-4" />
+                   <div className="flex gap-2">
+                    <button onClick={() => openModal(goal)} className="px-3 py-1 text-[10px] font-black uppercase italic text-zinc-500 hover:text-foreground bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 transition-all">
+                      Edit
                     </button>
-                    <button onClick={() => handleDelete(goal.id)} className="p-2.5 text-zinc-500 hover:text-red-500 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 transition-all">
-                      <Trash2 className="w-4 h-4" />
+                    <button onClick={() => handleDelete(goal.id)} className="px-3 py-1 text-[10px] font-black uppercase italic text-zinc-500 hover:text-red-500 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 transition-all">
+                      Del
                     </button>
                   </div>
                 </div>
@@ -217,15 +207,15 @@ export default function SavingsPage() {
                            <span className="text-4xl font-black text-foreground italic tracking-tighter">
                             {current.toLocaleString('en-IN').replace('₹', '')}
                            </span>
-                           <span className="text-xs font-black text-zinc-600 uppercase italic">INR Seeded</span>
+                           <span className="text-xs font-black text-zinc-600 uppercase italic">INR Saved</span>
                         </div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic mt-1">
-                            Target Threshold: {formatCurrency(target)}
+                            Target Amount: {formatCurrency(target)}
                         </p>
                     </div>
                     {!isCompleted && (
-                      <Button variant="indigo" size="sm" leftIcon={<ArrowUp className="w-4 h-4" />} onClick={() => openFundModal(goal)}>
-                        Deploy Funds
+                      <Button variant="indigo" size="sm" onClick={() => openFundModal(goal)}>
+                        Add Money
                       </Button>
                     )}
                   </div>
@@ -239,9 +229,9 @@ export default function SavingsPage() {
                     />
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
-                    <span className="text-zinc-800">Maturity Status: {percentage.toFixed(2)}%</span>
-                    {!isCompleted && <span className="text-zinc-500">{formatCurrency(target - current)} TO FULL MATURITY</span>}
-                    {isCompleted && <span className="text-emerald-500 animate-pulse">ACHIEVEMENT UNLOCKED</span>}
+                    <span className="text-zinc-800">Goal Progress: {percentage.toFixed(2)}%</span>
+                    {!isCompleted && <span className="text-zinc-500">{formatCurrency(target - current)} REMAINING</span>}
+                    {isCompleted && <span className="text-emerald-500 animate-pulse">Savings Completed!</span>}
                   </div>
                 </div>
               </Card>
@@ -294,7 +284,7 @@ export default function SavingsPage() {
           />
 
           <div className="pt-4 flex justify-end gap-3">
-            <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>Abort</Button>
+            <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>Cancel</Button>
             <Button type="submit" isLoading={isSubmitting} className="bg-emerald-600 hover:bg-emerald-500">
               {editingId ? 'Save Changes' : 'Save Goal'}
             </Button>
@@ -321,9 +311,9 @@ export default function SavingsPage() {
             autoFocus
           />
           <div className="pt-4 flex justify-end gap-3">
-            <Button variant="ghost" type="button" onClick={() => setIsFundModalOpen(false)}>Abort</Button>
+            <Button variant="ghost" type="button" onClick={() => setIsFundModalOpen(false)}>Cancel</Button>
             <Button type="submit" isLoading={isSubmitting} className="bg-indigo-600 hover:bg-indigo-500">
-              DEPLOY_FUNDS
+              Add Money
             </Button>
           </div>
         </form>

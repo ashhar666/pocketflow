@@ -1,6 +1,6 @@
-# Expense Tracker Backend API
+# PocketFlow Backend API
 
-This is the Django REST Framework backend for the Expense Tracker SaaS.
+This is the Django REST Framework backend for the PocketFlow SaaS.
 
 ## Prerequisites
 - Python 3.8+

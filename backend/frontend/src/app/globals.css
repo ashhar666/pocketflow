@@ -39,12 +39,13 @@
 }
 
 .dark {
-  --background: 0 0% 1.2%; /* #030303 */
+  --background: 0 0% 1.2%;
+  /* #030303 */
   --foreground: 210 40% 98%;
   --border: 217 33% 17%;
   --input: 217 33% 17%;
   --ring: 213 27% 84%;
-  
+
   --base-100: #030303;
   --base-200: #09090b;
   --base-300: #18181b;
@@ -90,24 +91,49 @@ body {
 /* Glassmorphism utility classes */
 @layer utilities {
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+    @apply bg-foreground/[0.02] dark:bg-white/[0.05] backdrop-blur-xl border border-border/10 dark:border-white/10 shadow-2xl transition-all duration-300;
   }
-  
+
+  .glass-card-light {
+    @apply bg-foreground/[0.05] dark:bg-white/5 backdrop-blur-lg border border-border/10 dark:border-white/10 shadow-xl;
+  }
+
   .glass-panel {
-    @apply bg-white/5 dark:bg-black/20 backdrop-blur-md border border-white/10;
+    @apply bg-foreground/[0.02] dark:bg-white/5 backdrop-blur-md border border-border/10 dark:border-white/10;
   }
-  
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-brand;
+  }
+
+  .aurora-bg {
+    @apply absolute inset-0 -z-10 overflow-hidden opacity-30 dark:opacity-50;
+    filter: blur(100px);
+  }
+
+  .aurora-blob {
+    @apply absolute rounded-full mix-blend-screen animate-pulse-slow;
+  }
+}
+
+/* Mesh Gradients */
+@layer base {
+  .mesh-gradient {
+    background-color: hsla(0, 0%, 0%, 1);
+    background-image:
+      radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
   }
 }
 
 /* Hide number input arrows */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
+
 /* Premium Auth Animations */
 @keyframes fadeSlideIn {
   from {
@@ -115,6 +141,7 @@ input[type=number]::-webkit-outer-spin-button {
     filter: blur(8px);
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     filter: blur(0px);
@@ -128,6 +155,7 @@ input[type=number]::-webkit-outer-spin-button {
     filter: blur(8px);
     transform: translateX(-40px);
   }
+
   to {
     opacity: 1;
     filter: blur(0px);
@@ -141,6 +169,7 @@ input[type=number]::-webkit-outer-spin-button {
     filter: blur(8px);
     transform: translateY(20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     filter: blur(0px);
@@ -163,22 +192,131 @@ input[type=number]::-webkit-outer-spin-button {
   animation: testimonialIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-delay-100 { animation-delay: 100ms; }
-.animate-delay-200 { animation-delay: 200ms; }
-.animate-delay-300 { animation-delay: 300ms; }
-.animate-delay-400 { animation-delay: 400ms; }
-.animate-delay-500 { animation-delay: 500ms; }
-.animate-delay-600 { animation-delay: 600ms; }
-.animate-delay-700 { animation-delay: 700ms; }
-.animate-delay-800 { animation-delay: 800ms; }
-.animate-delay-900 { animation-delay: 900ms; }
-.animate-delay-1000 { animation-delay: 1000ms; }
-.animate-delay-1200 { animation-delay: 1200ms; }
-.animate-delay-1400 { animation-delay: 1400ms; }
+.animate-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animate-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animate-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animate-delay-600 {
+  animation-delay: 600ms;
+}
+
+.animate-delay-700 {
+  animation-delay: 700ms;
+}
+
+.animate-delay-800 {
+  animation-delay: 800ms;
+}
+
+.animate-delay-900 {
+  animation-delay: 900ms;
+}
+
+.animate-delay-1000 {
+  animation-delay: 1000ms;
+}
+
+.animate-delay-1200 {
+  animation-delay: 1200ms;
+}
+
+.animate-delay-1400 {
+  animation-delay: 1400ms;
+}
 
 .custom-checkbox {
   @apply h-4 w-4 rounded text-violet-500 focus:ring-violet-500 transition-colors cursor-pointer;
   border-width: 1px;
   border-color: hsl(var(--border));
   background-color: hsl(var(--background));
+}
+
+@media print {
+
+  :root,
+  .dark {
+    --background: 0 0% 100% !important;
+    --foreground: 222 47% 11% !important;
+    --border: 214 32% 91% !important;
+    --base-100: #FFFFFF !important;
+    --base-200: #F8FAFC !important;
+    --base-300: #F1F5F9 !important;
+    --base-content: #0F172A !important;
+    --neutral: #FFFFFF !important;
+    --neutral-content: #0A0A0A !important;
+    --muted: #64748B !important;
+  }
+
+  html,
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Reset glass cards for clean print */
+  .glass-card,
+  [class*="bg-white/"],
+  [class*="bg-black/"] {
+    background-color: transparent !important;
+    border: 1px solid #e2e8f0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Fix page crop issues in flex/h-screen layouts */
+  body,
+  html,
+  main,
+  .min-h-screen,
+  .h-screen,
+  .flex-1,
+  .overflow-hidden,
+  .overflow-y-auto {
+    display: block !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+
+  /* Force charts rendering */
+  .recharts-responsive-container {
+    width: 100% !important;
+    height: 350px !important;
+    min-height: 350px !important;
+  }
+
+  svg {
+    max-width: 100% !important;
+  }
+
+  /* Avoid page breaks inside cards and tables */
+  .glass-card,
+  table,
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
 }

@@ -20,19 +20,28 @@ class SavingsGoalViewSet(viewsets.ModelViewSet):
     def add_money(self, request, pk=None):
         goal = self.get_object()
         amount = request.data.get('amount')
-        
+
         if not amount:
             return Response({"error": "Amount is required"}, status=status.HTTP_400_BAD_REQUEST)
-            
+
         try:
             amount = float(amount)
             if amount <= 0:
-                raise ValueError()
-        except ValueError:
+                raise ValueError("Amount must be positive")
+        except (TypeError, ValueError):
             return Response({"error": "Amount must be a positive number"}, status=status.HTTP_400_BAD_REQUEST)
-            
+
         goal.current_amount = float(goal.current_amount) + amount
+
+        # Warn if overfunded
+        overfunded = False
+        if goal.current_amount > float(goal.target_amount):
+            overfunded = True
+
         goal.save()
-        
+
         serializer = self.get_serializer(goal)
-        return Response(serializer.data)
+        response_data = serializer.data
+        if overfunded:
+            response_data['warning'] = 'Current amount exceeds target amount'
+        return Response(response_data)

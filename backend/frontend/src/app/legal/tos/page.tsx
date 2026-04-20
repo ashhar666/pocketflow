@@ -1,4 +1,12 @@
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Read PocketFlow's Terms of Service. Understand your rights, responsibilities, and our service agreements.",
+};
+
+
 
 export default function TermsOfServicePage() {
   return (
@@ -17,7 +25,7 @@ export default function TermsOfServicePage() {
           1. Acceptance of Terms
         </h2>
         <p className="leading-relaxed">
-          By accessing or using the Expense Tracker application, you agree to
+          By accessing or using the PocketFlow application, you agree to
           be bound by these Terms of Service. If you do not agree to all terms,
           please do not use our services.
         </p>
@@ -52,7 +60,7 @@ export default function TermsOfServicePage() {
           4. Acceptable Use
         </h2>
         <p className="leading-relaxed text-muted-foreground">
-          You agree not to use Expense Tracker for any illegal purposes or to
+          You agree not to use PocketFlow for any illegal purposes or to
           interfere with the application&apos;s performance. Financial data you
           input must be your own or data you have the legal right to manage.
         </p>
@@ -63,7 +71,7 @@ export default function TermsOfServicePage() {
           5. Limitation of Liability
         </h2>
         <div className="bg-destructive/10 border-l-4 border-destructive p-4 italic text-sm text-foreground space-y-2">
-            <p>Expense Tracker provides financial tracking and visualization tools, but we ARE NOT financial advisors. We do not provide investment, accounting, or legal advice.</p>
+            <p>PocketFlow provides financial tracking and visualization tools, but we ARE NOT financial advisors. We do not provide investment, accounting, or legal advice.</p>
             <p>We are not liable for any financial losses or damages resulting from the use of our services or reliance on the analytics generated.</p>
         </div>
       </section>
@@ -87,7 +95,7 @@ export default function TermsOfServicePage() {
           If you have any questions about these Terms, please contact us at:
           <br />
           <span className="font-bold text-foreground underline font-mono">
-            legal@expensetracker.com
+            legal@pocketflow.com
           </span>
         </p>
       </section>

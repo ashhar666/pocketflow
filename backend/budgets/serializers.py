@@ -8,12 +8,16 @@ class BudgetSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), source='category', write_only=True
     )
     category = CategorySerializer(read_only=True)
-    spent_amount = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    spent_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = Budget
         fields = ['id', 'category', 'category_id', 'monthly_limit', 'month', 'year', 'spent_amount', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_spent_amount(self, obj):
+        # Return the injected value if present (from list view), otherwise calculate it fallback
+        return getattr(obj, 'spent_amount', None) or obj.spent_amount_calc()
 
     def validate_category_id(self, value):
         request = self.context.get('request')
@@ -22,13 +26,17 @@ class BudgetSerializer(serializers.ModelSerializer):
         return value
         
     def validate(self, data):
-        # Ensure a budget for this category, month, and year doesn't already exist for this user on creation
+        # Ensure a budget for this category/month/year doesn't already exist (on creation)
         request = self.context.get('request')
         if request and request.method == 'POST':
+            from datetime import datetime
+            now = datetime.now()
             category = data.get('category')
-            month = data.get('month', getattr(self.instance, 'month', None))
-            year = data.get('year', getattr(self.instance, 'year', None))
-            
+            month = data.get('month') or now.month
+            year = data.get('year') or now.year
+
             if Budget.objects.filter(user=request.user, category=category, month=month, year=year).exists():
-                raise serializers.ValidationError("A budget for this category already exists for this month.")
+                raise serializers.ValidationError(
+                    f"A budget for {category.name} already exists for {now.strftime('%B %Y')}."
+                )
         return data

@@ -1,5 +1,14 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Legal",
+  description: "PocketFlow legal documents — Terms of Service, Privacy Policy, and Cookie Policy.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function LegalLayout({
   children,
@@ -12,13 +21,13 @@ export default function LegalLayout({
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
+            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all group italic"
           >
-            <ArrowLeft className="size-4 group-hover:-translate-x-0.5 transition-transform" />
-            Back to Home
+            <span className="group-hover:-translate-x-1 transition-transform">[BACK]</span>
+            Home
           </Link>
-          <div className="text-sm font-display font-bold uppercase tracking-tighter">
-            Expense Tracker
+          <div className="text-sm font-black uppercase tracking-tighter">
+            PocketFlow
           </div>
         </div>
       </nav>
@@ -27,7 +36,7 @@ export default function LegalLayout({
           {children}
         </div>
         <footer className="mt-24 pt-8 border-t border-border/40 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Expense Tracker. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} PocketFlow. All rights reserved.</p>
         </footer>
       </main>
     </div>

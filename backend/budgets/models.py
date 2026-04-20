@@ -22,12 +22,16 @@ class Budget(models.Model):
 
     class Meta:
         unique_together = ('user', 'category', 'month', 'year')
+        indexes = [
+            models.Index(fields=['user', 'month', 'year']),
+            models.Index(fields=['user', 'category']),
+        ]
 
     def __str__(self):
         return f"{self.category.name} Budget - {self.month}/{self.year}"
 
-    @property
-    def spent_amount(self):
+    def spent_amount_calc(self):
+        """Fallback single-budget spent calculation (not used in list view)."""
         from expenses.models import Expense
         from django.db.models import Sum
         expenses = Expense.objects.filter(

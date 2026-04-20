@@ -36,8 +36,8 @@ export default function RegisterPage() {
         password_confirm
       });
 
-      // Auto-login after successful registration
-      login(response.data.access, response.data.refresh, response.data.user);
+      // Auto-login after successful registration (cookies set by backend)
+      login(response.data.user);
       toast.success("Account created successfully!");
     } catch (error: any) {
       const errData = error.response?.data;

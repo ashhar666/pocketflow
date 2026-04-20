@@ -62,10 +62,10 @@ export function Footer() {
         <div className="w-full text-center py-20 overflow-hidden select-none border-t border-border/50">
           <div className="flex flex-col items-center justify-center leading-[0.75]">
             <span className="text-[22vw] md:text-[20vw] font-black tracking-tighter text-foreground uppercase opacity-10">
-              Expense
+              Pocket
             </span>
             <span className="text-[22vw] md:text-[20vw] font-black tracking-tighter text-foreground uppercase opacity-10">
-              Tracker
+              Flow
             </span>
           </div>
         </div>
@@ -73,7 +73,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-tight">Expense Tracker</span>
+            <span className="text-xl font-bold tracking-tight">PocketFlow</span>
             <span className="text-xs text-muted-foreground">© 2026. All rights reserved.</span>
           </div>
           

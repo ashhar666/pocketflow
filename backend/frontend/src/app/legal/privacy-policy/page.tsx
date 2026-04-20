@@ -1,4 +1,12 @@
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Read PocketFlow's Privacy Policy. Learn how we collect, use, and protect your personal and financial data.",
+};
+
+
 
 export default function PrivacyPolicyPage() {
   return (
@@ -15,10 +23,10 @@ export default function PrivacyPolicyPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-display font-bold">1. Introduction</h2>
         <p className="leading-relaxed">
-          Welcome to Expense Tracker (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to
+          Welcome to PocketFlow (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to
           protecting your personal information and your right to privacy. This
           Privacy Policy explains how we collect, use, and safeguard your data
-          when you use our Expense Tracker application.
+          when you use our PocketFlow application.
         </p>
       </section>
 
@@ -82,7 +90,7 @@ export default function PrivacyPolicyPage() {
           us at:
           <br />
           <span className="font-bold text-foreground underline font-mono">
-            support@expensetracker.com
+            support@pocketflow.com
           </span>
         </p>
       </section>

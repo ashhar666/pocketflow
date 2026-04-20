@@ -1,69 +1,92 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const faqs = [
   {
-    question: "Is my financial data safe with Expense Tracker?",
-    answer: "Absolutely. We use bank-grade AES-256 encryption to protect your data both at rest and in transit. Your security is our highest priority, and we never have access to your raw password or unencrypted financial details.",
+    question: "How do I log expenses with the Telegram bot?",
+    answer: "Getting started is simple. Just link your account to @PaisaTrackerBot. From there, you can send a text message (e.g., 'Lunch 150') or even a photo of your receipt. The bot instantly syncs with your dashboard.",
   },
   {
-    question: "Who can see my expense data?",
-    answer: "Only you. Your data is private and tied to your account. We do not sell, share, or rent your personal or financial information to third parties. Our team can only access aggregated, anonymized data for system performance monitoring.",
+    question: "Is my financial data secure?",
+    answer: "Absolutely. We employ bank-grade AES-256 encryption. Your security is our highest priority, utilizing a secure architecture that ensures only you have access to your personal financial intelligence.",
   },
   {
-    question: "Can I export my data for tax purposes?",
-    answer: "Yes! You can export all your transactions, budgets, and savings data in CSV or Excel formats at any time. This makes it incredibly easy to share with your accountant or import into tax preparation software.",
+    question: "How does the multi-currency conversion work?",
+    answer: "We support over 150 global currencies. When you log an expense in a foreign currency, the system automatically fetches the real-time exchange rate and converts it to your primary base currency for accurate tracking.",
   },
   {
-    question: "Is there a mobile app available?",
-    answer: "Expense Tracker is built as a Progressive Web App (PWA), meaning it works perfectly on all mobile browsers and can be 'installed' on your home screen for a native app experience on both iOS and Android.",
+    question: "Can I export my data for accounting?",
+    answer: "Yes. You can export all your transactions and analytics in CSV or Excel formats at any time. This allows for seamless integration with professional tax preparation software or personal accounting workflows.",
   },
   {
-    question: "Do you support multiple currencies?",
-    answer: "Yes, we support over 150+ currencies. You can set a primary currency for your dashboard and track individual expenses in different currencies, with automatic conversion based on real-time exchange rates.",
+    question: "Is there a monthly subscription fee?",
+    answer: "We offer a flexible range of options, from a powerful free tier to professional accounts for high-velocity wealth management. Check our console for the latest plan details.",
   },
 ];
 
 export const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const shouldReduceMotion = useReducedMotion()
 
   return (
-    <section className="pt-16 pb-32 bg-[#030303]">
-      <div className="max-w-4xl mx-auto px-6">
-        <div className="text-center mb-16 space-y-4">
-          <h2 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter uppercase italic">
-            Common Questions
-          </h2>
-          <p className="text-muted-foreground font-medium max-w-xl mx-auto">
-            Everything you need to know about building your wealth with Expense Tracker.
-          </p>
+    <section className="py-16 bg-background relative overflow-hidden border-t border-border/10 transition-colors duration-400">
+      {/* Decorative Aurora Blob */}
+      <div className="aurora-bg !opacity-5 dark:!opacity-10">
+        <div className="aurora-blob w-[600px] h-[600px] bg-emerald-600/5 right-0 top-1/2 -translate-y-1/2" />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 relative z-10">
+        <div className="text-center mb-12">
+          <motion.h2 
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-6xl font-black text-foreground tracking-tighter uppercase italic mb-8"
+          >
+            Essential <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-zinc-500">Q&A</span>
+          </motion.h2>
+          <motion.p 
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-zinc-500 font-medium max-w-xl mx-auto text-sm uppercase tracking-[0.2em] leading-relaxed"
+          >
+            Everything you need to know about the system architecture and financial management protocols.
+          </motion.p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
-              initial={{ filter: 'blur(12px)', opacity: 0 }}
+              initial={shouldReduceMotion ? { opacity: 1 } : { filter: 'blur(12px)', opacity: 0 }}
               whileInView={{ filter: 'blur(0px)', opacity: 1 }}
-              className={`border border-white/5 rounded-[2rem] overflow-hidden transition-all duration-500 ${
-                openIndex === index ? "bg-white/[0.03] border-white/10" : "bg-transparent hover:bg-white/[0.01]"
+              transition={{ delay: index * 0.1 }}
+              className={`glass-card overflow-hidden transition-all duration-700 bg-white/[0.02] border border-white/5 ${
+                openIndex === index ? "bg-emerald-500/[0.03] border-emerald-500/20" : "hover:bg-white/[0.05]"
               }`}
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-8 py-6 flex items-center justify-between text-left group"
+                className="w-full px-10 py-8 flex items-center justify-between text-left group"
               >
-                <span className="text-xl font-black text-zinc-400 group-hover:text-white transition-colors uppercase tracking-tight italic">
+                <span className={cn(
+                  "text-xl font-black uppercase tracking-tight italic transition-colors duration-500",
+                  openIndex === index ? "text-emerald-500" : "text-zinc-500 group-hover:text-zinc-300"
+                )}>
                   {faq.question}
                 </span>
-                <ChevronDown
-                  className={`size-5 text-muted-foreground transition-transform duration-300 ${
-                    openIndex === index ? "rotate-180 text-foreground" : ""
-                  }`}
-                />
+                <span className={cn(
+                  "text-[10px] font-black italic transition-transform duration-500 text-zinc-600",
+                  openIndex === index ? "rotate-90 text-emerald-500" : ""
+                )}>
+                  {openIndex === index ? "[-]" : "[+]"}
+                </span>
               </button>
 
               <AnimatePresence initial={false}>
@@ -72,9 +95,9 @@ export const FAQSection = () => {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <div className="px-10 pb-10 text-zinc-500 leading-relaxed font-medium">
+                    <div className="px-10 pb-10 text-zinc-400 leading-relaxed font-semibold text-base max-w-3xl uppercase tracking-widest">
                       {faq.answer}
                     </div>
                   </motion.div>
@@ -84,16 +107,21 @@ export const FAQSection = () => {
           ))}
         </div>
         
-        <div className="mt-20 p-12 bg-white/[0.02] rounded-[3rem] border border-white/5 text-center relative overflow-hidden group">
-            <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl -z-10" />
-            <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs mb-6">Unanswered Queries?</p>
+        <motion.div 
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="mt-24 p-16 glass-card text-center relative overflow-hidden group bg-white/[0.02] border border-white/5 rounded-[3rem]"
+        >
+            <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 blur-3xl -z-10" />
+            <div className="text-[40px] font-black text-emerald-500/10 mx-auto mb-8 uppercase italic tracking-tighter">SUPPORT.SYS</div>
+            <p className="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px] mb-8 italic">Complex Requirements?</p>
             <a 
                 href="mailto:support@expensetracker.com"
-                className="inline-flex h-14 items-center justify-center rounded-2xl bg-white px-10 text-sm font-black text-black shadow-2xl shadow-white/5 hover:bg-zinc-200 transition-all uppercase tracking-[0.2em]"
+                className="inline-flex h-16 items-center justify-center rounded-2xl bg-emerald-600 px-12 text-xs font-black text-white hover:bg-emerald-500 transition-all uppercase tracking-[0.3em] italic shadow-[0_0_30px_rgba(16,185,129,0.2)]"
             >
                 Contact Command
             </a>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

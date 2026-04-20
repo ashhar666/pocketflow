@@ -14,6 +14,10 @@ class SavingsGoal(models.Model):
 
     class Meta:
         ordering = ['deadline', 'created_at']
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['user', 'deadline']),
+        ]
 
     def __str__(self):
         return f"{self.title} - {self.current_amount}/{self.target_amount}"

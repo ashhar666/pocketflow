@@ -1,14 +1,23 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { AuthPage } from '@/components/ui/auth-page';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,7 +33,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const response = await api.post('/auth/login/', { email, password });
-      login(response.data.access, response.data.refresh, response.data.user);
+      login(response.data.user);
     } catch (error: any) {
       console.error("Login Error:", error.response?.data || error.message);
       const detailMsg = error.response?.data?.detail;
@@ -39,7 +48,7 @@ export default function LoginPage() {
       mode="login"
       onSubmit={handleLogin}
       isLoading={isLoading}
-      heroImageSrc="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=2160&q=80" // Coins/Growth theme
+      heroImageSrc="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=2160&q=80"
     />
   );
 }

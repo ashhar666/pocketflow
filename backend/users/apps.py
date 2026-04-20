@@ -6,7 +6,7 @@ class UsersConfig(AppConfig):
 
     def ready(self):
         import users.signals
-        
+
         # Enable WAL mode for SQLite to prevent locking issues
         from django.db import connection
         from django.db.backends.signals import connection_created
@@ -18,3 +18,4 @@ class UsersConfig(AppConfig):
                 with connection.cursor() as cursor:
                     cursor.execute('PRAGMA journal_mode=WAL;')
                     cursor.execute('PRAGMA synchronous=NORMAL;')
+                    cursor.execute('PRAGMA busy_timeout=30000;')

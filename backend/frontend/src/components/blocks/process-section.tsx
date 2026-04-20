@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { ContainerScroll, CardSticky } from "@/components/ui/cards-stack"
 
 const PROCESS_PHASES = [
@@ -8,57 +8,80 @@ const PROCESS_PHASES = [
     id: "process-1",
     title: "Account Setup",
     description:
-      "Join the community by creating a secure account. Set your currency preferences (₹) and configure your profile to start your wealth journey with bank-level encryption.",
+      "Join the elite community by creating a secure account. Configure your profile with bank-level encryption and custom currency preferences.",
   },
   {
     id: "process-2",
-    title: "Expense Tracking",
+    title: "Expense Protocol",
     description:
-      "Effortlessly log your daily spending. Categorize transactions instantly to see exactly where your money goes. No more manual spreadsheets—just real-time tracking.",
+      "Effortlessly log every transaction. Our zero-latency engine categorizes spending instantly, giving you a real-time view of your capital dispersion.",
   },
   {
     id: "process-3",
     title: "Budget Mastery",
     description:
-      "Take control by setting smart budget limits for groceries, entertainment, and more. Receive notifications as you approach your limits to prevent overspending before it happens.",
+      "Take command by setting intelligent budget limits. Receive instant alerts as you approach thresholds, preventing unauthorized capital leaks.",
   },
   {
     id: "process-4",
-    title: "Savings Goals",
+    title: "Savings Velocity",
     description:
-      "Define your dreams. Whether it's a new car, a home, or retirement, create dedicated savings buckets and watch your progress grow as you consistently hit your targets.",
+      "Accelerate your journey to legacy. Create dedicated growth milestones and track your progress with high-precision instruments.",
   },
   {
     id: "process-5",
-    title: "Wealth Reports",
+    title: "Wealth Insights",
     description:
-      "Unlock deep insights with automated financial reports. Our beautiful charts help you identify long-term trends and optimize your path to true financial freedom.",
+      "Unlock deep data visualizations. Our automated reports transform raw financial data into actionable strategies for true freedom.",
   },
 ]
 
 export const ProcessSection = () => {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
-    <div id="process" className="container min-h-svh place-content-center bg-[#030303] px-6 text-white xl:px-12 py-32">
-      <div className="grid md:grid-cols-2 md:gap-8 xl:gap-12 relative">
+    <div id="process" className="container min-h-svh place-content-center bg-[#030303] px-6 text-white xl:px-12 py-32 relative overflow-hidden">
+      {/* Decorative Aurora Blob */}
+      <div className="aurora-bg !opacity-10 dark:!opacity-20">
+        <div className="aurora-blob w-[800px] h-[800px] bg-indigo-600/20 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+      </div>
+
+      <div className="grid md:grid-cols-2 md:gap-8 xl:gap-12 relative z-10">
         <div className="left-0 top-0 md:sticky md:h-svh md:py-12 flex flex-col justify-center">
-          <h5 className="text-[10px] uppercase font-black tracking-[0.2em] text-zinc-500 mb-6 italic">Engineering Progress</h5>
-          <h2 className="mb-8 text-5xl lg:text-[5.5rem] font-black tracking-tighter uppercase italic leading-none">
+          <motion.h5 
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            className="text-[10px] uppercase font-black tracking-[0.2em] text-zinc-500 mb-6 italic"
+          >
+            Engineering Progress
+          </motion.h5>
+          <motion.h2 
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8 text-5xl lg:text-[5.5rem] font-black tracking-tighter uppercase italic leading-none"
+          >
             Absolute <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500">Wealth Control</span>
-          </h2>
-          <p className="max-w-prose text-lg text-zinc-500 leading-relaxed font-medium">
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">Wealth Control</span>
+          </motion.h2>
+          <motion.p 
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="max-w-prose text-lg text-zinc-500 leading-relaxed font-medium"
+          >
             A systematic architecture ensures every asset is accounted for. Guide your capital 
             from inception to legacy with mathematical clarity.
-          </p>
+          </motion.p>
         </div>
         <ContainerScroll className="min-h-[400vh] space-y-12 py-12">
           {PROCESS_PHASES.map((phase, index) => (
             <CardSticky
               key={phase.id}
               index={index + 1}
-              incrementY={60}
-              incrementZ={10}
-              className="rounded-[2.5rem] border border-white/5 p-12 md:p-16 shadow-[0_0_50px_-12px_rgba(255,255,255,0.1)] backdrop-blur-3xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors duration-500"
+              incrementY={shouldReduceMotion ? 0 : 60}
+              incrementZ={shouldReduceMotion ? 0 : 10}
+              className="glass-card p-12 md:p-16 hover:bg-white/[0.04] transition-colors duration-500"
             >
               <div className="flex items-center justify-between gap-4 mb-8 text-white">
                 <h2 className="text-4xl font-black tracking-tighter uppercase italic">

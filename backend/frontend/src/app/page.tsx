@@ -1,21 +1,22 @@
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { HeroSection } from '@/components/blocks/hero-section-1';
-import { ProcessSection } from '@/components/blocks/process-section';
-import { FeaturesSection } from '@/components/blocks/features-section';
-
+import { FeatureCardsSection } from '@/components/blocks/feature-cards-section';
+import { HowItWorksSimple } from '@/components/blocks/how-it-works-simple';
+import { TestimonialsSection } from '@/components/blocks/testimonials-section';
 import { FAQSection } from '@/components/blocks/faq-section';
-import { CTASection } from '@/components/blocks/cta-section';
+import { Footer } from '@/components/blocks/footer';
 
 export default function Home() {
   return (
-    <main className="flex flex-col min-h-screen">
-      <div className="flex-grow">
-        <HeroSection />
-        <ProcessSection />
-        <FeaturesSection />
+    <main className="flex flex-col min-h-screen relative">
 
-        <FAQSection />
-        <CTASection />
-      </div>
+
+      <HeroSection />
+      <FeatureCardsSection />
+      <HowItWorksSimple />
+      <TestimonialsSection />
+      <FAQSection />
+      <Footer />
     </main>
   );
 }

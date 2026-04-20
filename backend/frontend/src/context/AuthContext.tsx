@@ -1,10 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import Cookies from 'js-cookie';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import api from '../lib/api';
 import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 interface User {
   id: number;
@@ -18,10 +21,27 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (access: string, refresh: string, userData: User) => void;
+  login: (userData: User) => void;
   logout: () => void;
-  checkAuth: () => void;
+  updateUser: (userData: Partial<User>) => void;
 }
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+// Pages that do NOT require authentication.
+const PUBLIC_ROUTES = new Set([
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+]);
+
+// ---------------------------------------------------------------------------
+// Context
+// ---------------------------------------------------------------------------
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -29,95 +49,83 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: () => { },
   logout: () => { },
-  checkAuth: () => { },
+  updateUser: () => { },
 });
 
-const publicRoutes = ['/login', '/register', '/'];
+// ---------------------------------------------------------------------------
+// Provider
+// ---------------------------------------------------------------------------
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleUnauthenticated = useCallback(() => {
-    setUser(null);
-    setIsAuthenticated(false);
-    if (!publicRoutes.includes(pathname)) {
-      router.push('/login');
-    }
-  }, [pathname, router]);
+  // Track whether the initial auth check has completed.
+  const authInitialized = useRef(false);
 
-  const checkAuth = useCallback(async () => {
-    try {
+  // ── Initial auth check (runs ONCE on mount) ────────────────────────────────
+  useEffect(() => {
+    if (authInitialized.current) return;
+
+    const runCheck = async () => {
       setIsLoading(true);
-      const token = Cookies.get('access_token');
-      const refreshToken = Cookies.get('refresh_token');
-
-      if (!token) {
-        if (refreshToken) {
-          try {
-            // Attempt a silent refresh if access token is missing but refresh token exists
-            const { data } = await api.post('/auth/token/refresh/', {
-              refresh: refreshToken
-            });
-            const newAccessToken = data.access;
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            Cookies.set('access_token', newAccessToken, { secure: !isLocal, sameSite: 'strict', expires: 1 / 24 });
-            // Successfully refreshed, now fetch profile
-          } catch (refreshError) {
-            console.error('Silent refresh failed', refreshError);
-            handleUnauthenticated();
-            return;
-          }
-        } else {
-          handleUnauthenticated();
-          return;
-        }
+      try {
+        // Backend sets HTTP-only cookies automatically.
+        // Just fetch profile — if cookies exist, the request is authenticated.
+        const { data } = await api.get('/auth/profile/');
+        setUser(data);
+        setIsAuthenticated(true);
+      } catch {
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+        authInitialized.current = true;
       }
+    };
 
-      const response = await api.get('/auth/profile/');
-      setUser(response.data);
-      setIsAuthenticated(true);
+    runCheck();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      if (publicRoutes.includes(pathname)) {
+  // ── Navigation guard (runs AFTER auth is initialized) ──────────────────────
+  useEffect(() => {
+    if (!authInitialized.current) return;
+    if (isLoading) return;
+
+    if (isAuthenticated) {
+      if (pathname === '/login' || pathname === '/register') {
         router.push('/dashboard');
       }
-    } catch (error) {
-      console.error('Auth verification failed', error);
-      handleUnauthenticated();
-    } finally {
-      setIsLoading(false);
+      return;
     }
-  }, [handleUnauthenticated, pathname, router]);
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    if (PUBLIC_ROUTES.has(pathname)) return;
 
-  const login = (access: string, refresh: string, userData: User) => {
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    Cookies.set('access_token', access, { secure: !isLocal, sameSite: 'strict', expires: 1 / 24 }); // 1 hour
-    Cookies.set('refresh_token', refresh, { secure: !isLocal, sameSite: 'strict', expires: 7 }); // 7 days
+    router.push('/login');
+  }, [pathname, isAuthenticated, isLoading, router]);
 
+  // ── Login ─────────────────────────────────────────────────────────────────
+  // Backend sets HTTP-only cookies automatically — we just store user state.
+  const login = (userData: User) => {
     setUser(userData);
     setIsAuthenticated(true);
-    toast.success(`Welcome back!`);
+    toast.success('Welcome!');
     router.push('/dashboard');
   };
 
+  // ── Logout ────────────────────────────────────────────────────────────────
+  // Backend clears HTTP-only cookies automatically.
   const logout = async () => {
     try {
-      const refresh = Cookies.get('refresh_token');
-      if (refresh) {
-        await api.post('/auth/logout/', { refresh });
-      }
+      await api.post('/auth/logout/');
     } catch (error) {
-      console.error('Logout failed on the backend', error);
+      console.error('Logout backend call failed:', error);
     } finally {
-      Cookies.remove('access_token');
-      Cookies.remove('refresh_token');
       setUser(null);
       setIsAuthenticated(false);
       toast.success('Logged out successfully');
@@ -125,8 +133,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // ── Update User ──────────────────────────────────────────────────────────
+  const updateUser = (userData: Partial<User>) => {
+    setUser(prev => prev ? { ...prev, ...userData } : null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

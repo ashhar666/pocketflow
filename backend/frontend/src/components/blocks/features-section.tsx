@@ -1,13 +1,4 @@
 import React from 'react'
-import { 
-  ShieldCheck, 
-  BarChart3, 
-  Target, 
-  Wallet, 
-  Zap,
-  TrendingUp,
-  Fingerprint
-} from 'lucide-react'
 import { StickyScroll } from '@/components/ui/sticky-scroll'
 
 const content = [
@@ -15,8 +6,8 @@ const content = [
     title: "Elite Budgeting",
     description: "The most sophisticated expenditure engine ever conceived. Rule your cashflow with algorithmic precision and a zero-latency interface designed for performance.",
     content: (
-      <div className="h-full w-full bg-[linear-gradient(to_bottom_right,var(--cyan-500),var(--emerald-500))] flex items-center justify-center text-white p-8">
-        <Wallet className="size-24" />
+      <div className="h-full w-full bg-[linear-gradient(to_bottom_right,var(--cyan-500),var(--emerald-500))] flex items-center justify-center text-white p-8 font-black text-6xl italic">
+        WLT
       </div>
     ),
   },
@@ -24,8 +15,8 @@ const content = [
     title: "Legacy Goals",
     description: "Multi-generational wealth tracking. Define your milestones and let our prediction engine calculate the exact velocity required to reach them.",
     content: (
-      <div className="h-full w-full  flex items-center justify-center text-white p-8 bg-[linear-gradient(to_bottom_right,var(--blue-500),var(--violet-500))]">
-         <Target className="size-24" />
+      <div className="h-full w-full  flex items-center justify-center text-white p-8 bg-[linear-gradient(to_bottom_right,var(--blue-500),var(--violet-500))] font-black text-6xl italic">
+         TGT
       </div>
     ),
   },
@@ -33,8 +24,8 @@ const content = [
     title: "Zero-Knowledge Privacy",
     description: "Your financial fingerprints stay yours. Military-grade encryption ensures that your legacy is secured behind a fortress of mathematical certainty.",
     content: (
-      <div className="h-full w-full bg-[linear-gradient(to_bottom_right,var(--orange-500),var(--yellow-500))] flex items-center justify-center text-white p-8">
-        <Fingerprint className="size-24" />
+      <div className="h-full w-full bg-[linear-gradient(to_bottom_right,var(--orange-500),var(--yellow-500))] flex items-center justify-center text-white p-8 font-black text-6xl italic">
+        FPR
       </div>
     ),
   },
@@ -42,8 +33,8 @@ const content = [
     title: "Predictive Analytics",
     description: "See the future before it settles. Our visual insights transform raw chaos into actionable strategies for wealth expansion.",
     content: (
-      <div className="h-full w-full bg-[linear-gradient(to_bottom_right,var(--purple-500),var(--pink-500))] flex items-center justify-center text-white p-8">
-        <BarChart3 className="size-24" />
+      <div className="h-full w-full bg-[linear-gradient(to_bottom_right,var(--purple-500),var(--pink-500))] flex items-center justify-center text-white p-8 font-black text-6xl italic">
+        CRT
       </div>
     ),
   },

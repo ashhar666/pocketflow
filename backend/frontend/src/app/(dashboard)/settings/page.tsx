@@ -1,246 +1,131 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+
+// Specialized Modules
+import ProfileSettings from '@/components/settings/ProfileSettings';
+import SecuritySettings from '@/components/settings/SecuritySettings';
+import AppearanceSettings from '@/components/settings/AppearanceSettings';
+import DangerZone from '@/components/settings/DangerZone';
+import TelegramConnect from '@/components/settings/TelegramConnect';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/api';
-import toast from 'react-hot-toast';
-import { UserCog, Fingerprint, Eye, ShieldAlert, Moon, Sun, Settings as SettingsIcon, Trash2 } from 'lucide-react';
+import { User, Shield, Link2, Monitor, Trash2 } from 'lucide-react';
+
+const SECTIONS = [
+  { id: 'profile', label: 'Profile Settings', color: 'emerald', icon: User },
+  { id: 'security', label: 'Security', color: 'indigo', icon: Shield },
+  { id: 'integrations', label: 'Integrations', color: 'blue', icon: Link2 },
+  { id: 'interface', label: 'Appearance', color: 'zinc', icon: Monitor },
+  { id: 'danger', label: 'Delete Account', color: 'red', icon: Trash2 },
+];
 
 export default function SettingsPage() {
-  const { user, login } = useAuth();
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [activeTab, setActiveTab] = useState('profile');
 
-
-  const [profileData, setProfileData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    username: ''
-  });
-
-  const [passwordData, setPasswordData] = useState({
-    old_password: '',
-    new_password: '',
-  });
-
-  useEffect(() => {
-    if (user) {
-      setProfileData({
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        email: user.email || '',
-        username: user.username || ''
-      });
-    }
-
-    if (typeof document !== 'undefined') {
-      setIsDarkMode(document.documentElement.classList.contains('dark'));
-    }
-  }, [user]);
-
-  const toggleDarkMode = () => {
-    const isDark = document.documentElement.classList.toggle('dark');
-    setIsDarkMode(isDark);
-    if (!isDark) {
-      toast('Light mode is experimental!', { icon: '☀️' });
-    }
-  };
-
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setProfileLoading(true);
-    try {
-      const res = await api.put('/auth/profile/', profileData);
-      toast.success('Profile updated successfully');
-      // Update global context by tricking login or reloading auth
-      // Since our context doesn't expose setUser directly, we might need a refresh logic.
-      // For now, reload window is a cheap way, but let's just show toast.
-    } catch (error: any) {
-      toast.error('Failed to update profile');
-    } finally {
-      setProfileLoading(false);
-    }
-  };
-
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPasswordLoading(true);
-    try {
-      await api.put('/auth/change-password/', passwordData);
-      toast.success('Password changed successfully');
-      setPasswordData({ old_password: '', new_password: '' });
-    } catch (error: any) {
-      toast.error(error.response?.data?.old_password?.[0] || 'Failed to change password');
-    } finally {
-      setPasswordLoading(false);
+  // Sync scroll with navigation if needed, but for this redesign 
+  // we'll use a tab-like interface for a more "focused" feel.
+  
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'profile': return <ProfileSettings />;
+      case 'security': return <SecuritySettings />;
+      case 'integrations': return (
+        <Card glass className="relative overflow-hidden group border-white/5 transition-all duration-500">
+          <div className="flex items-center gap-4 mb-10 relative z-10">
+            <div className="size-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.1)] font-black italic text-[10px]">
+              ...
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-foreground uppercase italic tracking-tighter">Integrations</h2>
+              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 italic">Connected Services</p>
+            </div>
+          </div>
+          <TelegramConnect />
+        </Card>
+      );
+      case 'interface': return <AppearanceSettings />;
+      case 'danger': return <DangerZone />;
+      default: return <ProfileSettings />;
     }
   };
 
   return (
-    <div className="space-y-12">
-      <div className="flex flex-col sm:flex-row justify-between items-end gap-6 pb-8 border-b border-black/5 dark:border-white/5">
+    <div className="min-h-screen pb-20">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-end gap-6 pb-12">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            Settings
+          <div className="flex items-center gap-2 text-emerald-500 mb-2">
+            <div className="size-4 border border-emerald-500/20 rounded flex items-center justify-center bg-emerald-500/5 font-black italic text-[8px]">Set</div>
+            <span className="text-[10px] font-black uppercase tracking-widest italic">App Preferences</span>
+          </div>
+          <h1 className="text-4xl font-black tracking-tighter text-foreground uppercase italic">
+            App <span className="text-emerald-500">Settings</span>
           </h1>
-          <p className="text-zinc-500 text-sm font-medium">
-            Manage your account preferences and security
+          <p className="text-zinc-500 text-sm font-medium italic">
+            Manage your profile, security, and appearance preferences.
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-        {/* Navigation/Sidebar */}
-        <div className="lg:col-span-1 space-y-2">
-            <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic mb-4 px-4">Menu / Modules</h5>
-            <button className="w-full text-left px-5 py-3 bg-emerald-500/10 text-emerald-500 rounded-xl font-black uppercase italic tracking-wider text-xs border border-emerald-500/20 transition-all">
-              Identity Profile
-            </button>
-             <button className="w-full text-left px-5 py-3 bg-black/5 dark:bg-white/5 text-zinc-500 hover:text-foreground rounded-xl font-black uppercase italic tracking-wider text-xs border border-transparent hover:border-black/5 dark:hover:border-white/5 transition-all">
-              Security Matrix
-            </button>
-            <button className="w-full text-left px-5 py-3 text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground rounded-xl font-black uppercase italic tracking-wider text-xs border border-transparent transition-all">
-              Interface Sync
-            </button>
-            <button className="w-full text-left px-5 py-3 text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground rounded-xl font-black uppercase italic tracking-wider text-xs border border-transparent transition-all">
-              Protocol Exports
-            </button>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8">
+        {/* Floating Rail Navigation */}
+        <div className="lg:col-span-3">
+          <div className="sticky top-24 space-y-2">
+            <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic mb-4 px-4 flex items-center gap-2">
+              Menu
+            </h5>
+            <div className="flex flex-col gap-2">
+              {SECTIONS.map((section) => {
+                const Icon = section.icon;
+                const isActive = activeTab === section.id;
+                
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveTab(section.id)}
+                    className={`
+                      group relative overflow-hidden flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-300
+                      ${isActive 
+                        ? 'bg-emerald-500/10 text-emerald-500 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.2)]' 
+                        : 'bg-black/5 dark:bg-white/[0.02] text-zinc-500 hover:text-foreground hover:bg-black/10 dark:hover:bg-white/[0.05]'}
+                    `}
+                  >
+                    <div className="flex items-center gap-4 relative z-10">
+                      <span className={`text-xs font-black uppercase italic tracking-wider transition-all ${isActive ? 'translate-x-1' : ''}`}>
+                        {section.label}
+                      </span>
+                    </div>
+
+                    
+                    {/* Active Background Glow */}
+                    {isActive && (
+                      <motion.div 
+                        layoutId="nav-bg"
+                        className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent pointer-events-none"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="lg:col-span-3 space-y-12">
-          
-          <Card glass className="relative overflow-hidden group border-white/5 transition-all duration-500">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-              <UserCog className="size-24" />
-            </div>
-            
-            <div className="flex items-center gap-4 mb-10 relative z-10">
-              <div className="size-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-                <UserCog className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-black text-foreground uppercase italic tracking-tighter">Identity Core</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 italic">Primary User Attributes</p>
-              </div>
-            </div>
-            
-            <form onSubmit={handleProfileUpdate} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Input 
-                  label="Registry / First Name" 
-                  value={profileData.first_name}
-                  onChange={e => setProfileData({...profileData, first_name: e.target.value})}
-                />
-                <Input 
-                  label="Registry / Last Name" 
-                  value={profileData.last_name}
-                  onChange={e => setProfileData({...profileData, last_name: e.target.value})}
-                />
-              </div>
-              <Input 
-                label="System / Email Address" 
-                type="email"
-                value={profileData.email}
-                onChange={e => setProfileData({...profileData, email: e.target.value})}
-                disabled
-                className="opacity-40 cursor-not-allowed bg-black/5 dark:bg-zinc-900/20"
-              />
-              <Input 
-                label="Authentication / Username" 
-                value={profileData.username}
-                onChange={e => setProfileData({...profileData, username: e.target.value})}
-              />
-              <div className="pt-4 flex justify-end">
-                <Button variant="emerald" size="lg" type="submit" isLoading={profileLoading}>Update Profile</Button>
-              </div>
-            </form>
-          </Card>
-
-          <Card glass className="relative overflow-hidden group border-white/5 transition-all duration-500">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Fingerprint className="size-24" />
-            </div>
-
-            <div className="flex items-center gap-4 mb-10 relative z-10">
-              <div className="size-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 border border-indigo-500/20 shadow-[0_0_10px_rgba(79,70,229,0.1)]">
-                <Fingerprint className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-black text-foreground uppercase italic tracking-tighter">Access Matrix</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 italic">Security Protocol Rotation</p>
-              </div>
-            </div>
-            
-            <form onSubmit={handlePasswordUpdate} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Input 
-                  label="Current Cipher" 
-                  type="password"
-                  value={passwordData.old_password}
-                  onChange={e => setPasswordData({...passwordData, old_password: e.target.value})}
-                  required
-                />
-                <Input 
-                  label="New Cipher Sequence" 
-                  type="password"
-                  value={passwordData.new_password}
-                  onChange={e => setPasswordData({...passwordData, new_password: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="pt-4 flex justify-end">
-                <Button variant="indigo" size="lg" type="submit" isLoading={passwordLoading}>Update Password</Button>
-              </div>
-            </form>
-          </Card>
-
-          <Card glass className="relative overflow-hidden group border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-zinc-900/10 transition-colors hover:bg-black/[0.05] dark:hover:bg-zinc-900/20 duration-500">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Eye className="size-24" />
-            </div>
-
-            <div className="flex items-center justify-between relative z-10">
-              <div className="flex items-center gap-4">
-                <div className="size-10 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-foreground border border-black/10 dark:border-white/10 shadow-inner">
-                  {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                </div>
-                <div>
-                  <h2 className="text-xl font-black text-foreground uppercase italic tracking-tighter">Optical Sync</h2>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 italic">Interface Luminance Control</p>
-                </div>
-              </div>
-              <Button variant="secondary" onClick={toggleDarkMode}>
-                {isDarkMode ? 'LIGHT MODE (LEGACY)' : 'NOIR MODE (ACTIVE)'}
-              </Button>
-            </div>
-          </Card>
-          
-          <Card glass className="relative overflow-hidden group border-red-500/10 bg-red-500/[0.02] transition-colors hover:bg-red-500/[0.05] duration-500">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-              <ShieldAlert className="size-24" />
-            </div>
-
-            <div className="flex items-center justify-between relative z-10">
-              <div className="flex items-center gap-4">
-                <div className="size-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
-                    <ShieldAlert className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-black text-red-500 uppercase italic tracking-tighter">Termination</h2>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 italic">Permanent Account Erasure</p>
-                </div>
-              </div>
-              <Button variant="danger" size="md" onClick={() => toast.error('PROTOCOL RESTRICTED: Contact Sovereign Support.')}>
-                Erasure
-              </Button>
-            </div>
-          </Card>
+        {/* Dynamic Content Core */}
+        <div className="lg:col-span-9">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: 20, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, x: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {renderContent()}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>

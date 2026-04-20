@@ -28,8 +28,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={`
-              w-full rounded-xl border bg-zinc-900/80 backdrop-blur-md border-white/10 px-3 py-1.5 text-sm text-white
-              transition-all duration-300 placeholder:text-zinc-500
+              w-full rounded-xl border bg-zinc-100/50 dark:bg-zinc-900/80 backdrop-blur-md border-black/10 dark:border-white/10 px-3 py-1.5 text-sm text-foreground
+              transition-all duration-300 placeholder:text-zinc-500 dark:placeholder:text-zinc-400
               focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/40
               ${error ? 'border-red-500/50 focus:ring-red-500/20 focus:border-red-500/30' : ''}
               ${leftIcon ? 'pl-12' : ''}

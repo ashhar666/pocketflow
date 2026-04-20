@@ -40,12 +40,26 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     # AbstractUser has a username field which we will relax by not requiring it for auth
     email = models.EmailField(unique=True, max_length=255)
-    
+
+    # Telegram integration fields
+    telegram_chat_id    = models.CharField(max_length=64,  null=True, blank=True, unique=True)
+    telegram_link_token = models.CharField(max_length=128, null=True, blank=True)
+    telegram_link_expiry = models.DateTimeField(null=True, blank=True)
+
+    # Dedicated password reset fields
+    password_reset_token = models.CharField(max_length=128, null=True, blank=True)
+    password_reset_expiry = models.DateTimeField(null=True, blank=True)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = UserManager()
 
+    class Meta(AbstractUser.Meta):
+        indexes = [
+            models.Index(fields=['email']),
+            models.Index(fields=['telegram_chat_id']),
+        ]
+
     def __str__(self):
         return self.email
-

@@ -1,4 +1,4 @@
-# Automated Setup and Run for Expense Tracker
+# Automated Setup and Run for PocketFlow
 $ROOT = $PSScriptRoot
 
 Write-Host "--- Starting Backend Setup ---" -ForegroundColor Cyan

@@ -2,56 +2,47 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Shield, 
-  Cpu, 
-  Globe, 
-  Zap, 
-  FileJson, 
-  Fingerprint,
-  ArrowUpRight
-} from 'lucide-react';
 
 const bentoItems = [
   {
     title: "Quantum Architecture",
     description: "Zero-latency data synchronization across global nodes. Built for high-velocity capital management.",
-    icon: Cpu,
+    icon: "CPU",
     className: "md:col-span-2 md:row-span-2 bg-white/[0.02]",
     delay: 0.1
   },
   {
     title: "Registry Core",
     description: "Military-grade RSA-4096 encryption for every transaction index.",
-    icon: Shield,
+    icon: "SHD",
     className: "md:col-span-1 md:row-span-1 bg-indigo-500/5 border-indigo-500/10",
     delay: 0.2
   },
   {
     title: "Global Liquidity",
     description: "Real-time exchange engine supporting 150+ fiat and digital assets.",
-    icon: Globe,
+    icon: "GLB",
     className: "md:col-span-1 md:row-span-2 bg-white/[0.02]",
     delay: 0.3
   },
   {
     title: "Identity Layer",
     description: "Biometric and passkey-based access for absolute account sovereignty.",
-    icon: Fingerprint,
+    icon: "FPR",
     className: "md:col-span-1 md:row-span-1 bg-white/[0.02]",
     delay: 0.4
   },
   {
     title: "Automated Intelligence",
     description: "Predictive neural networks for autonomous expense classification.",
-    icon: Zap,
+    icon: "ZAP",
     className: "md:col-span-1 md:row-span-1 bg-violet-500/5 border-violet-500/10",
     delay: 0.5
   },
   {
     title: "Manifest Exports",
     description: "Generate cryptographically signed financial statements in PDF or JSON.",
-    icon: FileJson,
+    icon: "DOC",
     className: "md:col-span-1 md:row-span-1 bg-white/[0.02]",
     delay: 0.6
   }
@@ -65,7 +56,7 @@ export const BentoGridSection = () => {
 
           <p className="max-w-md text-zinc-500 font-medium leading-relaxed">
             The foundation of a wealth engine is built on absolute reliability. 
-            Explore the core capabilities of the Expense Tracker ecosystem.
+            Explore the core capabilities of the PocketFlow ecosystem.
           </p>
         </div>
 
@@ -85,7 +76,7 @@ export const BentoGridSection = () => {
               <div className="h-full flex flex-col justify-between">
                 <div className="space-y-6">
                   <div className="size-12 bg-white rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
-                    <item.icon className="size-6 text-black" />
+                    <span className="text-xs font-black text-black italic">{item.icon}</span>
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-xl font-black text-white uppercase italic tracking-tight">{item.title}</h3>
@@ -95,7 +86,7 @@ export const BentoGridSection = () => {
 
                 <div className="mt-8 flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic">{String(index + 1).padStart(2, "0")} / SYST</span>
-                    <ArrowUpRight className="size-4 text-zinc-800 transition-all duration-500 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    <span className="text-xs font-black text-zinc-800 transition-all duration-500 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 italic">[&gt;]</span>
                 </div>
               </div>
 

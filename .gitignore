@@ -24,6 +24,13 @@ var/
 *.egg
 db.sqlite3
 db.sqlite3-journal
+db.sqlite3-shm
+db.sqlite3-wal
+
+# Environment variables (CRITICAL: never commit secrets)
+.env
+.env.*
+!.env.example
 
 # Node / React / Next.js
 node_modules/
@@ -37,7 +44,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-.env*.local
 
 # IDEs
 .vscode/
@@ -48,3 +54,92 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+logs/
+ngrok.log
+
+# Tunnel configs
+wh.json
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+db.sqlite3
+db.sqlite3-journal
+db.sqlite3-shm
+db.sqlite3-wal
+
+# Environment variables (CRITICAL: never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Node / React / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.vercel
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+ngrok.log
+
+# Tunnel configs
+wh.json
+
+# PDF test outputs
+report.pdf
+test_report.pdf
+test_income.pdf
+debug_export.pdf
+ 
+# Local Dev Tools
+*.exe
+*.zip
+diff.txt
+.qwen/
+backend/scratch/
+*.pdf
+*.json
+img/

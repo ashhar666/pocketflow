@@ -1,0 +1,15 @@
+# Robots.txt for PocketFlow
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://pocketflow.com/sitemap.xml
+
+# Disallow admin/private areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/settings/
+
+# Crawl-delay for politeness
+Crawl-delay: 1

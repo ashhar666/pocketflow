@@ -3,26 +3,30 @@
 import React from 'react';
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
+  label?: string;
   error?: string;
-  options: { value: string | number; label: string }[];
+  options?: { value: string | number; label: string }[];
+  children?: React.ReactNode;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className = '', label, error, options, id, ...props }, ref) => {
-    const selectId = id || label.toLowerCase().replace(/\s+/g, '-');
+  ({ className = '', label, error, options, id, children, ...props }, ref) => {
+    const generatedId = React.useId();
+    const selectId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : generatedId);
     
     return (
       <div className="w-full flex flex-col gap-0.5">
-        <label htmlFor={selectId} className="text-[10px] font-black uppercase tracking-tight text-zinc-500 group-focus-within:text-emerald-500 transition-colors italic px-1">
-          {label}
-        </label>
+        {label && (
+          <label htmlFor={selectId} className="text-[10px] font-black uppercase tracking-tight text-zinc-500 group-focus-within:text-emerald-500 transition-colors italic px-1">
+            {label}
+          </label>
+        )}
         <div className="relative group">
           <select
             id={selectId}
             ref={ref}
             className={`
-              w-full rounded-xl border bg-zinc-900/80 backdrop-blur-md border-white/10 px-3 py-1.5 text-sm text-white appearance-none
+              w-full rounded-xl border bg-zinc-100/50 dark:bg-zinc-900/80 backdrop-blur-md border-black/10 dark:border-white/10 px-3 py-1.5 text-sm text-foreground appearance-none
               transition-all duration-300
               focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/40
               ${error ? 'border-red-500/50 focus:ring-red-500/20 focus:border-red-500/30' : ''}
@@ -30,8 +34,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             `}
             {...props}
           >
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-slate-900 text-white">
+            {children || options?.map((opt) => (
+              <option key={opt.value} value={opt.value} className="bg-background text-foreground">
                 {opt.label}
               </option>
             ))}

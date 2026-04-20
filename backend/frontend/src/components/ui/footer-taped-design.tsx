@@ -1,8 +1,8 @@
 "use client"
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Target, ArrowUpRight, Mail, Globe, Shield, Terminal, Zap, Fingerprint } from 'lucide-react'
 
 export const Component = () => {
   const currentYear = new Date().getFullYear();
@@ -38,7 +38,7 @@ export const Component = () => {
           transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
           className="text-[25vw] font-black tracking-tighter text-white uppercase italic leading-none whitespace-nowrap"
         >
-          EXPENSETRACKER
+          POCKETFLOW
         </motion.span>
       </div>
 
@@ -59,7 +59,7 @@ export const Component = () => {
                   <li key={item}>
                     <Link href={`/${item.toLowerCase()}`} className="text-zinc-400 hover:text-white transition-all text-sm font-bold flex items-center group/link tracking-tight">
                       <span className="group-hover/link:translate-x-1 transition-transform duration-300">{item}</span>
-                      <ArrowUpRight className="size-3 ml-1 opacity-0 group-hover/link:opacity-100 transition-all duration-300" />
+                      <span className="ml-1 opacity-0 group-hover/link:opacity-100 transition-all duration-300 text-[10px] text-emerald-500 font-black italic">↗</span>
                     </Link>
                   </li>
                 ))}
@@ -82,11 +82,11 @@ export const Component = () => {
           {/* Centered Brand Column */}
           <motion.div variants={itemVariants} className="lg:col-span-1 flex flex-col items-center justify-center space-y-8 order-1 lg:order-2 px-8 py-12 bg-white/[0.01] border border-white/5 rounded-[3rem] backdrop-blur-3xl shadow-2xl relative group">
             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl -z-10 rounded-[3rem]" />
-            <div className="size-20 bg-white rounded-[2rem] flex items-center justify-center shadow-[0_0_50px_-12px_rgba(255,255,255,0.4)] group-hover:scale-110 group-hover:rotate-6 transition-all duration-700">
-              <Target className="size-10 text-black" />
+            <div className="size-20 rounded-[2rem] flex items-center justify-center shadow-[0_0_50px_-12px_rgba(255,255,255,0.4)] group-hover:scale-110 group-hover:rotate-6 transition-all duration-700 overflow-hidden bg-white relative">
+              <Image src="/logo.png" alt="PocketFlow Logo" fill className="object-cover" />
             </div>
             <div className="text-center space-y-4">
-              <span className="block font-black text-2xl tracking-tighter text-white uppercase italic">Tracker</span>
+              <span className="block font-black text-2xl tracking-tighter text-white uppercase italic">PocketFlow</span>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 leading-tight">Elite Financial Instrument</p>
             </div>
           </motion.div>
@@ -109,12 +109,12 @@ export const Component = () => {
               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 italic">Infrastructure</h4>
               <div className="flex flex-col gap-6">
                 {[
-                  { label: 'GitHub', icon: Globe },
-                  { label: 'Network', icon: Zap },
-                  { label: 'Access', icon: Fingerprint }
+                  { label: 'GitHub', code: 'HUB' },
+                  { label: 'Network', code: 'NET' },
+                  { label: 'Access', code: 'ACC' }
                 ].map((social) => (
                   <Link key={social.label} href="#" className="text-zinc-500 hover:text-white transition-all flex items-center gap-3 group/soc">
-                    <social.icon className="size-4 opacity-50 group-hover/soc:opacity-100 group-hover/soc:text-white transition-all" />
+                    <span className="text-[8px] font-black border border-white/10 px-1 py-0.5 rounded-sm opacity-50 group-hover/soc:opacity-100 group-hover/soc:border-emerald-500/50 group-hover/soc:text-emerald-500 transition-all">{social.code}</span>
                     <span className="text-[10px] font-black tracking-widest uppercase">{social.label}</span>
                   </Link>
                 ))}
@@ -155,7 +155,7 @@ export const Component = () => {
             </p>
             <div className="flex items-center gap-2">
                 <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">© {currentYear}</span>
-                <span className="text-[10px] text-white font-black uppercase tracking-widest italic">ExpenseTracker</span>
+                <span className="text-[10px] text-white font-black uppercase tracking-widest italic">PocketFlow</span>
             </div>
           </div>
         </motion.div>
