@@ -9,6 +9,7 @@ interface CardStickyProps extends HTMLMotionProps<"div"> {
   index: number
   incrementY?: number
   incrementZ?: number
+  children?: React.ReactNode
 }
 
 const ContainerScroll = React.forwardRef<
