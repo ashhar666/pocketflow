@@ -2,8 +2,8 @@
 FROM python:3.11-slim as builder
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set work directory
 WORKDIR /app
@@ -22,23 +22,29 @@ RUN pip install --upgrade pip && \
 # Final stage
 FROM python:3.11-slim
 
-WORKDIR /app
-
 # Install runtime dependencies for psycopg2 and reportlab
 RUN apt-get update && apt-get install -y \
     libpq5 \
     libjpeg62-turbo \
     && rm -rf /var/lib/apt/lists/*
 
+# Hugging Face Spaces requires running as a non-root user (id 1000)
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
+
+WORKDIR $HOME/app
+
 # Copy from builder
 COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
-# Copy project
-COPY . .
+# Copy project files with ownership given to the new user
+COPY --chown=user . $HOME/app
 
-# Expone port
-EXPOSE 8000
+# Hugging Face exposes port 7860 by default
+EXPOSE 7860
 
-# Default command (can be overridden by docker-compose)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run collectstatic, then migrate, then start production server on port 7860
+CMD sh -c "python manage.py collectstatic --no-input && python manage.py migrate && gunicorn core.wsgi:application --bind 0.0.0.0:7860 --log-file -"

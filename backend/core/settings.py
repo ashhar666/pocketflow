@@ -84,8 +84,8 @@ ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS', 'localhost,127.0.0.1'
 ).split(',')
 
-# Allow common tunnel domains and Render domains for foolproof deployments
-ALLOWED_HOSTS += ['.ngrok-free.dev', '.ngrok.io', '127.0.0.1', 'localhost', '.onrender.com']
+# Allow common tunnel domains and Render/HF domains for foolproof deployments
+ALLOWED_HOSTS += ['.ngrok-free.dev', '.ngrok.io', '127.0.0.1', 'localhost', '.onrender.com', '.hf.space']
 
 # ── CSRF Trusted Origins ────────────────────────────────────────────────────
 CSRF_TRUSTED_ORIGINS = os.getenv(
