@@ -19,6 +19,10 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 # ── Logging Configuration ──────────────────────────────────────────────────────
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO' if not DEBUG else 'DEBUG')
 
+# Ensure logs directory exists in production
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -243,7 +247,7 @@ CSRF_COOKIE_SECURE = env_bool('CSRF_COOKIE_SECURE', SECURE_SSL_REDIRECT)
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
     # HSTS should only be used if we are enforcing SSL
     if SECURE_SSL_REDIRECT:
         SECURE_HSTS_SECONDS = 31536000  # 1 year
