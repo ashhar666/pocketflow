@@ -112,15 +112,15 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   <div>
                     <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">Identity Mapping</label>
                     <GlassInputWrapper label="USR">
-                      <input name="username" type="text" placeholder="Username" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 uppercase font-bold tracking-tight" />
+                      <input name="username" type="text" placeholder="Username" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                     </GlassInputWrapper>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <GlassInputWrapper>
-                        <input name="first_name" type="text" placeholder="First Name" className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 uppercase font-bold tracking-tight" />
+                        <input name="first_name" type="text" placeholder="First Name" className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                     </GlassInputWrapper>
                     <GlassInputWrapper>
-                        <input name="last_name" type="text" placeholder="Last Name" className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 uppercase font-bold tracking-tight" />
+                        <input name="last_name" type="text" placeholder="Last Name" className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                     </GlassInputWrapper>
                   </div>
                 </motion.div>
@@ -136,7 +136,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               <motion.div variants={itemVariants}>
                 <GlassInputWrapper label="PWD">
                     <div className="relative flex-1">
-                        <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Password" required className="w-full bg-transparent text-xs p-4 pr-16 focus:outline-none placeholder:text-zinc-700 uppercase font-bold tracking-tight" />
+                        <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Password" required className="w-full bg-transparent text-xs p-4 pr-16 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-4 flex items-center text-[10px] font-black italic text-zinc-600 hover:text-emerald-500 transition-colors uppercase tracking-tighter">
                             {showPassword ? "HIDE" : "SHOW"}
                         </button>
@@ -147,7 +147,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               {mode === 'register' && (
                 <motion.div variants={itemVariants}>
                     <GlassInputWrapper label="VER">
-                        <input name="password_confirm" type={showPassword ? 'text' : 'password'} placeholder="Confirm Password" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 uppercase font-bold tracking-tight" />
+                        <input name="password_confirm" type={showPassword ? 'text' : 'password'} placeholder="Confirm Password" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                     </GlassInputWrapper>
                 </motion.div>
               )}
