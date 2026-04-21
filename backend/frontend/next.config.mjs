@@ -14,8 +14,12 @@ const nextConfig = {
     async rewrites() {
         return [
             {
+                source: '/api/:path*/',
+                destination: 'https://ashharshahan-pocketflow.hf.space/api/:path*/',
+            },
+            {
                 source: '/api/:path*',
-                destination: 'https://ashharshahan-pocketflow.hf.space/api/:path*',
+                destination: 'https://ashharshahan-pocketflow.hf.space/api/:path*/',
             },
         ];
     },
