@@ -30,6 +30,11 @@ export function middleware(request: NextRequest) {
 
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
+  // If it's a public route, always allow access
+  if (isPublicRoute) {
+    return NextResponse.next();
+  }
+
   // If it's a protected route and no valid token → redirect to login
   if (isProtectedRoute && !accessToken) {
     const loginUrl = new URL('/login', request.url);

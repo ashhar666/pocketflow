@@ -97,15 +97,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!authInitialized.current) return;
     if (isLoading) return;
 
+    // Standardize pathname for comparison (handle potential null/undefined)
+    const currentPath = pathname || '/';
+
     if (isAuthenticated) {
-      if (pathname === '/login' || pathname === '/register') {
+      // If authenticated and on login/register → send to dashboard
+      if (currentPath === '/login' || currentPath === '/register') {
         router.push('/dashboard');
       }
       return;
     }
 
-    if (PUBLIC_ROUTES.has(pathname)) return;
+    // If NOT authenticated
+    // If it's a public route (including root '/') → stay there
+    if (PUBLIC_ROUTES.has(currentPath)) {
+      return;
+    }
 
+    // Otherwise → redirect to login
+    console.warn(`[AUTH] Unauthorized access to ${currentPath}. Redirecting to /login`);
     router.push('/login');
   }, [pathname, isAuthenticated, isLoading, router]);
 
