@@ -110,7 +110,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // If NOT authenticated
     // If it's a public route (including root '/') → stay there
-    if (PUBLIC_ROUTES.has(currentPath)) {
+    const isPublic = PUBLIC_ROUTES.has(currentPath) || currentPath === '/' || currentPath === '';
+    
+    if (isPublic) {
       return;
     }
 
