@@ -1,52 +1,44 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-// Routes that do NOT require authentication
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
-
-// Routes that require authentication
-// Routes that require authentication
-const PROTECTED_PREFIXES = [
-  '/dashboard', 
-  '/settings', 
-  '/expenses', 
-  '/income', 
-  '/budgets', 
-  '/categories', 
-  '/savings', 
-  '/reports', 
-  '/telegram'
-];
+import { PUBLIC_ROUTES, PROTECTED_PREFIXES } from './lib/constants';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  
+  // Standardize pathname (remove trailing slash for comparison)
+  const currentPath = pathname.replace(/\/$/, '') || '/';
+
   // Server-side middleware CAN read HTTP-only cookies
   const accessToken = request.cookies.get('access_token')?.value;
 
-  // Check if the current route is a protected route
+  // 1. Check if the current route is a public route
+  const isPublicRoute = PUBLIC_ROUTES.includes(currentPath);
+
+  // 2. Check if the current route starts with a protected prefix
   const isProtectedRoute = PROTECTED_PREFIXES.some((prefix) =>
-    pathname.startsWith(prefix)
+    currentPath.startsWith(prefix)
   );
 
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || pathname === '/' || pathname === '';
+  // LOGGING (Visible in server logs/Vercel logs)
+  // console.log(`[MIDDLEWARE] Path: ${currentPath} | Public: ${isPublicRoute} | Protected: ${isProtectedRoute} | Auth: ${!!accessToken}`);
 
   // If it's a public route, always allow access
   if (isPublicRoute) {
+    // Exception: If user has token and is on login/register → redirect to dashboard
+    if ((currentPath === '/login' || currentPath === '/register') && accessToken) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
     return NextResponse.next();
   }
 
   // If it's a protected route and no valid token → redirect to login
   if (isProtectedRoute && !accessToken) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', pathname);
+    loginUrl.searchParams.set('from', currentPath);
     return NextResponse.redirect(loginUrl);
   }
 
-  // If user has token and is on login/register → redirect to dashboard
-  if ((pathname === '/login' || pathname === '/register') && accessToken) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
+  // Default to allowing access (for other internal routes, static assets, etc.)
   return NextResponse.next();
 }
 

@@ -1,10 +1,14 @@
 #!/bin/bash
+# HF Space Startup Script v1.0.1 (Unix LF format)
 # Exit immediately if a command fails and print each command (set -ex)
 set -ex
 
 echo "==> [HF-BOOT] Starting production startup script..."
 echo "==> [HF-BOOT] User: $(whoami)"
+echo "==> [HF-BOOT] Python: $(python --version)"
 echo "==> [HF-BOOT] Directory: $(pwd)"
+echo "==> [HF-BOOT] File List (Recursive):"
+ls -R
 
 # Create logs directory manually just in case
 mkdir -p logs

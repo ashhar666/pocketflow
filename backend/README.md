@@ -1,3 +1,13 @@
+---
+title: PocketFlow
+emoji: 💰
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # PocketFlow Backend API
 
 This is the Django REST Framework backend for the PocketFlow SaaS.

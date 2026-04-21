@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { PUBLIC_ROUTES } from './constants';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -37,11 +38,15 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // If refresh token fails, redirect to login ONLY for protected routes
         if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-          const PUBLIC_ROUTES = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
-          const isPublicRoute = PUBLIC_ROUTES.includes(window.location.pathname);
+          // Standardize pathname (remove trailing slash for comparison)
+          const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+          const isPublicRoute = PUBLIC_ROUTES.includes(currentPath);
           
           if (!isPublicRoute) {
+            console.warn(`[API] Auth refresh failed on protected route: ${currentPath}. Redirecting to /login`);
             window.location.href = '/login';
+          } else {
+            console.info(`[API] Auth refresh failed on public route: ${currentPath}. Staying on page.`);
           }
         }
         return Promise.reject(refreshError);

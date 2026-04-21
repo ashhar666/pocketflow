@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import api from '../lib/api';
 import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { PUBLIC_ROUTES } from '../lib/constants';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -25,19 +26,6 @@ interface AuthContextType {
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
 }
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-// Pages that do NOT require authentication.
-const PUBLIC_ROUTES = new Set([
-  '/',
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/reset-password',
-]);
 
 // ---------------------------------------------------------------------------
 // Context
@@ -79,7 +67,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { data } = await api.get('/auth/profile/');
         setUser(data);
         setIsAuthenticated(true);
-      } catch {
+      } catch (error: any) {
+        // Only log if it's not a standard 401 (which is expected for guests)
+        if (error.response?.status !== 401) {
+          console.error('[AUTH] Profile fetch failed:', error);
+        }
         setUser(null);
         setIsAuthenticated(false);
       } finally {
@@ -94,25 +86,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // ── Navigation guard (runs AFTER auth is initialized) ──────────────────────
   useEffect(() => {
-    if (!authInitialized.current) return;
-    if (isLoading) return;
+    if (!authInitialized.current) {
+      console.log('[AUTH] Waiting for initialization...');
+      return;
+    }
+    if (isLoading) {
+      console.log('[AUTH] Still loading profile...');
+      return;
+    }
 
-    // Standardize pathname for comparison (handle potential null/undefined)
-    const currentPath = pathname || '/';
+    // Standardize pathname for comparison (handle potential null/undefined and trailing slashes)
+    const currentPath = (pathname || '/').replace(/\/$/, '') || '/';
 
     if (isAuthenticated) {
       // If authenticated and on login/register → send to dashboard
       if (currentPath === '/login' || currentPath === '/register') {
+        console.info(`[AUTH] Authenticated user on ${currentPath}. Redirecting to /dashboard`);
         router.push('/dashboard');
       }
       return;
     }
 
     // If NOT authenticated
-    // If it's a public route (including root '/') → stay there
-    const isPublic = PUBLIC_ROUTES.has(currentPath) || currentPath === '/' || currentPath === '';
+    // Check if it's a public route
+    const isPublic = PUBLIC_ROUTES.includes(currentPath);
     
     if (isPublic) {
+      console.info(`[AUTH] Guest on public route: ${currentPath}. Access allowed.`);
       return;
     }
 
@@ -122,7 +122,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [pathname, isAuthenticated, isLoading, router]);
 
   // ── Login ─────────────────────────────────────────────────────────────────
-  // Backend sets HTTP-only cookies automatically — we just store user state.
   const login = (userData: User) => {
     setUser(userData);
     setIsAuthenticated(true);
@@ -131,7 +130,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // ── Logout ────────────────────────────────────────────────────────────────
-  // Backend clears HTTP-only cookies automatically.
   const logout = async () => {
     try {
       await api.post('/auth/logout/');
