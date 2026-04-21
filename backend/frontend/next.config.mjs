@@ -10,15 +10,8 @@ const nextConfig = {
         ],
     },
     trailingSlash: false,
-    // Proxy API requests to Hugging Face to solve cross-domain auth issues
-    async rewrites() {
-        return [
-            {
-                source: '/api/:path*',
-                destination: 'https://ashharshahan-pocketflow.hf.space/api/:path*',
-            },
-        ];
-    },
+    // Dev mode: Direct API calls work with CORS on localhost
+    // Production: Uses Vercel-serverless proxy (see vercel.json)
     // Performance optimizations
     swcMinify: true,
     compiler: {
