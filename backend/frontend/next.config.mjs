@@ -9,6 +9,15 @@ const nextConfig = {
             },
         ],
     },
+    // Proxy API requests to Hugging Face to solve cross-domain auth issues
+    async rewrites() {
+        return [
+            {
+                source: '/api/:path*',
+                destination: 'https://ashharshahan-pocketflow.hf.space/api/:path*',
+            },
+        ];
+    },
     // Performance optimizations
     swcMinify: true,
     compiler: {
