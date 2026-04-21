@@ -83,12 +83,15 @@ TELEGRAM_WEBHOOK_SECRET = os.getenv('TELEGRAM_WEBHOOK_SECRET', '')
 
 # ── Allowed Hosts ───────────────────────────────────────────────────────────
 # Never use ['*'] in production. Configure via ALLOWED_HOSTS in .env.
-ALLOWED_HOSTS = os.getenv(
-    'ALLOWED_HOSTS', 'localhost,127.0.0.1'
-).split(',')
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.hf.space',
+    'proxy.spaces.internal.huggingface.tech',
+]
 
 # Allow common tunnel domains and Render/HF domains for foolproof deployments
-ALLOWED_HOSTS += ['.ngrok-free.dev', '.ngrok.io', '127.0.0.1', 'localhost', '.onrender.com', '.hf.space']
+ALLOWED_HOSTS += ['.ngrok-free.dev', '.ngrok.io', '.onrender.com']
 
 # ── CSRF Trusted Origins ────────────────────────────────────────────────────
 CSRF_TRUSTED_ORIGINS = os.getenv(
@@ -246,7 +249,10 @@ CSRF_COOKIE_SECURE = env_bool('CSRF_COOKIE_SECURE', SECURE_SSL_REDIRECT)
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'SAMEORIGIN'
+    # Hugging Face Spaces requires the app to be embeddable in an iframe.
+    # We disable X_FRAME_OPTIONS restriction to allow the HF dashboard to display the app.
+    X_FRAME_OPTIONS = 'ALLOWALL' # or just comment it out to use the default 'SAMEORIGIN' which might block
+
     # HSTS should only be used if we are enforcing SSL
     if SECURE_SSL_REDIRECT:
         SECURE_HSTS_SECONDS = 31536000  # 1 year
