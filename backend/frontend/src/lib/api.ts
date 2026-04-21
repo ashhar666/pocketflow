@@ -35,9 +35,14 @@ api.interceptors.response.use(
         // Retry the original request (cookies are automatically sent)
         return api(originalRequest);
       } catch (refreshError) {
-        // If refresh token fails, redirect to login (unless already there)
+        // If refresh token fails, redirect to login ONLY for protected routes
         if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-          window.location.href = '/login';
+          const PUBLIC_ROUTES = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
+          const isPublicRoute = PUBLIC_ROUTES.includes(window.location.pathname);
+          
+          if (!isPublicRoute) {
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(refreshError);
       }
