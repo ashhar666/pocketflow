@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith(prefix)
   );
 
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || pathname === '/' || pathname === '';
 
   // If it's a public route, always allow access
   if (isPublicRoute) {
