@@ -9,6 +9,7 @@ const nextConfig = {
             },
         ],
     },
+    trailingSlash: true,
     // Proxy API requests to Hugging Face to solve cross-domain auth issues
     async rewrites() {
         return [
