@@ -18,6 +18,12 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import requests
+import socket
+import urllib3.util.connection as urllib3_cn
+
+def allowed_gai_family():
+    return socket.AF_INET
+urllib3_cn.allowed_gai_family = allowed_gai_family
 
 from expenses.models import Expense
 from budgets.models import Budget

@@ -2,6 +2,13 @@ import logging
 import requests
 import mimetypes
 from django.conf import settings
+import socket
+import urllib3.util.connection as urllib3_cn
+
+# Force IPv4 to prevent Hugging Face / Telegram IPv6 SSLEOF packet-drop issues
+def allowed_gai_family():
+    return socket.AF_INET
+urllib3_cn.allowed_gai_family = allowed_gai_family
 
 logger = logging.getLogger(__name__)
 
