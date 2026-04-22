@@ -335,8 +335,8 @@ export function HeroSection() {
                             step="0.01"
                             value={temperature}
                             onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer [appearance:slider-vertical] z-10"
-                            style={{ padding: 0 }}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            style={{ WebkitAppearance: 'none', appearance: 'none', padding: 0, writingMode: 'vertical-lr', direction: 'rtl' }}
                         />
                     </div>
                 </div>

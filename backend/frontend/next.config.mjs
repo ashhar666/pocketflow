@@ -10,8 +10,19 @@ const nextConfig = {
         ],
     },
     trailingSlash: false,
-    // Dev mode: Direct API calls work with CORS on localhost
-    // Production: Uses Vercel-serverless proxy (see vercel.json)
+    async rewrites() {
+        return [
+            {
+                source: '/api',
+                destination: 'https://ashharshahan-pocketflow.hf.space/api/',
+            },
+            {
+                source: '/api/:path*',
+                // Append trailing slash to ensure Django backend doesn't 301 redirect POST requests causing data drops
+                destination: 'https://ashharshahan-pocketflow.hf.space/api/:path*/',
+            },
+        ];
+    },
     // Performance optimizations
     swcMinify: true,
     compiler: {
