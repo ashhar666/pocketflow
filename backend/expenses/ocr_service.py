@@ -1,12 +1,19 @@
 import os
 import json
 import logging
+import socket
+import urllib3.util.connection as urllib3_cn
 from google import genai
 from django.conf import settings
 from PIL import Image
 import io
 
 logger = logging.getLogger(__name__)
+
+# Force IPv4 to prevent Hugging Face / Google API IPv6 SSLEOF packet-drop issues
+def allowed_gai_family():
+    return socket.AF_INET
+urllib3_cn.allowed_gai_family = allowed_gai_family
 
 def scan_receipt_image(image_file):
     api_key = settings.GEMINI_API_KEY

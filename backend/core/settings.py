@@ -342,6 +342,8 @@ else:
 TELEGRAM_BOT_TOKEN    = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_BOT_USERNAME = os.getenv('TELEGRAM_BOT_USERNAME', '')
 TELEGRAM_WEBHOOK_URL  = os.getenv('TELEGRAM_WEBHOOK_URL', '')
+TELEGRAM_PROXY_ENABLED = env_bool('TELEGRAM_PROXY_ENABLED', False)
+
 
 # ── AI Scan Settings ────────────────────────────────────────────────────────
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')

@@ -38,6 +38,9 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 
 from .bot_logic import parse_expense_message
+import os
+import traceback
+
 from .utils import send_message, get_telegram_file_path, download_telegram_file, send_document
 from expenses.ocr_service import scan_receipt_image
 
