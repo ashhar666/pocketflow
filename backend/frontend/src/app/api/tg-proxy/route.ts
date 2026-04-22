@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export async function GET(req: NextRequest) {
+  return handleRequest(req, 'GET');
+}
+
 export async function POST(req: NextRequest) {
+  return handleRequest(req, 'POST');
+}
+
+async function handleRequest(req: NextRequest, method: string) {
   try {
     const { searchParams } = new URL(req.url);
     const target = searchParams.get('target');
@@ -10,32 +18,40 @@ export async function POST(req: NextRequest) {
     }
 
     // Security check: Only proxy to Telegram
-    if (!target.startsWith('https://api.telegram.org')) {
-      return NextResponse.json({ error: 'Forbidden target' }, { status: 403 });
+    const allowedBase = 'https://api.telegram.org';
+    if (!target.startsWith(allowedBase)) {
+      return NextResponse.json({ error: 'Forbidden target', detail: `Only ${allowedBase} allowed` }, { status: 403 });
     }
 
-    const contentType = req.headers.get('content-type') || '';
-    
-    // Forward the request to Telegram
-    const response = await fetch(target, {
-      method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-      },
-      // Passing the request body directly handles both JSON and FormData/Files
-      body: req.body,
-      // @ts-ignore - duplex is required for streaming request bodies in some environments
-      duplex: 'half',
-    });
+    const headers: Record<string, string> = {};
+    const contentType = req.headers.get('content-type');
+    if (contentType) headers['Content-Type'] = contentType;
 
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
+    const fetchOptions: RequestInit = {
+      method: method,
+      headers: headers,
+    };
+
+    if (method === 'POST') {
+      const body = await req.arrayBuffer();
+      if (body.byteLength > 0) {
+        fetchOptions.body = body;
+      }
+    }
+
+    const response = await fetch(target, fetchOptions);
+    const responseData = await response.json().catch(() => null);
+
+    return NextResponse.json(responseData || { ok: response.ok, status: response.status }, { 
+      status: response.status 
+    });
 
   } catch (error: any) {
     console.error('TgProxy Error:', error);
     return NextResponse.json({ 
       error: 'Proxy Error', 
-      message: error.message 
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }, { status: 500 });
   }
 }

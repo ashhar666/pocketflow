@@ -9,9 +9,12 @@ from .views import (
 )
 from .debug_views import DebugLogsView, DebugEnvView, DebugWebhookStatusView, NetworkTestView
 
-# Step 9: Vercel Proxy Bridge + versioned ping
+# Step 12: Robust Proxy Bridge + versioned ping
 urlpatterns = [
-    path('ping/', lambda r: HttpResponse('pong - v18')),
+    path('ping/', lambda r: HttpResponse('pong - v21')),
+
+
+
 
 
 

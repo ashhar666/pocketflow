@@ -109,8 +109,19 @@ class NetworkTestView(APIView):
                 results["request_telegram_base"] = f"OK ({r.status_code})"
             except Exception as e:
                 results["request_telegram_base"] = str(e)
+            
+            # Test Vercel Proxy specifically
+            from .utils import get_tg_url
+            try:
+                proxy_url = get_tg_url("https://api.telegram.org/")
+                results["proxy_url_used"] = proxy_url
+                r = requests.post(proxy_url, timeout=15)
+                results["request_vercel_proxy"] = f"OK ({r.status_code}) -> {r.text[:100]}"
+            except Exception as e:
+                results["request_vercel_proxy"] = str(e)
                 
             return Response(results)
+
 
         except Exception:
             return Response({"error": traceback.format_exc()}, status=500)
