@@ -1,7 +1,4 @@
-'use client';
-
-import { usePathname } from 'next/navigation';
-import MinimalistFooter from '@/components/layout/MinimalistFooter';
+import { Footer } from '@/components/blocks/footer';
 
 const HIDE_FOOTER_PATHS = [
   '/login', 
@@ -29,5 +26,5 @@ export default function FooterVisibility() {
 
   if (shouldHide) return null;
   
-  return <MinimalistFooter />;
+  return <Footer />;
 }

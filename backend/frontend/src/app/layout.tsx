@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import ClientProviders from "./providers";
+import FooterVisibility from "./FooterVisibility";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -185,6 +186,7 @@ export default function RootLayout({
         }} />
         <ClientProviders>
           {children}
+          <FooterVisibility />
         </ClientProviders>
       </body>
     </html>
