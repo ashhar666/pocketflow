@@ -16,8 +16,14 @@ export const Footer = () => {
             </span>
           </div>
 
-          {/* Minimal Links */}
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+          {/* Minimal Links & Contact */}
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-8 gap-y-4">
+            <a 
+              href="mailto:support@pocketflow.com" 
+              className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors cursor-pointer"
+            >
+              Support
+            </a>
             <Link 
               href="/legal/privacy-policy" 
               className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors cursor-pointer"
@@ -30,12 +36,14 @@ export const Footer = () => {
             >
               Terms
             </Link>
-            <Link 
-              href="/legal/cookie-policy" 
-              className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors cursor-pointer"
-            >
-              Cookies
-            </Link>
+            
+            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-full">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500/80">
+                Operational
+              </span>
+            </div>
+
             <div className="w-px h-3 bg-zinc-800 hidden md:block" />
             <Link 
               href="/dashboard" 
