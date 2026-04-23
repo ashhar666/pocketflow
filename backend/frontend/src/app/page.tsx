@@ -4,7 +4,6 @@ import { FeatureCardsSection } from '@/components/blocks/feature-cards-section';
 import { HowItWorksSimple } from '@/components/blocks/how-it-works-simple';
 import { TestimonialsSection } from '@/components/blocks/testimonials-section';
 import { FAQSection } from '@/components/blocks/faq-section';
-import { Footer } from '@/components/blocks/footer';
 
 export default function Home() {
   return (
@@ -16,7 +15,6 @@ export default function Home() {
       <HowItWorksSimple />
       <TestimonialsSection />
       <FAQSection />
-      <Footer />
     </main>
   );
 }
