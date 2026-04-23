@@ -12,7 +12,7 @@ export const Footer = () => {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-foreground rounded-full animate-pulse" />
             <span className="text-sm font-black tracking-[0.3em] uppercase italic text-foreground">
-              Expense Tracker
+              PocketFlow
             </span>
           </div>
 
