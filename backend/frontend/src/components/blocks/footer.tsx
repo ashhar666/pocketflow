@@ -20,11 +20,6 @@ export const Footer = () => {
             </p>
           </div>
 
-          {/* Theme Control Center ( rellocated toggle ) */}
-          <div className="flex flex-col items-center gap-6 p-8 glass-card">
-            <p className="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px] italic">Interface Mode</p>
-            <ThemeToggle />
-          </div>
 
           {/* Secondary Links/Info */}
           <div className="flex flex-col items-center md:items-end text-center md:text-right space-y-4">

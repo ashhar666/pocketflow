@@ -107,21 +107,6 @@ export const FAQSection = () => {
           ))}
         </div>
         
-        <motion.div 
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="mt-24 p-16 glass-card text-center relative overflow-hidden group bg-white/[0.02] border border-white/5 rounded-[3rem]"
-        >
-            <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 blur-3xl -z-10" />
-            <div className="text-[40px] font-black text-emerald-500/10 mx-auto mb-8 uppercase italic tracking-tighter">SUPPORT.SYS</div>
-            <p className="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px] mb-8 italic">Complex Requirements?</p>
-            <a 
-                href="mailto:support@expensetracker.com"
-                className="inline-flex h-16 items-center justify-center rounded-2xl bg-emerald-600 px-12 text-xs font-black text-white hover:bg-emerald-500 transition-all uppercase tracking-[0.3em] italic shadow-[0_0_30px_rgba(16,185,129,0.2)]"
-            >
-                Contact Command
-            </a>
-        </motion.div>
       </div>
     </section>
   );
