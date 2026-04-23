@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://pocketflow.com';
+const SITE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://pocketflow-chi.vercel.app';
 
 export default function robots(): MetadataRoute.Robots {
   return {
