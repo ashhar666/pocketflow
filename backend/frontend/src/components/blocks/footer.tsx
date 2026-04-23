@@ -24,9 +24,10 @@ export const Footer = () => {
           {/* Secondary Links/Info */}
           <div className="flex flex-col items-center md:items-end text-center md:text-right space-y-4">
             <div className="flex items-center gap-6">
-              <a href="#" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic">Privacy</a>
-              <a href="#" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic">Terms</a>
-              <a href="#" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic">Console</a>
+              <a href="/legal/privacy-policy" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic">Privacy</a>
+              <a href="/legal/tos" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic">Terms</a>
+              <a href="/legal/cookie-policy" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic">Cookies</a>
+              <a href="/dashboard" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic">Console</a>
             </div>
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-700 italic">
               &copy; {new Date().getFullYear()} Paisa Command Protocols.
