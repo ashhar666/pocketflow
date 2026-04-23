@@ -25,9 +25,6 @@ export const Footer = () => {
               <Link href="/legal/cookie-policy" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic cursor-pointer">Cookies</Link>
               <Link href="/dashboard" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-foreground transition-colors italic cursor-pointer">Console</Link>
             </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-700 italic">
-              &copy; {new Date().getFullYear()} Paisa Command Protocols.
-            </p>
           </div>
         </div>
       </div>
