@@ -45,19 +45,7 @@ export default function TermsOfServicePage() {
 
       <section className="space-y-4">
         <h2 className="text-2xl font-display font-bold uppercase tracking-tight">
-          3. Subscriptions & Payments
-        </h2>
-        <p className="leading-relaxed">
-          While we offer a free tier, certain premium features require
-          subscriptions. You agree to the billing plan you select and
-          acknowledge that payments are non-refundable unless specified
-          otherwise.
-        </p>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-display font-bold uppercase tracking-tight">
-          4. Acceptable Use
+          3. Acceptable Use
         </h2>
         <p className="leading-relaxed text-muted-foreground">
           You agree not to use PocketFlow for any illegal purposes or to
@@ -68,7 +56,7 @@ export default function TermsOfServicePage() {
 
       <section className="space-y-4">
         <h2 className="text-2xl font-display font-bold uppercase tracking-tight text-destructive">
-          5. Limitation of Liability
+          4. Limitation of Liability
         </h2>
         <div className="bg-destructive/10 border-l-4 border-destructive p-4 italic text-sm text-foreground space-y-2">
             <p>PocketFlow provides financial tracking and visualization tools, but we ARE NOT financial advisors. We do not provide investment, accounting, or legal advice.</p>
@@ -78,7 +66,7 @@ export default function TermsOfServicePage() {
 
       <section className="space-y-4">
         <h2 className="text-2xl font-display font-bold uppercase tracking-tight">
-          6. Modifications to Service
+          5. Modifications to Service
         </h2>
         <p className="leading-relaxed text-muted-foreground">
           We reserve the right to modify or discontinue our services at any
