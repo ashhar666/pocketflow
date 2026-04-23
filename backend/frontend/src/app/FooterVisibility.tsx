@@ -1,3 +1,6 @@
+"use client";
+
+import { usePathname } from 'next/navigation';
 import { Footer } from '@/components/blocks/footer';
 
 const HIDE_FOOTER_PATHS = [
