@@ -18,7 +18,11 @@ urllib3_cn.allowed_gai_family = allowed_gai_family
 def scan_receipt_image(image_file):
     api_key = settings.GEMINI_API_KEY
     if not api_key:
-        return {"error": "GEMINI_API_KEY not configured in environment"}
+        print("❌ OCR ERROR: GEMINI_API_KEY is not set!")
+        return {"error": "API Key missing"}
+    
+    # 🕵️ DIAGNOSTIC: Print masked key to verify rotation
+    print(f"🕵️ Using API Key: {api_key[:4]}...{api_key[-4:]}")
 
     try:
         client = genai.Client(api_key=api_key)
