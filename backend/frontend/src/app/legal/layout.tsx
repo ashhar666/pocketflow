@@ -5,8 +5,8 @@ export const metadata: Metadata = {
   title: "Legal",
   description: "PocketFlow legal documents — Terms of Service, Privacy Policy, and Cookie Policy.",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
 };
 

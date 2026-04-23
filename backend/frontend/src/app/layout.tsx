@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   creator: "PocketFlow",
   publisher: "PocketFlow",
   alternates: {
-    canonical: SITE_URL,
+    canonical: "/",
   },
   robots: {
     index: true,
@@ -58,9 +58,16 @@ export const metadata: Metadata = {
     creator: "@pocketflow",
   },
   icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
+    icon: [
+      { url: "/favicon.png" },
+      { url: "/icon.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/favicon.png" },
+    ],
   },
+  manifest: "/manifest.json",
+  category: "finance",
 };
 
 const jsonLd = {
@@ -93,11 +100,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              jsonLd,
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "PocketFlow",
+                url: SITE_URL,
+                logo: `${SITE_URL}/favicon.png`,
+                sameAs: [
+                  "https://twitter.com/pocketflow",
+                  "https://github.com/pocketflow"
+                ],
+              }
+            ])
+          }}
         />
       </head>
       <body className={`${inter.className} min-h-screen bg-background antialiased`}>
