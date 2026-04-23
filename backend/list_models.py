@@ -1,6 +1,6 @@
 from google import genai
 
-key = "AIzaSyCiBzKxhIF90KJ2uq28n7mVbYrhVunR-7Q"
+key = "AIzaSyBYrPU15yAtIjoH-L4dBsawvymoaM5njxQ"
 
 def list_models():
     try:

@@ -45,11 +45,10 @@ def scan_receipt_image(image_file):
 
         # Trying multiple models with automatic fallback due to quota/availability limits
         models_to_try = [
+            "gemini-flash-lite-latest",
             "gemini-2.0-flash",
-            "gemini-flash-latest",
             "gemini-1.5-flash",
             "gemini-1.5-pro",
-            "gemini-2.0-flash-lite",
         ]
 
         response = None
