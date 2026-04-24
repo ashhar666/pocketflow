@@ -346,7 +346,11 @@ TELEGRAM_PROXY_ENABLED = env_bool('TELEGRAM_PROXY_ENABLED', False)
 
 
 # ── AI Scan Settings ────────────────────────────────────────────────────────
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_API_KEY = (
+    os.getenv('GEMINI_API_KEY', '')
+    or os.getenv('GOOGLE_API_KEY', '')
+    or os.getenv('GOOGLE_GENERATIVE_AI_API_KEY', '')
+)
 
 # ── JWT Cookie Names (must match cookie_utils.py) ────────────────────────────
 JWT_ACCESS_COOKIE_NAME = "access_token"
@@ -365,4 +369,3 @@ if SENTRY_DSN:
         environment='production' if not DEBUG else 'development',
     )
     logger.info("Sentry error tracking initialized")
-

@@ -146,6 +146,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         result = scan_receipt_image(image_file)
         
         if "error" in result:
-            return Response(result, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            response_status = result.get("status_code", status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(result, status=response_status)
             
         return Response(result)
