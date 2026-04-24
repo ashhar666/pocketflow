@@ -5,8 +5,8 @@ class EmailBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
-            # Login via email (which might be passed as username in DRF kwargs)
-            user = UserModel.objects.get(email=username)
+            # Login via email (case-insensitive)
+            user = UserModel.objects.get(email__iexact=username)
         except UserModel.DoesNotExist:
             try:
                 # Fallback, just in case kwargs comes in differently

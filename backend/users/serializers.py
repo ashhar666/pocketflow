@@ -34,17 +34,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'password', 'password_confirm', 'first_name', 'last_name')
 
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password_confirm']:
-            raise serializers.ValidationError({"password": "Passwords do not match."})
-        return attrs
+    def validate_email(self, value):
+        value = value.lower()
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
 
     def create(self, validated_data):
         validated_data.pop('password_confirm', None)
 
+        # Force lowercase email for consistency
+        email = validated_data['email'].lower()
+        
         username = validated_data.pop('username', None)
         create_params = {
-            'email': validated_data['email'],
+            'email': email,
             'password': validated_data['password'],
             'first_name': validated_data.get('first_name', ''),
             'last_name': validated_data.get('last_name', ''),
@@ -77,14 +81,14 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
     def validate_email(self, value):
         value = value.lower()
         try:
-            user = User.objects.get(email=value)
+            # Use iexact for case-insensitive lookup
+            user = User.objects.get(email__iexact=value)
         except User.DoesNotExist:
             # Constant-time delay to prevent email enumeration
             time.sleep(PASSWORD_RESET_DELAY)
             return value
         
         # User exists - proceed to generate token
-        # Generate and store token
         token = secrets.token_urlsafe(32)
         user.password_reset_token = hash_reset_token(token)
         user.password_reset_expiry = timezone.now() + timedelta(minutes=15)
@@ -100,13 +104,21 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
             f"{reset_link}\n\n"
             f"If you did not request this, ignore this email.\n"
         )
-        send_mail(
-            subject,
-            message,
-            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@pocketflow.com'),
-            [value],
-            fail_silently=False,
-        )
+        try:
+            send_mail(
+                subject,
+                message,
+                getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@pocketflow.com'),
+                [value],
+                fail_silently=False,
+            )
+        except Exception as e:
+            # Log the error but don't leak it to the user
+            # In a real app, we'd use a logger here
+            print(f"FAILED TO SEND EMAIL: {str(e)}")
+            # If in debug mode, maybe we want to know
+            if getattr(settings, 'DEBUG', False):
+                pass 
         return value
 
 
@@ -125,7 +137,8 @@ class ResetPasswordConfirmSerializer(serializers.Serializer):
         token = data['token']
 
         try:
-            user = User.objects.get(email=email)
+            # Case-insensitive lookup for reset
+            user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
             raise serializers.ValidationError({"email": "Invalid token or email."})
 

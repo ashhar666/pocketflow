@@ -50,6 +50,8 @@ In your Space settings, add these secrets:
 | `TELEGRAM_BOT_TOKEN` | `<your-telegram-bot-token>` |
 | `GEMINI_API_KEY` | `<your-google-ai-api-key>` |
 | `FRONTEND_URL` | `https://<your-frontend-domain>` |
+| `EMAIL_HOST_USER` | `<your-gmail-address>` |
+| `EMAIL_HOST_PASSWORD` | `<your-gmail-app-password>` |
 
 ### Step 3: Prepare Backend Files
 
