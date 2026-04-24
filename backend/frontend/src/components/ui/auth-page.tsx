@@ -182,6 +182,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               </motion.button>
             </form>
 
+            <motion.div variants={itemVariants} className="relative flex items-center justify-center">
               <span className="w-full border-t border-white/5"></span>
               <span className="px-6 text-[9px] font-black uppercase tracking-[0.4em] text-zinc-700 bg-[#030303] absolute italic">Or continue with</span>
             </motion.div>
