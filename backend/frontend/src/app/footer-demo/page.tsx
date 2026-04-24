@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
 import { Component as TapedFooter } from "@/components/ui/footer-taped-design";
+
+export const metadata: Metadata = {
+  title: "Footer Demo",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function DemoOne() {
   return (

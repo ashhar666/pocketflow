@@ -10,8 +10,11 @@ load_dotenv(BASE_DIR / '.env', override=True)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
-    print("CRITICAL: SECRET_KEY environment variable is missing! Using insecure fallback for debugging.")
-    SECRET_KEY = 'django-insecure-fallback-key-change-this-immediately'
+    if os.getenv('DEBUG', 'False') == 'True':
+        print("CRITICAL: SECRET_KEY environment variable is missing! Using insecure fallback for debugging.")
+        SECRET_KEY = 'django-insecure-fallback-key-change-this-immediately'
+    else:
+        raise RuntimeError("SECRET_KEY environment variable is required when DEBUG is False.")
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 

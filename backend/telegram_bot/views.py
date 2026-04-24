@@ -327,6 +327,10 @@ class WebhookView(APIView):
     authentication_classes = []
 
     def post(self, request):
+        if not settings.TELEGRAM_WEBHOOK_SECRET and not settings.DEBUG:
+            logger.error("Telegram webhook rejected because TELEGRAM_WEBHOOK_SECRET is not configured.")
+            return Response({"error": "Webhook is not configured securely."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
         # ── Verify Telegram Secret Header ─────────────────────────────────────
         secret_token = request.headers.get('X-Telegram-Bot-Api-Secret-Token')
         if settings.TELEGRAM_WEBHOOK_SECRET and secret_token != settings.TELEGRAM_WEBHOOK_SECRET:
@@ -828,6 +832,11 @@ class SyncWebhookView(APIView):
         token = settings.TELEGRAM_BOT_TOKEN
         if not token:
             return Response({"error": "Bot token not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if not settings.TELEGRAM_WEBHOOK_SECRET:
+            return Response(
+                {"error": "TELEGRAM_WEBHOOK_SECRET is required before syncing the webhook."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
         if getattr(settings, 'TELEGRAM_WEBHOOK_URL', ''):
             webhook_url = settings.TELEGRAM_WEBHOOK_URL

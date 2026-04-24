@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model, authenticate
+from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import (
     RegisterSerializer,
@@ -86,7 +87,7 @@ class LogoutView(APIView):
 
     def post(self, request):
         try:
-            refresh_token = request.COOKIES.get("refresh_token")
+            refresh_token = request.COOKIES.get(settings.JWT_REFRESH_COOKIE_NAME)
             if not refresh_token:
                 return Response({"detail": "Missing refresh token."}, status=status.HTTP_400_BAD_REQUEST)
             token = RefreshToken(refresh_token)
@@ -108,7 +109,7 @@ class CustomTokenRefreshView(APIView):
     throttle_classes = [AnonRateThrottle]
 
     def post(self, request):
-        refresh_token = request.COOKIES.get("refresh_token")
+        refresh_token = request.COOKIES.get(settings.JWT_REFRESH_COOKIE_NAME)
         if not refresh_token:
             return Response({"detail": "Missing refresh token."}, status=status.HTTP_401_UNAUTHORIZED)
 

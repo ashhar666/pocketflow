@@ -4,6 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
 from django.conf import settings
 import secrets
+import hashlib
 import time
 from datetime import timedelta
 from django.utils import timezone
@@ -12,6 +13,10 @@ User = get_user_model()
 
 # Constant-time delay to prevent email enumeration attacks
 PASSWORD_RESET_DELAY = 0.5  # seconds
+
+
+def hash_reset_token(token: str) -> str:
+    return hashlib.sha256(token.encode('utf-8')).hexdigest()
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -81,7 +86,7 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
         # User exists - proceed to generate token
         # Generate and store token
         token = secrets.token_urlsafe(32)
-        user.password_reset_token = token
+        user.password_reset_token = hash_reset_token(token)
         user.password_reset_expiry = timezone.now() + timedelta(minutes=15)
         user.save(update_fields=['password_reset_token', 'password_reset_expiry'])
 
@@ -124,7 +129,12 @@ class ResetPasswordConfirmSerializer(serializers.Serializer):
         except User.DoesNotExist:
             raise serializers.ValidationError({"email": "Invalid token or email."})
 
-        if user.password_reset_token != token:
+        hashed_token = hash_reset_token(token)
+        stored_token = user.password_reset_token or ''
+        if not (
+            secrets.compare_digest(stored_token, hashed_token)
+            or secrets.compare_digest(stored_token, token)
+        ):
             raise serializers.ValidationError({"token": "Invalid token."})
 
         if user.password_reset_expiry and timezone.now() > user.password_reset_expiry:

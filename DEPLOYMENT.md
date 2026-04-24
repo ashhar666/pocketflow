@@ -43,13 +43,13 @@ In your Space settings, add these secrets:
 | Secret Name | Value |
 |-------------|-------|
 | `DEBUG` | `False` |
-| `SECRET_KEY` | `pocketflow-super-secret-key-3b482x-193ja8` (generate new) |
-| `DATABASE_URL` | `postgresql://neondb_owner:npg_dkomuGr5tb0y@ep-wandering-brook-amtr199r.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require` |
-| `CORS_ALLOWED_ORIGINS` | `https://pocketflow.vercel.app` |
-| `TELEGRAM_WEBHOOK_SECRET` | `C-X0qv9pWdsSESIoHBLcIHA6zeLng85HxzQ1qc7CCvo4uYc55mljXosy9CECJyVj` |
-| `TELEGRAM_BOT_TOKEN` | `8780848675:AAGcWeIB8u7Nz5M6v16TeDE6udHPcLPqRg8` |
-| `GEMINI_API_KEY` | `AIzaSyBc-PHhf_Ow35IGgmw1T2dmWhS1V41Qw4Y` |
-| `FRONTEND_URL` | `https://pocketflow.vercel.app` |
+| `SECRET_KEY` | `<generate-a-new-secret-key>` |
+| `DATABASE_URL` | `postgresql://<user>:<password>@<host>/<db>?sslmode=require` |
+| `CORS_ALLOWED_ORIGINS` | `https://<your-frontend-domain>` |
+| `TELEGRAM_WEBHOOK_SECRET` | `<generate-a-random-secret>` |
+| `TELEGRAM_BOT_TOKEN` | `<your-telegram-bot-token>` |
+| `GEMINI_API_KEY` | `<your-google-ai-api-key>` |
+| `FRONTEND_URL` | `https://<your-frontend-domain>` |
 
 ### Step 3: Prepare Backend Files
 

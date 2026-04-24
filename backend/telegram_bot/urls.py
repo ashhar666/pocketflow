@@ -1,5 +1,6 @@
 from django.urls import path
 from django.http import HttpResponse
+from django.conf import settings
 from .views import (
     WebhookView, 
     GenerateLinkView, 
@@ -7,7 +8,6 @@ from .views import (
     StatusView, 
     SyncWebhookView
 )
-from .debug_views import DebugLogsView, DebugEnvView, DebugWebhookStatusView, NetworkTestView
 
 # Step 12: Robust Proxy Bridge + versioned ping
 urlpatterns = [
@@ -23,13 +23,16 @@ urlpatterns = [
     path('status/', StatusView.as_view(), name='telegram-status'),
     path('disconnect/', DisconnectView.as_view(), name='telegram-disconnect'),
     path('sync/', SyncWebhookView.as_view(), name='telegram-sync-webhook'),
-    
-    # Debug Endpoints
-    path('debug-logs/', DebugLogsView.as_view(), name='debug-logs'),
-    path('debug-env/', DebugEnvView.as_view(), name='debug-env'),
-    path('debug-webhook/', DebugWebhookStatusView.as_view(), name='debug-webhook'),
-    path('network-test/', NetworkTestView.as_view(), name='network-test'),
 ]
 
+if settings.DEBUG:
+    from .debug_views import DebugLogsView, DebugEnvView, DebugWebhookStatusView, NetworkTestView
+
+    urlpatterns += [
+        path('debug-logs/', DebugLogsView.as_view(), name='debug-logs'),
+        path('debug-env/', DebugEnvView.as_view(), name='debug-env'),
+        path('debug-webhook/', DebugWebhookStatusView.as_view(), name='debug-webhook'),
+        path('network-test/', NetworkTestView.as_view(), name='network-test'),
+    ]
 
 

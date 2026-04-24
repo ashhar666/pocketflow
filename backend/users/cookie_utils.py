@@ -18,6 +18,14 @@ JWT_COOKIE_SAMESITE = "None"
 JWT_COOKIE_DOMAIN = None                  # Set to your domain in production
 
 
+def _cookie_delete_kwargs():
+    return {
+        "path": "/",
+        "domain": JWT_COOKIE_DOMAIN,
+        "samesite": JWT_COOKIE_SAMESITE,
+    }
+
+
 def set_jwt_cookies(response, access_token, refresh_token):
     """
     Set HTTP-only cookies for JWT access and refresh tokens on the response.
@@ -51,5 +59,5 @@ def clear_jwt_cookies(response):
     """
     Clear HTTP-only JWT cookies on logout.
     """
-    response.delete_cookie(JWT_ACCESS_COOKIE_NAME, path="/")
-    response.delete_cookie(JWT_REFRESH_COOKIE_NAME, path="/")
+    response.delete_cookie(JWT_ACCESS_COOKIE_NAME, **_cookie_delete_kwargs())
+    response.delete_cookie(JWT_REFRESH_COOKIE_NAME, **_cookie_delete_kwargs())
