@@ -96,22 +96,24 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           <div className="flex flex-col gap-10">
             <motion.div variants={itemVariants} className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-[0.2em] italic mb-2">
-                   <span>{mode === 'login' ? 'AUTH.SECURE' : 'ENTRY.PROTOCOL'}</span>
+                   <span>{mode === 'login' ? 'LOG IN' : 'REGISTER'}</span>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-black leading-[0.85] tracking-[-0.08em] uppercase italic text-white">
-                    {title || (mode === 'login' ? "Elevate \nYour Wealth" : "Start Your \nLegacy")}
+                    {title || (mode === 'login' ? "Welcome \nBack" : "Create \nAccount")}
                 </h1>
                 <p className="text-zinc-500 font-medium text-sm max-w-[28ch] uppercase tracking-widest leading-relaxed">
-                    {description || (mode === 'login' ? "Log in to track your wealth." : "Start your financial journey today.")}
+                    {description || (mode === 'login' ? "Log in to your account." : "Join PocketFlow today.")}
                 </p>
+
             </motion.div>
 
             <form className="space-y-6" onSubmit={onSubmit}>
               {mode === 'register' && (
                 <motion.div variants={itemVariants} className="space-y-6">
                   <div>
-                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">Identity Mapping</label>
-                    <GlassInputWrapper label="USR">
+                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">User Details</label>
+                    <GlassInputWrapper label="USER">
+
                       <input name="username" type="text" placeholder="Username" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                     </GlassInputWrapper>
                   </div>
@@ -127,14 +129,16 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               )}
 
               <motion.div variants={itemVariants}>
-                {mode === 'login' && <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">Security Credentials</label>}
-                <GlassInputWrapper label="EML">
+                {mode === 'login' && <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">Login Details</label>}
+                <GlassInputWrapper label="EMAIL">
+
                   <input name="email" type="email" placeholder="Email Address" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                 </GlassInputWrapper>
               </motion.div>
 
               <motion.div variants={itemVariants}>
-                <GlassInputWrapper label="PWD">
+                <GlassInputWrapper label="PASS">
+
                     <div className="relative flex-1">
                         <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Password" required className="w-full bg-transparent text-xs p-4 pr-16 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-4 flex items-center text-[10px] font-black italic text-zinc-600 hover:text-emerald-500 transition-colors uppercase tracking-tighter">
@@ -146,7 +150,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               {mode === 'register' && (
                 <motion.div variants={itemVariants}>
-                    <GlassInputWrapper label="VER">
+                    <GlassInputWrapper label="CONFIRM">
+
                         <input name="password_confirm" type={showPassword ? 'text' : 'password'} placeholder="Confirm Password" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                     </GlassInputWrapper>
                 </motion.div>
@@ -156,11 +161,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 <motion.div variants={itemVariants} className="flex items-center justify-between text-[10px] px-1">
                     <label className="flex items-center gap-3 cursor-pointer group">
                       <input type="checkbox" name="rememberMe" className="custom-checkbox" />
-                      <span className="text-zinc-600 font-bold uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Remember Session</span>
+                      <span className="text-zinc-600 font-bold uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Remember Me</span>
                     </label>
-                    <Link href="/forgot-password" className="font-black text-emerald-500 hover:text-emerald-400 transition-colors uppercase tracking-[0.15em] italic">Lost Credentials?</Link>
+                    <Link href="/forgot-password" className="font-black text-emerald-500 hover:text-emerald-400 transition-colors uppercase tracking-[0.15em] italic">Forgot Password?</Link>
                 </motion.div>
               )}
+
 
               <motion.button 
                 variants={itemVariants}
@@ -170,15 +176,16 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 disabled={isLoading}
                 className="w-full rounded-2xl bg-white text-black py-5 font-black hover:bg-emerald-500 hover:text-white transition-all active:scale-[0.98] flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-[0.3em] italic"
               >
-                {isLoading ? "SYNCHRONIZING..." : (mode === 'login' ? "Access Citadel" : "Initialize Account")}
+                {isLoading ? "LOADING..." : (mode === 'login' ? "Log In" : "Register")}
+
                 {!isLoading && <span className="text-[10px] group-hover:translate-x-1 transition-transform">→</span>}
               </motion.button>
             </form>
 
-            <motion.div variants={itemVariants} className="relative flex items-center justify-center">
               <span className="w-full border-t border-white/5"></span>
-              <span className="px-6 text-[9px] font-black uppercase tracking-[0.4em] text-zinc-700 bg-[#030303] absolute italic">Alternative Protocol</span>
+              <span className="px-6 text-[9px] font-black uppercase tracking-[0.4em] text-zinc-700 bg-[#030303] absolute italic">Or continue with</span>
             </motion.div>
+
 
             <motion.button 
               variants={itemVariants}
@@ -187,15 +194,17 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               className="w-full flex items-center justify-center gap-3 border border-white/5 rounded-2xl py-4 transition-all font-black text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-white italic"
             >
                 <GoogleIcon />
-                <span>Google.Link</span>
+                <span>Google</span>
             </motion.button>
 
+
             <motion.p variants={itemVariants} className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">
-              {mode === 'login' ? "New System Builder?" : "Existing Citizen?"}{' '}
+              {mode === 'login' ? "New user?" : "Already have an account?"}{' '}
               <Link href={mode === 'login' ? "/register" : "/login"} className="text-white hover:text-emerald-500 transition-colors ml-2 underline decoration-white/20 underline-offset-[6px]">
-                {mode === 'login' ? "Register.IO" : "Sign.In"}
+                {mode === 'login' ? "Register" : "Log In"}
               </Link>
             </motion.p>
+
           </div>
         </motion.div>
       </section>
