@@ -4,6 +4,8 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import ClientProviders from "./providers";
 import FooterVisibility from "./FooterVisibility";
+import { Analytics } from "@vercel/analytics/react";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -192,7 +194,9 @@ export default function RootLayout({
           {children}
           <FooterVisibility />
         </ClientProviders>
+        <Analytics />
       </body>
+
     </html>
   );
 }
