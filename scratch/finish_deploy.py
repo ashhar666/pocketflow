@@ -4,7 +4,7 @@ from huggingface_hub import HfApi
 # Using the token from the user's previous command
 token = os.getenv("HF_TOKEN", "")
 repo_id = "ashharshahan/pocketflow"
-gemini_key = "AIzaSyCKyfNjm-z0LPHkTsHxWeobRVCDkwz7_EQ"
+gemini_key = os.getenv("GEMINI_API_KEY", "")
 
 api = HfApi(token=token)
 
