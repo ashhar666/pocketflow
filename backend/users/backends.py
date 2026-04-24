@@ -11,7 +11,7 @@ class EmailBackend(ModelBackend):
             try:
                 # Fallback, just in case kwargs comes in differently
                 if 'email' in kwargs:
-                    user = UserModel.objects.get(email=kwargs['email'])
+                    user = UserModel.objects.get(email__iexact=kwargs['email'])
                 else:
                     return None
             except UserModel.DoesNotExist:
