@@ -9,6 +9,7 @@ import {
   AreaChart, Area
 } from 'recharts';
 import api from '@/lib/api';
+import { formatScanFailure } from '@/lib/scanError';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { 
@@ -217,7 +218,8 @@ export default function DashboardPage() {
       }, 3000);
 
     } catch (error: any) {
-      const errorMessage = error.response?.data?.error || error.message || "Extraction failed";
+      console.error('Scan Error Details:', error.response?.data || error);
+      const errorMessage = formatScanFailure(error);
       toast.error(`Scan Failure: ${errorMessage}`);
     } finally {
       setIsScanning(false);

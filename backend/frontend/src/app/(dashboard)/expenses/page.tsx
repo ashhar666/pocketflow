@@ -8,6 +8,7 @@ import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Modal } from '@/components/ui/Modal';
 import api from '@/lib/api';
+import { formatScanFailure } from '@/lib/scanError';
 import toast from 'react-hot-toast';
 import { 
   Plus, 
@@ -235,8 +236,8 @@ export default function ExpensesPage() {
       }, 2500);
 
     } catch (error: any) {
-      console.error('Scan Error Details:', error);
-      const errorMessage = error.response?.data?.error || error.message || error.toString();
+      console.error('Scan Error Details:', error.response?.data || error);
+      const errorMessage = formatScanFailure(error);
       toast.error(`Scan Failure: ${errorMessage}`);
       setIsModalOpen(false); // Close on hard fail so they can try again or manual
     } finally {

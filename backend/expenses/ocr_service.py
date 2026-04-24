@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 import socket
 
 import urllib3.util.connection as urllib3_cn
@@ -29,15 +30,46 @@ def _build_scan_error(message, code="scan_failed", status_code=500, details=None
     return error
 
 
-def _classify_scan_exception(exc):
+def _sanitize_scan_message(message, max_length=280):
+    text = " ".join(str(message or "").split())
+    if not text:
+        return ""
+
+    text = re.sub(r"AIza[0-9A-Za-z\-_]{20,}", "AIza...REDACTED", text)
+    text = re.sub(r"(api[_ -]?key\s*[=:]\s*)(\S+)", r"\1REDACTED", text, flags=re.IGNORECASE)
+
+    if len(text) > max_length:
+        return f"{text[: max_length - 3]}..."
+    return text
+
+
+def _build_scan_details(exc, model_errors=None):
+    details = {
+        "exception_type": exc.__class__.__name__,
+        "reason": _sanitize_scan_message(exc),
+    }
+    if model_errors:
+        details["failed_models"] = [
+            {
+                "model": item["model"],
+                "message": _sanitize_scan_message(item["message"], max_length=180),
+            }
+            for item in model_errors
+        ]
+    return details
+
+
+def _classify_scan_exception(exc, model_errors=None):
     message = str(exc)
     lowered = message.lower()
+    details = _build_scan_details(exc, model_errors=model_errors)
 
     if "api key expired" in lowered:
         return _build_scan_error(
-            "AI scan is unavailable because the Gemini API key has expired. Renew the key in backend/.env.",
+            "AI scan is unavailable because Gemini reported the API key as expired.",
             code="gemini_key_expired",
             status_code=503,
+            details=details,
         )
 
     if (
@@ -47,9 +79,10 @@ def _classify_scan_exception(exc):
         or "please pass a valid api key" in lowered
     ):
         return _build_scan_error(
-            "AI scan is unavailable because the Gemini API key is invalid or revoked. Update GEMINI_API_KEY in backend/.env or in your deployment secrets.",
+            "AI scan is unavailable because Gemini rejected the API key.",
             code="gemini_key_invalid",
             status_code=503,
+            details=details,
         )
 
     if "quota" in lowered or "rate limit" in lowered or "resource_exhausted" in lowered:
@@ -57,6 +90,7 @@ def _classify_scan_exception(exc):
             "AI scan is temporarily unavailable because the Gemini quota has been exceeded. Please try again later.",
             code="gemini_quota_exceeded",
             status_code=503,
+            details=details,
         )
 
     if "unavailable" in lowered or "high demand" in lowered:
@@ -64,6 +98,7 @@ def _classify_scan_exception(exc):
             "AI scan is temporarily unavailable because Gemini is overloaded. Please try again shortly.",
             code="gemini_unavailable",
             status_code=503,
+            details=details,
         )
 
     if "not found" in lowered and "model" in lowered:
@@ -71,6 +106,7 @@ def _classify_scan_exception(exc):
             "AI scan is temporarily unavailable because the configured Gemini model is no longer supported.",
             code="gemini_model_not_found",
             status_code=503,
+            details=details,
         )
 
     if "deadline" in lowered or "timed out" in lowered or "timeout" in lowered:
@@ -78,12 +114,22 @@ def _classify_scan_exception(exc):
             "AI scan timed out while contacting Gemini. Please try again.",
             code="gemini_timeout",
             status_code=504,
+            details=details,
+        )
+
+    if isinstance(exc, json.JSONDecodeError):
+        return _build_scan_error(
+            "AI scan failed because Gemini returned a response that could not be parsed.",
+            code="gemini_invalid_json",
+            status_code=502,
+            details=details,
         )
 
     return _build_scan_error(
-        f"AI scan failed: {message}",
+        "AI scan failed while processing the receipt.",
         code="scan_failed",
         status_code=500,
+        details=details,
     )
 
 
@@ -96,6 +142,8 @@ def scan_receipt_image(image_file):
             code="gemini_key_missing",
             status_code=503,
         )
+
+    model_errors = []
 
     try:
         client = genai.Client(api_key=api_key)
@@ -145,13 +193,23 @@ def scan_receipt_image(image_file):
                 logger.debug("SUCCESS!")
                 break
             except Exception as model_error:
-                err_msg = str(model_error)[:80]
+                err_msg = _sanitize_scan_message(model_error, max_length=180)
                 logger.warning("Model %s failed: %s", model_id, err_msg)
+                model_errors.append(
+                    {
+                        "model": model_id,
+                        "message": str(model_error),
+                    }
+                )
                 last_error = model_error
                 continue
 
         if response is None:
-            logger.error("All AI models failed. Final error: %s", last_error)
+            logger.error(
+                "All AI models failed. Final error: %s | model_errors=%s",
+                _sanitize_scan_message(last_error),
+                _build_scan_details(last_error, model_errors=model_errors).get("failed_models", []),
+            )
             raise last_error
 
         text = response.text.strip()
@@ -171,4 +229,4 @@ def scan_receipt_image(image_file):
 
     except Exception as exc:
         logger.exception("AI Scan Error: %s", str(exc))
-        return _classify_scan_exception(exc)
+        return _classify_scan_exception(exc, model_errors=model_errors)
