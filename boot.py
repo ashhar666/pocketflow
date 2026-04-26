@@ -26,9 +26,13 @@ def run_command(cmd):
 
 log("Python Bootstrapper Initializing...")
 
-# Diagnostic: List files to confirm pathing
-log("Checking file structure...")
-run_command("ls -R . | head -n 20")
+# 0. Change directory to backend where manage.py lives
+log("Changing directory to backend...")
+if os.path.exists("backend"):
+    os.chdir("backend")
+else:
+    log("CRITICAL: backend directory not found!")
+    sys.exit(1)
 
 # 1. Collectstatic
 log("Collecting static files...")
