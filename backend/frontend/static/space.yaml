@@ -1,0 +1,29 @@
+# PocketFlow - Hugging Face Spaces Configuration
+# https://huggingface.co/docs/hub/spaces-sdks-docker
+
+title: PocketFlow
+emoji: 💰
+colorFrom: emerald
+colorTo: green
+sdk: docker
+app_port: 8000
+python_version: "3.10"
+
+# Hardware configuration  
+# CPU: 2 vCPU, 16GB RAM (scale from free tier)
+hardware:
+  cpu: 2
+  memory: 16GB
+
+# Environment variables (set in Space settings - NOT in this file)
+# DEBUG=false
+# SECRET_KEY=<generate-new>
+# DATABASE_URL=<your-neon-url>
+# TELEGRAM_WEBHOOK_SECRET=<generate-new>
+# TELEGRAM_BOT_TOKEN=<from @BotFather>
+# GEMINI_API_KEY=<from Google AI Studio>
+
+# Required packages (installed automatically from requirements.txt)
+# - django
+# - djangorestframework
+# - gunicorn (for production)
