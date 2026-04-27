@@ -292,7 +292,7 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/hour',
         'user': '1000/hour',
-        'login': '10/hour',
+        'login': '50/hour',
         'receipt_scan': '20/hour',  # AI API calls are expensive
     },
 }
