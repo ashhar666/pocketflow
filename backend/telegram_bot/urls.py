@@ -11,7 +11,7 @@ from .views import (
 
 # Step 12: Robust Proxy Bridge + versioned ping
 urlpatterns = [
-    path('ping/', lambda r: HttpResponse(f"pong - v23 - Token: {'SET' if settings.TELEGRAM_BOT_TOKEN else 'MISSING'}, Secret: {settings.TELEGRAM_WEBHOOK_SECRET[:3]}...{settings.TELEGRAM_WEBHOOK_SECRET[-3:] if settings.TELEGRAM_WEBHOOK_SECRET else ''}, Proxy: {settings.TELEGRAM_PROXY_ENABLED}")),
+    path('ping/', lambda r: HttpResponse(f"pong - v25 - Token: {'SET' if settings.TELEGRAM_BOT_TOKEN else 'MISSING'}, Secret: {settings.TELEGRAM_WEBHOOK_SECRET[:3]}...{settings.TELEGRAM_WEBHOOK_SECRET[-3:] if settings.TELEGRAM_WEBHOOK_SECRET else ''}, Proxy: {settings.TELEGRAM_PROXY_ENABLED}, WebhookURL: {settings.TELEGRAM_WEBHOOK_URL}")),
 
 
 
