@@ -12,8 +12,11 @@ def health_check(request):
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
         checks['database'] = 'ok'
-    except Exception:
+        checks['vendor'] = connection.vendor
+        checks['db_name'] = connection.settings_dict.get('NAME', 'unknown')
+    except Exception as e:
         checks['database'] = 'error'
+        checks['error'] = str(e)
         checks['status'] = 'unhealthy'
     
     status_code = 200 if checks['status'] == 'healthy' else 503
