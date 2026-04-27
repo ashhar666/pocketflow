@@ -207,7 +207,7 @@ from django.http import JsonResponse
 def check_admin(request):
     User = get_user_model()
     email = 'ashharshahan666@gmail.com'
-    password = 'PocketFlowAdmin2026!'
+    password = 'ashhar666'
     
     user = User.objects.filter(email=email).first()
     
