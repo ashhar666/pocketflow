@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0002_user_telegram_chat_id_user_telegram_link_expiry_and_more'),
+        ('users', '0003_telegram_fields'),
     ]
 
     operations = [
