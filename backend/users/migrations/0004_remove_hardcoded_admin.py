@@ -14,7 +14,7 @@ def delete_hardcoded_admin(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0003_user_password_reset_expiry_user_password_reset_token_and_more'),
+        ('users', '0004_password_reset_fields'),
     ]
 
     operations = [
