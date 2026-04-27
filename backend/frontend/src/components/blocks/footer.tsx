@@ -38,7 +38,7 @@ export const Footer = () => {
               <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500">Support</h4>
               <nav className="flex flex-col gap-4">
                 <a 
-                  href="mailto:support@pocketflow.com" 
+                  href="mailto:ashharshahan666@gmail.com" 
                   className="group flex items-center gap-3 text-sm font-semibold hover:text-emerald-400 transition-colors"
                 >
                   <div className="p-2 rounded-full bg-white/5 group-hover:bg-emerald-500/10 transition-colors">
