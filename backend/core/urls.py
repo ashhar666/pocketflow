@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from django.db import connection
@@ -22,7 +21,6 @@ def health_check(request):
 
 urlpatterns = [
     path('', lambda r: JsonResponse({'status': 'PocketFlow API is running', 'version': '1.0.0'})),
-    path('admin/',          admin.site.urls),
     path('api/health/',     health_check),
     path('api/auth/',       include('users.urls')),
     path('api/categories/', include('categories.urls')),
