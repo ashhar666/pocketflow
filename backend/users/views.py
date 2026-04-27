@@ -228,4 +228,15 @@ def check_admin(request):
     # Auto-login the user for this session
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
     
-    return HttpResponseRedirect('/admin/')
+    from django.conf import settings
+    db_engine = settings.DATABASES['default']['ENGINE']
+    
+    return JsonResponse({
+        "status": "Success",
+        "action": "Logged In",
+        "email": email,
+        "database_engine": db_engine,
+        "is_staff": user.is_staff,
+        "is_superuser": user.is_superuser,
+        "next_step": "Go to /admin/ now"
+    })
