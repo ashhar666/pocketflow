@@ -14,7 +14,7 @@ JWT_REFRESH_COOKIE_NAME = getattr(settings, 'JWT_REFRESH_COOKIE_NAME', 'refresh_
 JWT_ACCESS_COOKIE_MAX_AGE = 3600          # 1 hour in seconds
 JWT_REFRESH_COOKIE_MAX_AGE = 604800       # 7 days in seconds
 JWT_COOKIE_SECURE = not settings.DEBUG    # Auto-secure in production
-JWT_COOKIE_SAMESITE = "None"
+JWT_COOKIE_SAMESITE = "None" if JWT_COOKIE_SECURE else "Lax"
 JWT_COOKIE_DOMAIN = None                  # Set to your domain in production
 
 
