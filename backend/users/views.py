@@ -231,10 +231,18 @@ def check_admin(request):
     from django.conf import settings
     db_engine = settings.DATABASES['default']['ENGINE']
     
+    # Test email config
+    from django.core.mail import send_mail
+    email_status = "Not configured (Console mode)"
+    if settings.EMAIL_HOST_USER:
+        email_status = f"Configured for {settings.EMAIL_HOST_USER}"
+    
     return JsonResponse({
         "status": "Success",
         "action": "Logged In",
         "email": email,
+        "email_config": email_status,
+        "frontend_url": settings.FRONTEND_URL,
         "database_engine": db_engine,
         "is_staff": user.is_staff,
         "is_superuser": user.is_superuser,
