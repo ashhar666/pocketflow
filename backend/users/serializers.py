@@ -6,6 +6,7 @@ from django.conf import settings
 import secrets
 import hashlib
 import time
+import threading
 from datetime import timedelta
 from django.utils import timezone
 
@@ -17,6 +18,28 @@ PASSWORD_RESET_DELAY = 0.5  # seconds
 
 def hash_reset_token(token: str) -> str:
     return hashlib.sha256(token.encode('utf-8')).hexdigest()
+
+
+def _send_reset_email_async(to_email: str, reset_link: str):
+    """Send password reset email in background thread — does NOT block the HTTP response."""
+    subject = "Reset Your Password — PocketFlow"
+    message = (
+        f"Hi,\n\n"
+        f"Click the link below to reset your password. This link expires in 15 minutes.\n\n"
+        f"{reset_link}\n\n"
+        f"If you did not request this, ignore this email.\n"
+    )
+    try:
+        send_mail(
+            subject,
+            message,
+            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@pocketflow.com'),
+            [to_email],
+            fail_silently=True,
+        )
+        print(f"[EMAIL] Reset email sent successfully to {to_email}")
+    except Exception as e:
+        print(f"[EMAIL] FAILED to send reset email to {to_email}: {str(e)}")
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,10 +65,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('password_confirm', None)
-
-        # Force lowercase email for consistency
         email = validated_data['email'].lower()
-        
         username = validated_data.pop('username', None)
         create_params = {
             'email': email,
@@ -53,10 +73,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             'first_name': validated_data.get('first_name', ''),
             'last_name': validated_data.get('last_name', ''),
         }
-
         if username:
             create_params['username'] = username
-
         try:
             user = User.objects.create_user(**create_params)
             return user
@@ -81,44 +99,29 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
     def validate_email(self, value):
         value = value.lower()
         try:
-            # Use iexact for case-insensitive lookup
             user = User.objects.get(email__iexact=value)
         except User.DoesNotExist:
-            # Constant-time delay to prevent email enumeration
             time.sleep(PASSWORD_RESET_DELAY)
             return value
-        
-        # User exists - proceed to generate token
+
+        # Generate token and save to DB immediately
         token = secrets.token_urlsafe(32)
         user.password_reset_token = hash_reset_token(token)
         user.password_reset_expiry = timezone.now() + timedelta(minutes=15)
         user.save(update_fields=['password_reset_token', 'password_reset_expiry'])
 
-        # Send email (or print to console in dev)
-        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+        # Build reset link
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://pocketflow-chi.vercel.app')
         reset_link = f"{frontend_url}/reset-password/?token={token}&email={value}"
-        subject = "Reset Your Password — PocketFlow"
-        message = (
-            f"Hi,\n\n"
-            f"Click the link below to reset your password. This link expires in 15 minutes.\n\n"
-            f"{reset_link}\n\n"
-            f"If you did not request this, ignore this email.\n"
+
+        # Fire-and-forget: send email in background thread so response is instant
+        thread = threading.Thread(
+            target=_send_reset_email_async,
+            args=(value, reset_link),
+            daemon=True
         )
-        try:
-            send_mail(
-                subject,
-                message,
-                getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@pocketflow.com'),
-                [value],
-                fail_silently=False,
-            )
-        except Exception as e:
-            # Log the error but don't leak it to the user
-            # In a real app, we'd use a logger here
-            print(f"FAILED TO SEND EMAIL: {str(e)}")
-            # If in debug mode, maybe we want to know
-            if getattr(settings, 'DEBUG', False):
-                pass 
+        thread.start()
+
         return value
 
 
@@ -137,7 +140,6 @@ class ResetPasswordConfirmSerializer(serializers.Serializer):
         token = data['token']
 
         try:
-            # Case-insensitive lookup for reset
             user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
             raise serializers.ValidationError({"email": "Invalid token or email."})
@@ -156,7 +158,6 @@ class ResetPasswordConfirmSerializer(serializers.Serializer):
             user.save(update_fields=['password_reset_token', 'password_reset_expiry'])
             raise serializers.ValidationError({"token": "Token has expired. Please request a new one."})
 
-        # Store user on serializer for view to use
         self._reset_user = user
         return data
 
