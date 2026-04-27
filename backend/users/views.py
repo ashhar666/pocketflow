@@ -233,6 +233,7 @@ def check_admin(request):
     
     # Test email config
     from django.core.mail import send_mail
+    import traceback
     email_status = "Not configured (Console mode)"
     email_test_result = "Not tested"
     
@@ -250,6 +251,7 @@ def check_admin(request):
                 email_test_result = "SUCCESS! Email sent."
             except Exception as e:
                 email_test_result = f"FAILED: {str(e)}"
+                print(f"EMAIL TEST FAILED: {traceback.format_exc()}")
     
     return JsonResponse({
         "status": "Success",
