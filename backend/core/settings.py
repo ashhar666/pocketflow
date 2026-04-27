@@ -333,7 +333,12 @@ if _email_host_user:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
     EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+    # Auto-detect SSL vs TLS based on port (can be overridden via env)
+    # Port 465 → SSL (implicit), Port 587 → STARTTLS (explicit)
+    _use_ssl = os.getenv('EMAIL_USE_SSL', 'True' if EMAIL_PORT == 465 else 'False') == 'True'
+    _use_tls = os.getenv('EMAIL_USE_TLS', 'False' if _use_ssl else 'True') == 'True'
+    EMAIL_USE_SSL = _use_ssl
+    EMAIL_USE_TLS = _use_tls
     EMAIL_HOST_USER = _email_host_user
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
     DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', f'PocketFlow <{_email_host_user}>')
