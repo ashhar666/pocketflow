@@ -41,11 +41,8 @@ export const Sidebar = () => {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 shrink-0 h-screen bg-background border-r border-border sticky top-0 overflow-hidden transition-colors duration-400 print:hidden z-[10001]">
         <div className="pt-10 p-6 pb-4">
-          <Link href="/" className="flex items-center space-x-3 group/logo">
-            <div className="size-9 rounded-lg flex items-center justify-center shadow-lg group-hover/logo:scale-110 transition-transform overflow-hidden">
-              <Image src="/logo.png" alt="PocketFlow Logo" width={36} height={36} className="size-full object-cover" />
-            </div>
-            <div className="flex flex-col -space-y-0.5">
+          <Link href="/" className="flex items-center group/logo">
+            <div className="flex flex-col -space-y-0.5 ml-1">
               <span className="font-black text-base tracking-tighter text-foreground uppercase italic leading-none">PocketFlow</span>
               <div className="flex items-center gap-1.5">
                 <div className="size-1 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
