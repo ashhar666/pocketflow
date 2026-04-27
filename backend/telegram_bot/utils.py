@@ -162,14 +162,17 @@ def get_telegram_file_path(file_id: str) -> str:
 def download_telegram_file(file_path: str) -> bytes:
     """
     Download the actual file content from Telegram's file server.
+    Reroutes through proxy if enabled.
     """
     token = settings.TELEGRAM_BOT_TOKEN
-    url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    original_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    url = get_tg_url(original_url)
     try:
-        response = requests.get(url, timeout=20)
+        response = requests.get(url, timeout=30)
         if response.ok:
             return response.content
+        logger.error("download failed (URL: %s): %s — %s", url, response.status_code, response.text)
         return None
     except Exception as e:
-        logger.error("download error: %s", e)
+        logger.error("download error (URL: %s): %s", url, e)
         return None

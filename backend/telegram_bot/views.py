@@ -429,6 +429,11 @@ class WebhookView(APIView):
                 logger.debug("Empty message received")
                 return Response({"ok": True})
 
+            # ── /ping (Health Check) ───────────────────────────────────
+            if text == '/ping':
+                send_message(chat_id, f"<b>PONG!</b> 🏓\n\nVersion: v21\nStatus: Online\nTime: {timezone.now()}\nEnvironment: {'Local' if settings.DEBUG else 'Production'}")
+                return Response({"ok": True})
+
             # ── /start {token} ──────────────────────────────────────────
             if text.startswith('/start'):
                 parts = text.split(maxsplit=1)
@@ -784,8 +789,18 @@ class WebhookView(APIView):
             import traceback
             error_detail = traceback.format_exc()
             logger.exception("Telegram Webhook error: %s", error_detail)
-            # Still return 200 to Telegram so it doesn't retry indefinitely,
-            # but log the full error for debugging.
+            
+            # Notify the user so they aren't left wondering
+            try:
+                send_message(
+                    chat_id, 
+                    "⚠️ <b>Sorry, something went wrong.</b>\n\n"
+                    "I encountered an internal error while processing your request. "
+                    "The developers have been notified."
+                )
+            except:
+                pass
+                
             return Response({"ok": True})
 
 
