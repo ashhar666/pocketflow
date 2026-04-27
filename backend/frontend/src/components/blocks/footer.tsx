@@ -28,7 +28,7 @@ export const Footer = () => {
         </div>
 
         {/* Massive Typography - Refined Scale and Style */}
-        <div className="w-full mb-12">
+        <div className="w-full mb-12 text-center">
           <h2 className="text-[8vw] font-black tracking-[-0.05em] leading-none uppercase text-white select-none font-display">
             Pocketflow
           </h2>
