@@ -236,7 +236,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   <Link href={
                     (mode === 'login') ? "/register" : "/login"
                   } className="text-white hover:text-emerald-500 transition-colors ml-2 underline decoration-white/20 underline-offset-[6px]">
-                    {mode === 'register' ? "Log In" : "Log In"}
+                    {mode === 'register' ? "Log In" : "Register"}
                   </Link>
                 </motion.p>
               </>
