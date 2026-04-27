@@ -39,11 +39,8 @@ export const Footer = () => {
               <nav className="flex flex-col gap-4">
                 <a 
                   href="mailto:ashharshahan666@gmail.com" 
-                  className="group flex items-center gap-3 text-sm font-semibold hover:text-emerald-400 transition-colors"
+                  className="group flex items-center text-sm font-semibold hover:text-emerald-400 transition-colors"
                 >
-                  <div className="p-2 rounded-full bg-white/5 group-hover:bg-emerald-500/10 transition-colors">
-                    <Mail className="w-4 h-4" />
-                  </div>
                   Contact Support
                 </a>
               </nav>
@@ -53,10 +50,7 @@ export const Footer = () => {
 
         {/* Bottom Section */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
-              <span className="text-black font-black text-xs italic">PF</span>
-            </div>
+          <div className="flex items-center">
             <span className="text-lg font-bold tracking-tighter uppercase italic">PocketFlow</span>
           </div>
 
