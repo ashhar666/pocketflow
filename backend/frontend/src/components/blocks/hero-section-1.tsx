@@ -455,10 +455,7 @@ const HeroHeader = () => {
                 )}>
                     <div className="relative flex items-center justify-between gap-6">
                         <div className="flex w-full justify-between lg:w-auto">
-                            <Link href="/" className="flex items-center space-x-3 group/logo">
-                                <div className="size-8 rounded-lg flex items-center justify-center shadow-lg group-hover/logo:scale-110 transition-transform overflow-hidden">
-                                    <img src="/logo.png" alt="PocketFlow Logo" className="size-full object-cover" />
-                                </div>
+                            <Link href="/" className="flex items-center group/logo">
                                 <div className="flex flex-col -space-y-1">
                                     <span className="font-black text-xl tracking-tighter hidden sm:block text-foreground uppercase italic font-display">PocketFlow</span>
                                     <div className="flex items-center gap-2">
