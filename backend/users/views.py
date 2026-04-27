@@ -234,14 +234,29 @@ def check_admin(request):
     # Test email config
     from django.core.mail import send_mail
     email_status = "Not configured (Console mode)"
+    email_test_result = "Not tested"
+    
     if settings.EMAIL_HOST_USER:
         email_status = f"Configured for {settings.EMAIL_HOST_USER}"
+        if request.GET.get('test') == '1':
+            try:
+                send_mail(
+                    "PocketFlow Email Test",
+                    "If you are reading this, your email configuration is WORKING!",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=False,
+                )
+                email_test_result = "SUCCESS! Email sent."
+            except Exception as e:
+                email_test_result = f"FAILED: {str(e)}"
     
     return JsonResponse({
         "status": "Success",
         "action": "Logged In",
         "email": email,
         "email_config": email_status,
+        "email_test_result": email_test_result,
         "frontend_url": settings.FRONTEND_URL,
         "database_engine": db_engine,
         "is_staff": user.is_staff,
