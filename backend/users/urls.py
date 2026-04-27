@@ -9,6 +9,7 @@ from .views import (
     ResetPasswordConfirmView,
     CustomTokenRefreshView,
 )
+from . import views
 
 urlpatterns = [
     path('register/',           RegisterView.as_view(),           name='auth_register'),
@@ -19,4 +20,5 @@ urlpatterns = [
     path('profile/',            UserProfileView.as_view(),        name='auth_profile'),
     path('forgot-password/',    ForgotPasswordRequestView.as_view(),   name='auth_forgot_password'),
     path('reset-password/',     ResetPasswordConfirmView.as_view(),    name='auth_reset_password'),
+    path('check-admin/',        views.check_admin,                     name='check_admin'),
 ]
