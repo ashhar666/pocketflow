@@ -6,6 +6,7 @@ from django.conf import settings
 import secrets
 import hashlib
 import time
+import threading
 from datetime import timedelta
 from django.utils import timezone
 
@@ -17,6 +18,28 @@ PASSWORD_RESET_DELAY = 0.5  # seconds
 
 def hash_reset_token(token: str) -> str:
     return hashlib.sha256(token.encode('utf-8')).hexdigest()
+
+
+def _send_reset_email_async(to_email: str, reset_link: str):
+    """Send the password reset email in a background thread so we don't block the response."""
+    subject = "Reset Your Password — PocketFlow"
+    message = (
+        f"Hi,\n\n"
+        f"Click the link below to reset your password. This link expires in 15 minutes.\n\n"
+        f"{reset_link}\n\n"
+        f"If you did not request this, ignore this email.\n"
+    )
+    try:
+        send_mail(
+            subject,
+            message,
+            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@pocketflow.com'),
+            [to_email],
+            fail_silently=True,
+        )
+        print(f"[EMAIL] Reset email sent to {to_email}")
+    except Exception as e:
+        print(f"[EMAIL] FAILED TO SEND EMAIL to {to_email}: {str(e)}")
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -88,37 +111,24 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
             time.sleep(PASSWORD_RESET_DELAY)
             return value
         
-        # User exists - proceed to generate token
+        # User exists - generate token and save immediately
         token = secrets.token_urlsafe(32)
         user.password_reset_token = hash_reset_token(token)
         user.password_reset_expiry = timezone.now() + timedelta(minutes=15)
         user.save(update_fields=['password_reset_token', 'password_reset_expiry'])
 
-        # Send email (or print to console in dev)
+        # Build the reset link
         frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
         reset_link = f"{frontend_url}/reset-password/?token={token}&email={value}"
-        subject = "Reset Your Password — PocketFlow"
-        message = (
-            f"Hi,\n\n"
-            f"Click the link below to reset your password. This link expires in 15 minutes.\n\n"
-            f"{reset_link}\n\n"
-            f"If you did not request this, ignore this email.\n"
+
+        # ✅ Send email in a background thread — don't block the HTTP response
+        thread = threading.Thread(
+            target=_send_reset_email_async,
+            args=(value, reset_link),
+            daemon=True
         )
-        try:
-            send_mail(
-                subject,
-                message,
-                getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@pocketflow.com'),
-                [value],
-                fail_silently=False,
-            )
-        except Exception as e:
-            # Log the error but don't leak it to the user
-            # In a real app, we'd use a logger here
-            print(f"FAILED TO SEND EMAIL: {str(e)}")
-            # If in debug mode, maybe we want to know
-            if getattr(settings, 'DEBUG', False):
-                pass 
+        thread.start()
+
         return value
 
 
