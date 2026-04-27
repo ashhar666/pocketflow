@@ -19,12 +19,13 @@ const GoogleIcon = () => (
 // --- TYPE DEFINITIONS ---
 
 interface AuthPageProps {
-  mode: 'login' | 'register';
+  mode: 'login' | 'register' | 'forgot-password' | 'reset-password';
   title?: React.ReactNode;
   description?: React.ReactNode;
   heroImageSrc?: string;
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   isLoading?: boolean;
+  children?: React.ReactNode;
 }
 
 // --- SUB-COMPONENTS ---
@@ -56,6 +57,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   heroImageSrc = "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=2160&q=80",
   onSubmit,
   isLoading = false,
+  children,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -96,115 +98,149 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           <div className="flex flex-col gap-10">
             <motion.div variants={itemVariants} className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-[0.2em] italic mb-2">
-                   <span>{mode === 'login' ? 'LOG IN' : 'REGISTER'}</span>
+                   <span>
+                    {mode === 'login' ? 'LOG IN' : 
+                     mode === 'register' ? 'REGISTER' : 
+                     mode === 'forgot-password' ? 'RECOVERY' : 'RESET'}
+                   </span>
                 </div>
-                <h1 className="text-5xl md:text-7xl font-black leading-[0.85] tracking-[-0.08em] uppercase italic text-white">
-                    {title || (mode === 'login' ? "Welcome \nBack" : "Create \nAccount")}
+                <h1 className="text-5xl md:text-7xl font-black leading-[0.85] tracking-[-0.08em] uppercase italic text-white whitespace-pre-line">
+                    {title || (
+                      mode === 'login' ? "Welcome \nBack" : 
+                      mode === 'register' ? "Create \nAccount" :
+                      mode === 'forgot-password' ? "Reset \nPassword" : "Set New \nPassword"
+                    )}
                 </h1>
                 <p className="text-zinc-500 font-medium text-sm max-w-[28ch] uppercase tracking-widest leading-relaxed">
-                    {description || (mode === 'login' ? "Log in to your account." : "Join PocketFlow today.")}
+                    {description || (
+                      mode === 'login' ? "Log in to your account." : 
+                      mode === 'register' ? "Join PocketFlow today." :
+                      mode === 'forgot-password' ? "Enter your email for a reset link." : "Enter your new password below."
+                    )}
                 </p>
-
             </motion.div>
 
-            <form className="space-y-6" onSubmit={onSubmit}>
-              {mode === 'register' && (
-                <motion.div variants={itemVariants} className="space-y-6">
-                  <div>
-                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">User Details</label>
-                    <GlassInputWrapper label="USER">
-
-                      <input name="username" type="text" placeholder="Username" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
-                    </GlassInputWrapper>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <GlassInputWrapper>
-                        <input name="first_name" type="text" placeholder="First Name" className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
-                    </GlassInputWrapper>
-                    <GlassInputWrapper>
-                        <input name="last_name" type="text" placeholder="Last Name" className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
-                    </GlassInputWrapper>
-                  </div>
-                </motion.div>
-              )}
-
+            {children ? (
               <motion.div variants={itemVariants}>
-                {mode === 'login' && <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">Login Details</label>}
-                <GlassInputWrapper label="EMAIL">
-
-                  <input name="email" type="email" placeholder="Email Address" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
-                </GlassInputWrapper>
+                {children}
               </motion.div>
+            ) : (
+              <>
+                <form className="space-y-6" onSubmit={onSubmit}>
+                  {mode === 'register' && (
+                    <motion.div variants={itemVariants} className="space-y-6">
+                      <div>
+                        <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">User Details</label>
+                        <GlassInputWrapper label="USER">
 
-              <motion.div variants={itemVariants}>
-                <GlassInputWrapper label="PASS">
+                          <input name="username" type="text" placeholder="Username" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
+                        </GlassInputWrapper>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <GlassInputWrapper>
+                            <input name="first_name" type="text" placeholder="First Name" className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
+                        </GlassInputWrapper>
+                        <GlassInputWrapper>
+                            <input name="last_name" type="text" placeholder="Last Name" className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
+                        </GlassInputWrapper>
+                      </div>
+                    </motion.div>
+                  )}
 
-                    <div className="relative flex-1">
-                        <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Password" required className="w-full bg-transparent text-xs p-4 pr-16 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-4 flex items-center text-[10px] font-black italic text-zinc-600 hover:text-emerald-500 transition-colors uppercase tracking-tighter">
-                            {showPassword ? "HIDE" : "SHOW"}
-                        </button>
-                    </div>
-                </GlassInputWrapper>
-              </motion.div>
+                  <motion.div variants={itemVariants}>
+                    {(mode === 'login' || mode === 'forgot-password') && <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">
+                      {mode === 'login' ? 'Login Details' : 'Account Details'}
+                    </label>}
+                    <GlassInputWrapper label="EMAIL">
 
-              {mode === 'register' && (
-                <motion.div variants={itemVariants}>
-                    <GlassInputWrapper label="CONFIRM">
-
-                        <input name="password_confirm" type={showPassword ? 'text' : 'password'} placeholder="Confirm Password" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
+                      <input name="email" type="email" placeholder="Email Address" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
                     </GlassInputWrapper>
-                </motion.div>
-              )}
+                  </motion.div>
 
-              {mode === 'login' && (
-                <motion.div variants={itemVariants} className="flex items-center justify-between text-[10px] px-1">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" name="rememberMe" className="custom-checkbox" />
-                      <span className="text-zinc-600 font-bold uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Remember Me</span>
-                    </label>
-                    <Link href="/forgot-password" className="font-black text-emerald-500 hover:text-emerald-400 transition-colors uppercase tracking-[0.15em] italic">Forgot Password?</Link>
-                </motion.div>
-              )}
+                  {(mode !== 'forgot-password') && (
+                    <motion.div variants={itemVariants}>
+                      <GlassInputWrapper label="PASS">
 
+                          <div className="relative flex-1">
+                              <input name="password" type={showPassword ? 'text' : 'password'} placeholder={mode === 'reset-password' ? "New Password" : "Password"} required className="w-full bg-transparent text-xs p-4 pr-16 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
+                              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-4 flex items-center text-[10px] font-black italic text-zinc-600 hover:text-emerald-500 transition-colors uppercase tracking-tighter">
+                                  {showPassword ? "HIDE" : "SHOW"}
+                              </button>
+                          </div>
+                      </GlassInputWrapper>
+                    </motion.div>
+                  )}
 
-              <motion.button 
-                variants={itemVariants}
-                whileHover={{ scale: 1.01, boxShadow: "0 0 30px rgba(16,185,129,0.2)" }}
-                whileTap={{ scale: 0.98 }}
-                type="submit" 
-                disabled={isLoading}
-                className="w-full rounded-2xl bg-white text-black py-5 font-black hover:bg-emerald-500 hover:text-white transition-all active:scale-[0.98] flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-[0.3em] italic"
-              >
-                {isLoading ? "LOADING..." : (mode === 'login' ? "Log In" : "Register")}
+                  {(mode === 'register' || mode === 'reset-password') && (
+                    <motion.div variants={itemVariants}>
+                        <GlassInputWrapper label="CONFIRM">
 
-                {!isLoading && <span className="text-[10px] group-hover:translate-x-1 transition-transform">→</span>}
-              </motion.button>
-            </form>
+                            <input name="password_confirm" type={showPassword ? 'text' : 'password'} placeholder="Confirm Password" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
+                        </GlassInputWrapper>
+                    </motion.div>
+                  )}
 
-            <motion.div variants={itemVariants} className="relative flex items-center justify-center">
-              <span className="w-full border-t border-white/5"></span>
-              <span className="px-6 text-[9px] font-black uppercase tracking-[0.4em] text-zinc-700 bg-[#030303] absolute italic">Or continue with</span>
-            </motion.div>
-
-
-            <motion.button 
-              variants={itemVariants}
-              whileHover={{ backgroundColor: "rgba(255,255,255,0.03)" }}
-              type="button" 
-              className="w-full flex items-center justify-center gap-3 border border-white/5 rounded-2xl py-4 transition-all font-black text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-white italic"
-            >
-                <GoogleIcon />
-                <span>Google</span>
-            </motion.button>
+                  {mode === 'login' && (
+                    <motion.div variants={itemVariants} className="flex items-center justify-between text-[10px] px-1">
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                          <input type="checkbox" name="rememberMe" className="custom-checkbox" />
+                          <span className="text-zinc-600 font-bold uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Remember Me</span>
+                        </label>
+                        <Link href="/forgot-password" className="font-black text-emerald-500 hover:text-emerald-400 transition-colors uppercase tracking-[0.15em] italic">Forgot Password?</Link>
+                    </motion.div>
+                  )}
 
 
-            <motion.p variants={itemVariants} className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">
-              {mode === 'login' ? "New user?" : "Already have an account?"}{' '}
-              <Link href={mode === 'login' ? "/register" : "/login"} className="text-white hover:text-emerald-500 transition-colors ml-2 underline decoration-white/20 underline-offset-[6px]">
-                {mode === 'login' ? "Register" : "Log In"}
-              </Link>
-            </motion.p>
+                  <motion.button 
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.01, boxShadow: "0 0 30px rgba(16,185,129,0.2)" }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit" 
+                    disabled={isLoading}
+                    className="w-full rounded-2xl bg-white text-black py-5 font-black hover:bg-emerald-500 hover:text-white transition-all active:scale-[0.98] flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-[0.3em] italic"
+                  >
+                    {isLoading ? "LOADING..." : (
+                      mode === 'login' ? "Log In" : 
+                      mode === 'register' ? "Register" :
+                      mode === 'forgot-password' ? "Send Link" : "Reset Password"
+                    )}
+
+                    {!isLoading && <span className="text-[10px] group-hover:translate-x-1 transition-transform">→</span>}
+                  </motion.button>
+                </form>
+
+                {(mode === 'login' || mode === 'register') && (
+                  <>
+                    <motion.div variants={itemVariants} className="relative flex items-center justify-center">
+                      <span className="w-full border-t border-white/5"></span>
+                      <span className="px-6 text-[9px] font-black uppercase tracking-[0.4em] text-zinc-700 bg-[#030303] absolute italic">Or continue with</span>
+                    </motion.div>
+
+                    <motion.button 
+                      variants={itemVariants}
+                      whileHover={{ backgroundColor: "rgba(255,255,255,0.03)" }}
+                      type="button" 
+                      className="w-full flex items-center justify-center gap-3 border border-white/5 rounded-2xl py-4 transition-all font-black text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-white italic"
+                    >
+                        <GoogleIcon />
+                        <span>Google</span>
+                    </motion.button>
+                  </>
+                )}
+
+                <motion.p variants={itemVariants} className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">
+                  {mode === 'login' ? "New user?" : 
+                   mode === 'register' ? "Already have an account?" : 
+                   mode === 'forgot-password' ? "Remember your password?" : "Back to"}
+                  {' '}
+                  <Link href={
+                    (mode === 'login') ? "/register" : "/login"
+                  } className="text-white hover:text-emerald-500 transition-colors ml-2 underline decoration-white/20 underline-offset-[6px]">
+                    {mode === 'register' ? "Log In" : "Log In"}
+                  </Link>
+                </motion.p>
+              </>
+            )}
 
           </div>
         </motion.div>
