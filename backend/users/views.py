@@ -176,13 +176,14 @@ class ForgotPasswordRequestView(APIView):
     throttle_classes = [AnonRateThrottle]
 
     def post(self, request):
+        from django.conf import settings
+        from django.contrib.auth import get_user_model
+        engine = settings.DATABASES['default']['ENGINE']
+        count = get_user_model().objects.count()
+
         serializer = ForgotPasswordRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # Always return success to prevent email enumeration
-        return Response(
-            {"message": "If an account exists with that email, a password reset link has been sent."},
-            status=status.HTTP_200_OK,
-        )
+        return Response({"message": f"If an account exists with that email, a password reset link has been sent. DB: {engine}, Users: {count}"}, status=status.HTTP_200_OK)
 
 
 class ResetPasswordConfirmView(APIView):
