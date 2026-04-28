@@ -108,11 +108,10 @@ def _send_reset_email_async(to_email: str, reset_link: str):
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@pocketflow.com')
         msg = EmailMultiAlternatives(subject, text_body, from_email, [to_email])
         msg.attach_alternative(html_body, "text/html")
-        msg.send(fail_silently=False)
+        msg.send(fail_silently=True)
         print(f"[EMAIL] Reset email sent to {to_email}")
     except Exception as e:
         print(f"[EMAIL] FAILED TO SEND EMAIL to {to_email}: {str(e)}")
-        raise e
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -187,11 +186,8 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
         frontend_url = getattr(settings, 'FRONTEND_URL', 'https://pocketflow-chi.vercel.app')
         reset_link = f"{frontend_url}/reset-password/?token={token}&email={value}"
 
-        # TEMPORARY FIX: Send email synchronously to catch errors
-        try:
-            _send_reset_email_async(value, reset_link)
-        except Exception as e:
-            raise serializers.ValidationError({"email": f"Failed to send email: {str(e)}"})
+        # Dispatch email asynchronously
+        threading.Thread(target=_send_reset_email_async, args=(value, reset_link)).start()
 
         return value
 
