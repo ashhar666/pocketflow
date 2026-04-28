@@ -108,7 +108,7 @@ def _send_reset_email_async(to_email: str, reset_link: str):
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@pocketflow.com')
         msg = EmailMultiAlternatives(subject, text_body, from_email, [to_email])
         msg.attach_alternative(html_body, "text/html")
-        msg.send(fail_silently=True)
+        msg.send(fail_silently=False)
         print(f"[EMAIL] Reset email sent to {to_email}")
     except Exception as e:
         print(f"[EMAIL] FAILED TO SEND EMAIL to {to_email}: {str(e)}")
@@ -218,10 +218,7 @@ class ResetPasswordConfirmSerializer(serializers.Serializer):
 
         hashed_token = hash_reset_token(token)
         stored_token = user.password_reset_token or ''
-        if not (
-            secrets.compare_digest(stored_token, hashed_token)
-            or secrets.compare_digest(stored_token, token)
-        ):
+        if not secrets.compare_digest(stored_token, hashed_token):
             raise serializers.ValidationError({"token": "Invalid token."})
 
         if user.password_reset_expiry and timezone.now() > user.password_reset_expiry:

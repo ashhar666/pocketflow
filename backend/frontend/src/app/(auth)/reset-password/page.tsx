@@ -11,6 +11,7 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const email = searchParams.get('email');
   
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -40,14 +41,25 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      await api.post('/auth/reset-password/', { 
+      await api.post('/auth/reset-password/', {
         token,
-        new_password: password 
+        email,
+        new_password: password,
+        confirm_password: password_confirm,
       });
       setSuccess(true);
       toast.success("Password reset successfully!");
     } catch (err: any) {
-      toast.error(err.response?.data?.detail || "Failed to reset password.");
+      const data = err.response?.data;
+      const message =
+        data?.detail ||
+        data?.token?.[0] ||
+        data?.email?.[0] ||
+        data?.new_password?.[0] ||
+        data?.confirm_password?.[0] ||
+        data?.non_field_errors?.[0] ||
+        "Failed to reset password.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
+import toast from 'react-hot-toast';
 import { AuthPage } from '@/components/ui/auth-page';
 import { motion } from 'framer-motion';
 
@@ -26,8 +27,8 @@ export default function ForgotPasswordPage() {
       await api.post('/auth/forgot-password/', { email: emailValue });
       setStep('sent');
     } catch (err: any) {
-      // toast is already handled globally or we can add it here if needed
       console.error(err);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
