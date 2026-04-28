@@ -112,6 +112,7 @@ def _send_reset_email_async(to_email: str, reset_link: str):
         print(f"[EMAIL] Reset email sent to {to_email}")
     except Exception as e:
         print(f"[EMAIL] FAILED TO SEND EMAIL to {to_email}: {str(e)}")
+        raise e
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -186,13 +187,11 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
         frontend_url = getattr(settings, 'FRONTEND_URL', 'https://pocketflow-chi.vercel.app')
         reset_link = f"{frontend_url}/reset-password/?token={token}&email={value}"
 
-        # Fire-and-forget: send email in background thread so response is instant
-        thread = threading.Thread(
-            target=_send_reset_email_async,
-            args=(value, reset_link),
-            daemon=True
-        )
-        thread.start()
+        # TEMPORARY FIX: Send email synchronously to catch errors
+        try:
+            _send_reset_email_async(value, reset_link)
+        except Exception as e:
+            raise serializers.ValidationError({"email": f"Failed to send email: {str(e)}"})
 
         return value
 
