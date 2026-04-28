@@ -178,12 +178,15 @@ class ForgotPasswordRequestView(APIView):
     def post(self, request):
         from django.conf import settings
         from django.contrib.auth import get_user_model
+        import os
         engine = settings.DATABASES['default']['ENGINE']
         count = get_user_model().objects.count()
+        db_url = os.environ.get('DATABASE_URL', 'NOT_SET')
+        db_url = db_url[:40] + "..." if len(db_url) > 40 else db_url
 
         serializer = ForgotPasswordRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response({"message": f"If an account exists with that email, a password reset link has been sent. DB: {engine}, Users: {count}"}, status=status.HTTP_200_OK)
+        return Response({"message": f"DB: {engine}, Users: {count}, URL: {db_url}"}, status=status.HTTP_200_OK)
 
 
 class ResetPasswordConfirmView(APIView):
