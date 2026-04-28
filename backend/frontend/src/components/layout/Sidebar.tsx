@@ -15,7 +15,8 @@ import {
   PiggyBank, 
   Send, 
   Settings,
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
@@ -103,27 +104,30 @@ export const Sidebar = () => {
         </div>
       </aside>
 
+
+
       {/* Mobile Bottom Tab Bar */}
-      <nav className="md:hidden fixed bottom-4 inset-x-4 z-[10001] bg-background/80 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl safe-area-bottom px-2 overflow-hidden transition-colors duration-400">
-        <div className="flex justify-around items-center h-16">
+      <nav className="md:hidden fixed bottom-4 inset-x-4 z-[10001] bg-background/80 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl safe-area-bottom px-2 overflow-visible transition-colors duration-400">
+        <div className="flex justify-around items-center h-16 relative">
+          
           {navItems.slice(0, 5).map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
               <Link key={item.name} href={item.href} className="flex flex-col items-center justify-center w-full h-full relative transition-all duration-300">
                 {isActive && (
-                  <motion.div
-                    layoutId="mobile-active"
-                    className="absolute inset-0 bg-emerald-500/5 -z-10"
-                  />
+                  <motion.div layoutId="mobile-active" className="absolute inset-0 bg-emerald-500/5 -z-10" />
                 )}
-                <Icon className={`size-5 mb-1 transition-all duration-300 ${isActive ? 'text-emerald-500 scale-110' : 'text-zinc-600'}`} />
-                <span className={`text-[8px] font-black uppercase tracking-widest italic leading-none transition-colors duration-300 ${isActive ? 'text-emerald-500' : 'text-zinc-600'}`}>
-                  {item.name}
-                </span>
+                <motion.div whileTap={{ scale: 0.8 }} className="flex flex-col items-center">
+                  <Icon className={`size-5 mb-1 transition-all duration-300 ${isActive ? 'text-emerald-500 scale-110' : 'text-zinc-600'}`} />
+                  <span className={`text-[8px] font-black uppercase tracking-widest italic leading-none transition-colors duration-300 ${isActive ? 'text-emerald-500' : 'text-zinc-600'}`}>
+                    {item.name}
+                  </span>
+                </motion.div>
               </Link>
             );
           })}
+
         </div>
       </nav>
     </>
