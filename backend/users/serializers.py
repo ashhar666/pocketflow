@@ -70,8 +70,8 @@ def _send_reset_email_async(to_email: str, reset_link: str):
                 <tr>
                   <td align="center" style="padding:8px 0 32px;">
                     <a href="{reset_link}"
-                       style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 36px;border-radius:10px;letter-spacing:0.3px;">
-                      Reset My Password
+                       style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 36px;border-radius:10px;font-weight:600;">
+                       Reset My Password
                     </a>
                   </td>
                 </tr>
@@ -168,13 +168,19 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
     """Step 1: Request a password reset token."""
     email = serializers.EmailField(required=True)
 
-    def validate_email(self, value):
-        value = value.lower()
+    def validate(self, data):
+        """
+        Called during is_valid(). This is where we generate the token and send the email.
+        """
+        email = data['email'].lower()
+        
         try:
-            user = User.objects.get(email__iexact=value)
+            user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
+            # Add constant-time delay to prevent email enumeration
             time.sleep(PASSWORD_RESET_DELAY)
-            return value
+            # Return data as-is; we always return success to prevent email enumeration
+            return data
 
         # Generate token and save to DB immediately
         token = secrets.token_urlsafe(32)
@@ -184,12 +190,12 @@ class ForgotPasswordRequestSerializer(serializers.Serializer):
 
         # Build reset link
         frontend_url = getattr(settings, 'FRONTEND_URL', 'https://pocketflow-chi.vercel.app')
-        reset_link = f"{frontend_url}/reset-password/?token={token}&email={value}"
+        reset_link = f"{frontend_url}/reset-password/?token={token}&email={email}"
 
         # Dispatch email asynchronously
-        threading.Thread(target=_send_reset_email_async, args=(value, reset_link)).start()
+        threading.Thread(target=_send_reset_email_async, args=(email, reset_link)).start()
 
-        return value
+        return data
 
 
 class ResetPasswordConfirmSerializer(serializers.Serializer):
