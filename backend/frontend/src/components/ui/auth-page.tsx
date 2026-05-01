@@ -24,7 +24,9 @@ interface AuthPageProps {
   description?: React.ReactNode;
   heroImageSrc?: string;
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+  onGoogleClick?: () => void;
   isLoading?: boolean;
+  isGoogleLoading?: boolean;
   children?: React.ReactNode;
 }
 
@@ -56,7 +58,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   description,
   heroImageSrc = "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=2160&q=80",
   onSubmit,
+  onGoogleClick,
   isLoading = false,
+  isGoogleLoading = false,
   children,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -220,10 +224,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       variants={itemVariants}
                       whileHover={{ backgroundColor: "rgba(255,255,255,0.03)" }}
                       type="button" 
-                      className="w-full flex items-center justify-center gap-3 border border-white/5 rounded-2xl py-4 transition-all font-black text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-white italic"
+                      onClick={onGoogleClick}
+                      disabled={isGoogleLoading || isLoading}
+                      className="w-full flex items-center justify-center gap-3 border border-white/5 rounded-2xl py-4 transition-all font-black text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-white italic disabled:opacity-50"
                     >
                         <GoogleIcon />
-                        <span>Google</span>
+                        <span>{isGoogleLoading ? 'CONNECTING...' : 'Google'}</span>
                     </motion.button>
                   </>
                 )}
