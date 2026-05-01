@@ -3,6 +3,15 @@ import { PUBLIC_ROUTES } from './constants';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
+/**
+ * Builds a full API URL for a given path.
+ * Useful for window.location redirects (like Google Login) where axios isn't used.
+ */
+export const buildApiUrl = (path: string) => {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${API_URL}${cleanPath}`;
+};
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
