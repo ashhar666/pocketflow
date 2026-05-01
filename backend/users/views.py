@@ -202,3 +202,161 @@ class ResetPasswordConfirmView(APIView):
             {"message": "Password updated successfully. You can now log in."},
             status=status.HTTP_200_OK,
         )
+
+
+# ---------------------------------------------------------------------------
+# Google OAuth2 Authentication
+# ---------------------------------------------------------------------------
+
+import os
+import requests
+import logging
+from django.conf import settings
+from django.core import signing
+from django.shortcuts import redirect
+from django.utils.crypto import get_random_string
+from rest_framework_simplejwt.tokens import RefreshToken
+from .cookie_utils import set_auth_cookies
+
+logger = logging.getLogger(__name__)
+
+# Constants for signed state
+GOOGLE_OAUTH_STATE_COOKIE = "google_oauth_state"
+GOOGLE_OAUTH_STATE_MAX_AGE = 600  # 10 minutes
+
+def _get_google_redirect_uri():
+    # Use environment variable if set, otherwise fallback to standard calculation
+    env_uri = os.environ.get("GOOGLE_OAUTH_REDIRECT_URI")
+    if env_uri:
+        return env_uri
+    return f"{settings.APP_URL}/api/auth/google/callback/"
+
+def _frontend_auth_redirect(status_code, user_data=None):
+    """Helper to redirect back to frontend with a status query param"""
+    frontend_url = settings.CORS_ALLOWED_ORIGINS[0]
+    return redirect(f"{frontend_url}/login?auth_status={status_code}")
+
+class GoogleOAuthLoginView(APIView):
+    """
+    GET /api/auth/google/login/
+    Redirects user to Google OAuth consent screen.
+    """
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        # 1. Generate a signed state
+        # We don't rely on cookies for state because of cross-domain proxy issues (Hugging Face)
+        # Instead we use a signed timestamped state that Google will pass back to us.
+        state = signing.TimestampSigner(salt="google-oauth").sign(get_random_string(32))
+        
+        client_id = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
+        redirect_uri = _get_google_redirect_uri()
+        
+        google_auth_url = (
+            "https://accounts.google.com/o/oauth2/v2/auth"
+            f"?client_id={client_id}"
+            f"&response_type=code"
+            f"&scope=openid%20email%20profile"
+            f"&redirect_uri={redirect_uri}"
+            f"&state={state}"
+        )
+        
+        response = redirect(google_auth_url)
+        # We still set a cookie as a fallback/security layer for standard flow
+        response.set_cookie(
+            GOOGLE_OAUTH_STATE_COOKIE,
+            state,
+            max_age=GOOGLE_OAUTH_STATE_MAX_AGE,
+            httponly=True,
+            secure=not settings.DEBUG,
+            samesite="None" if not settings.DEBUG else "Lax",
+        )
+        return response
+
+class GoogleOAuthCallbackView(APIView):
+    """
+    GET /api/auth/google/callback/
+    Receives code from Google, exchanges for tokens, and logs in user.
+    """
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        code = request.GET.get("code")
+        error = request.GET.get("error")
+        
+        if error:
+            logger.error(f"Google OAuth error: {error}")
+            return _frontend_auth_redirect("google_denied")
+
+        if not code:
+            return _frontend_auth_redirect("missing_google_code")
+
+        state = request.GET.get("state")
+        # Validate the signed state
+        try:
+            signing.TimestampSigner(salt="google-oauth").unsign(
+                state or "",
+                max_age=GOOGLE_OAUTH_STATE_MAX_AGE,
+            )
+        except (signing.BadSignature, signing.SignatureExpired):
+            logger.warning("Google OAuth callback rejected because state validation failed.")
+            return _frontend_auth_redirect("invalid_google_state")
+
+        # Exchange code for access token
+        token_url = "https://oauth2.googleapis.com/token"
+        data = {
+            "code": code,
+            "client_id": os.environ.get("GOOGLE_OAUTH_CLIENT_ID"),
+            "client_secret": os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET"),
+            "redirect_uri": _get_google_redirect_uri(),
+            "grant_type": "authorization_code",
+        }
+
+        try:
+            token_res = requests.post(token_url, data=data, timeout=10)
+            token_res.raise_for_status()
+            tokens = token_res.json()
+            access_token = tokens.get("access_token")
+        except Exception as e:
+            logger.error(f"Failed to exchange Google code: {str(e)}")
+            return _frontend_auth_redirect("google_token_failed")
+
+        # Get user info
+        user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
+        try:
+            user_res = requests.get(user_info_url, headers={"Authorization": f"Bearer {access_token}"}, timeout=10)
+            user_res.raise_for_status()
+            user_info = user_res.json()
+        except Exception as e:
+            logger.error(f"Failed to fetch Google user info: {str(e)}")
+            return _frontend_auth_redirect("google_user_failed")
+
+        email = user_info.get("email")
+        if not email:
+            return _frontend_auth_redirect("no_email")
+
+        # Create or update user
+        User = get_user_model()
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "username": email.split("@")[0] + "_" + get_random_string(4),
+                "first_name": user_info.get("given_name", ""),
+                "last_name": user_info.get("family_name", ""),
+            }
+        )
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        
+        # Redirect to frontend dashboard with success
+        frontend_url = settings.CORS_ALLOWED_ORIGINS[0]
+        response = redirect(f"{frontend_url}/dashboard?auth_status=success")
+        
+        # Set cookies
+        set_auth_cookies(response, str(refresh.access_token), str(refresh))
+        
+        # Clean up state cookie
+        response.delete_cookie(GOOGLE_OAUTH_STATE_COOKIE)
+        
+        return response

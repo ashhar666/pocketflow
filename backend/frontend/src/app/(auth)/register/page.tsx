@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import api, { buildApiUrl } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { AuthPage } from '@/components/ui/auth-page';
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,6 +41,7 @@ export default function RegisterPage() {
       // Auto-login after successful registration (cookies set by backend)
       login(response.data.user);
       toast.success("Account created successfully!");
+      router.push('/dashboard');
     } catch (error: any) {
       const errData = error.response?.data;
       if (errData && typeof errData === 'object' && !errData.detail) {
@@ -54,11 +57,18 @@ export default function RegisterPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    setIsLoading(true);
+    window.location.href = buildApiUrl('/auth/google/login/');
+  };
+
   return (
     <AuthPage
       mode="register"
       onSubmit={handleRegister}
+      onGoogleClick={handleGoogleLogin}
       isLoading={isLoading}
+      isGoogleLoading={isLoading}
       heroImageSrc="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=2160&q=80" // Portfolio/Growth theme
     />
   );

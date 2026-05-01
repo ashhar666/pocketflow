@@ -31,12 +31,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  /* 
   // If it's a protected route and no valid token → redirect to login
   if (isProtectedRoute && !accessToken) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('from', currentPath);
     return NextResponse.redirect(loginUrl);
   }
+  */
 
   // Default to allowing access (for other internal routes, static assets, etc.)
   return NextResponse.next();

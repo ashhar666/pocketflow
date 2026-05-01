@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import api, { buildApiUrl } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { AuthPage } from '@/components/ui/auth-page';
 
@@ -34,6 +34,7 @@ export default function LoginPage() {
     try {
       const response = await api.post('/auth/login/', { email, password });
       login(response.data.user);
+      router.push('/dashboard');
     } catch (error: any) {
       console.error("Login Error:", error.response?.data || error.message);
       const detailMsg = error.response?.data?.detail;
@@ -43,11 +44,18 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    setIsLoading(true);
+    window.location.href = buildApiUrl('/auth/google/login/');
+  };
+
   return (
     <AuthPage
       mode="login"
       onSubmit={handleLogin}
+      onGoogleClick={handleGoogleLogin}
       isLoading={isLoading}
+      isGoogleLoading={isLoading}
       heroImageSrc="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=2160&q=80"
     />
   );
