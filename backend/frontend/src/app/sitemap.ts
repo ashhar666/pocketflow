@@ -1,10 +1,12 @@
 import { MetadataRoute } from "next";
 
+const DEFAULT_SITE_URL = "https://www.pocket-flow.app";
+
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   process.env.NEXT_PUBLIC_APP_URL ||
   process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') ||
-  'https://pocketflow-chi.vercel.app';
+  DEFAULT_SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
