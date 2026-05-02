@@ -34,7 +34,7 @@ export const Footer = () => {
             </div>
             <div className="flex flex-col gap-5 col-span-2 sm:col-span-1">
               <span className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-600 italic">Support</span>
-              <a href="mailto:ashharshahan666@gmail.com" className="text-zinc-400 hover:text-white transition-colors text-xs font-medium underline underline-offset-4">Contact Support</a>
+              <a href="mailto:pocketflow.app@gmail.com" className="text-zinc-400 hover:text-white transition-colors text-xs font-medium underline underline-offset-4">Contact Support</a>
             </div>
           </div>
         </div>

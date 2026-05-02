@@ -18,7 +18,7 @@ export default function LegalNoticePage() {
         <div className="space-y-2 text-zinc-400">
           <p className="font-bold text-foreground">PocketFlow Studio</p>
           <p>Kerala, India</p>
-          <p>Email: ashharshahan666@gmail.com</p>
+          <p>Email: pocketflow.app@gmail.com</p>
         </div>
       </section>
 
