@@ -21,9 +21,10 @@ export const Footer = () => {
       await api.post("/auth/support/", { message });
       toast.success("Message sent! We'll get back to you soon.");
       setMessage("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Support submission error:", error);
-      toast.error("Failed to send message. Please try again later.");
+      const errorMsg = error.response?.data?.detail || "Failed to send message. Please try again later.";
+      toast.error(errorMsg, { duration: 5000 });
     } finally {
       setIsSending(false);
     }

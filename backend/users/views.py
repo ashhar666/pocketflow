@@ -372,7 +372,13 @@ class SupportMessageView(APIView):
 
     def post(self, request):
         message = request.data.get('message')
-        user_email = request.data.get('email', 'Anonymous')
+        
+        # Try to identify the sender
+        user_email = "Anonymous"
+        if request.user and request.user.is_authenticated:
+            user_email = request.user.email
+        elif request.data.get('email'):
+            user_email = request.data.get('email')
         
         if not message:
             return Response({"detail": "Message is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -380,15 +386,25 @@ class SupportMessageView(APIView):
         # Construct email body
         full_message = f"Support Request from: {user_email}\n\nMessage:\n{message}"
         
+        # Use a clean email for the recipient (avoid 'Name <email>' format in recipient_list)
+        # We'll use EMAIL_HOST_USER if available, otherwise the official support mail
+        recipient = getattr(settings, 'EMAIL_HOST_USER', 'pocketflow.app@gmail.com')
+        if not recipient:
+            recipient = 'pocketflow.app@gmail.com'
+
         try:
             send_mail(
-                subject="PocketFlow Support Request",
+                subject=f"PocketFlow Support: {user_email}",
                 message=full_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                recipient_list=[recipient],
                 fail_silently=False,
             )
             return Response({"detail": "Message sent successfully."}, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error(f"Failed to send support email: {str(e)}")
-            return Response({"detail": "Failed to send message. Please try again later."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.error(f"Support email error: {str(e)}")
+            # Return a more helpful error message including the fallback email
+            return Response(
+                {"detail": "We couldn't send your message automatically. Please email us directly at pocketflow.app@gmail.com"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
