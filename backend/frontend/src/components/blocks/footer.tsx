@@ -34,7 +34,27 @@ export const Footer = () => {
             </div>
             <div className="flex flex-col gap-5 col-span-2 sm:col-span-1">
               <span className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-600 italic">Support</span>
-              <a href="mailto:pocketflow.app@gmail.com" className="text-zinc-400 hover:text-white transition-colors text-xs font-medium underline underline-offset-4">Contact Support</a>
+              <div className="flex flex-col gap-4">
+                <textarea 
+                  id="footer-support-message"
+                  placeholder="What's the problem?"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-4 text-xs text-zinc-300 placeholder:text-zinc-700 focus:outline-none focus:border-emerald-500/50 transition-all resize-none h-24"
+                />
+                <button 
+                  onClick={() => {
+                    const msg = (document.getElementById('footer-support-message') as HTMLTextAreaElement)?.value;
+                    if (msg) {
+                      window.location.href = `mailto:pocketflow.app@gmail.com?subject=Support Request&body=${encodeURIComponent(msg)}`;
+                    } else {
+                      window.location.href = `mailto:pocketflow.app@gmail.com?subject=Support Request`;
+                    }
+                  }}
+                  className="group flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 transition-all active:scale-95"
+                >
+                  Send Message
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
