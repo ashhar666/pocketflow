@@ -1,10 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import api from "@/lib/api";
+import toast from "react-hot-toast";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!message.trim()) {
+      toast.error("Please enter a message first.");
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      await api.post("/auth/support/", { message });
+      toast.success("Message sent! We'll get back to you soon.");
+      setMessage("");
+    } catch (error) {
+      console.error("Support submission error:", error);
+      toast.error("Failed to send message. Please try again later.");
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
     <footer className="w-full bg-[#000000] text-white pt-32 pb-12 overflow-hidden border-t border-white/5 font-sans relative">
@@ -36,22 +59,17 @@ export const Footer = () => {
               <span className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-600 italic">Support</span>
               <div className="flex flex-col gap-4">
                 <textarea 
-                  id="footer-support-message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   placeholder="What's the problem?"
                   className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-4 text-xs text-zinc-300 placeholder:text-zinc-700 focus:outline-none focus:border-emerald-500/50 transition-all resize-none h-24"
                 />
                 <button 
-                  onClick={() => {
-                    const msg = (document.getElementById('footer-support-message') as HTMLTextAreaElement)?.value;
-                    if (msg) {
-                      window.location.href = `mailto:pocketflow.app@gmail.com?subject=Support Request&body=${encodeURIComponent(msg)}`;
-                    } else {
-                      window.location.href = `mailto:pocketflow.app@gmail.com?subject=Support Request`;
-                    }
-                  }}
-                  className="group flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 transition-all active:scale-95"
+                  onClick={handleSubmit}
+                  disabled={isSending}
+                  className="group flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Send Message
+                  {isSending ? "Sending..." : "Send Message"}
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
                 </button>
               </div>

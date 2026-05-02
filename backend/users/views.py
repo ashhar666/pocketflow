@@ -15,6 +15,7 @@ from .serializers import (
     ResetPasswordConfirmSerializer,
 )
 from .cookie_utils import set_jwt_cookies, clear_jwt_cookies
+from django.core.mail import send_mail
 
 User = get_user_model()
 
@@ -360,3 +361,34 @@ class GoogleOAuthCallbackView(APIView):
         response.delete_cookie(GOOGLE_OAUTH_STATE_COOKIE)
         
         return response
+
+class SupportMessageView(APIView):
+    """
+    POST /api/auth/support/
+    Accepts { message }. Sends a support request email to the admin.
+    """
+    permission_classes = (AllowAny,)
+    throttle_classes = [AnonRateThrottle]
+
+    def post(self, request):
+        message = request.data.get('message')
+        user_email = request.data.get('email', 'Anonymous')
+        
+        if not message:
+            return Response({"detail": "Message is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Construct email body
+        full_message = f"Support Request from: {user_email}\n\nMessage:\n{message}"
+        
+        try:
+            send_mail(
+                subject="PocketFlow Support Request",
+                message=full_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                fail_silently=False,
+            )
+            return Response({"detail": "Message sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Failed to send support email: {str(e)}")
+            return Response({"detail": "Failed to send message. Please try again later."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

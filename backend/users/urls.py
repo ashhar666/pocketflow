@@ -8,6 +8,7 @@ from .views import (
     ForgotPasswordRequestView,
     ResetPasswordConfirmView,
     CustomTokenRefreshView,
+    SupportMessageView,
 )
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     path('profile/',            UserProfileView.as_view(),        name='auth_profile'),
     path('forgot-password/',    ForgotPasswordRequestView.as_view(),   name='auth_forgot_password'),
     path('reset-password/',     ResetPasswordConfirmView.as_view(),    name='auth_reset_password'),
+    path('support/',            SupportMessageView.as_view(),           name='auth_support'),
 ]
