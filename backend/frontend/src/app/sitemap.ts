@@ -1,12 +1,6 @@
 import { MetadataRoute } from "next";
 
-const DEFAULT_SITE_URL = "https://www.pocket-flow.app";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  process.env.NEXT_PUBLIC_APP_URL ||
-  process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') ||
-  DEFAULT_SITE_URL;
+const SITE_URL = "https://www.pocket-flow.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
