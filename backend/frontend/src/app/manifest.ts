@@ -2,13 +2,13 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "PocketFlow - Smart Expense Tracker",
+    name: "PocketFlow | Smart AI Expense Tracker",
     short_name: "PocketFlow",
-    description: "Track expenses, manage budgets, and scan receipts with AI.",
+    description: "Track your expenses effortlessly with AI receipt scanning and real-time insights.",
     start_url: "/",
     display: "standalone",
-    background_color: "#020617",
-    theme_color: "#020617",
+    background_color: "#0f172a",
+    theme_color: "#0f172a",
     icons: [
       {
         src: "/favicon.png",
@@ -16,13 +16,8 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
       {
-        src: "/favicon.png",
+        src: "/icon.png",
         sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        src: "/favicon.png",
-        sizes: "512x512",
         type: "image/png",
       },
     ],

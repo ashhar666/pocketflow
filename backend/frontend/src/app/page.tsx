@@ -4,6 +4,15 @@ import { FeatureCardsSection } from '@/components/blocks/feature-cards-section';
 import { HowItWorksSimple } from '@/components/blocks/how-it-works-simple';
 import { TestimonialsSection } from '@/components/blocks/testimonials-section';
 import { FAQSection } from '@/components/blocks/faq-section';
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "PocketFlow | Smart AI Expense Tracker & Receipt Scanner",
+  description: "Stop manual data entry. Use PocketFlow's AI to scan receipts, track spending, and manage your budget in real-time.",
+  alternates: {
+    canonical: "https://www.pocket-flow.app",
+  },
+};
 
 export default function Home() {
   return (
