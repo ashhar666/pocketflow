@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    compress: true,
     images: {
+        formats: ['image/avif', 'image/webp'],
         remotePatterns: [
             {
                 protocol: 'https',
@@ -27,6 +29,9 @@ const nextConfig = {
     swcMinify: true,
     compiler: {
         removeConsole: process.env.NODE_ENV === 'production',
+    },
+    experimental: {
+        optimizePackageImports: ['lucide-react', 'recharts', 'framer-motion'],
     },
     typescript: {
         ignoreBuildErrors: false,

@@ -1,13 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import {
-  BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-  AreaChart, Area
-} from 'recharts';
 import api from '@/lib/api';
 import { formatScanFailure } from '@/lib/scanError';
 import toast from 'react-hot-toast';
@@ -25,8 +21,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ReceiptText,
-  AlertCircle,
-  Loader2
+  AlertCircle
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -41,6 +36,36 @@ interface MonthlySummary {
   total_balance: number;
   by_category: { name: string; amount: number; color: string }[];
 }
+
+const ChartSkeleton = ({ label = 'Loading chart' }: { label?: string }) => (
+  <div className="h-full min-h-64 animate-pulse rounded-2xl bg-zinc-200/70 dark:bg-zinc-800/70 flex items-center justify-center">
+    <span className="text-[10px] font-black uppercase italic tracking-widest text-zinc-400">{label}</span>
+  </div>
+);
+
+const CashflowTrendChart = dynamic(
+  () => import('./DashboardCharts').then((mod) => mod.CashflowTrendChart),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+);
+
+const CategoryPieChart = dynamic(
+  () => import('./DashboardCharts').then((mod) => mod.CategoryPieChart),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+);
+
+const WeeklyBreakdownChart = dynamic(
+  () => import('./DashboardCharts').then((mod) => mod.WeeklyBreakdownChart),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+);
 
 const formatCurrency = (val: number | string | undefined | null) => {
   const num = typeof val === 'string' ? parseFloat(val) : (val || 0);
@@ -96,29 +121,43 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      const failures: string[] = [];
-      try {
-        const safeGet = async (url: string) => {
-          try {
-            const r = await api.get(url);
-            return r;
-          } catch (e: any) {
-            console.error(`Error fetching ${url}:`, e?.response?.data || e.message);
-            failures.push(url);
-            return { data: null };
-          }
-        };
+    let isMounted = true;
 
-        const [monthRes, weekRes, trendRes, insightsRes, activityRes] = await Promise.all([
-          safeGet('/summary/monthly/'),
+    const recordFailure = (url: string) => {
+      if (!isMounted) return;
+      setFailedEndpoints((prev) => (prev.includes(url) ? prev : [...prev, url]));
+      setDismissedError(false);
+    };
+
+    const safeGet = async (url: string) => {
+      try {
+        return await api.get(url);
+      } catch (e: any) {
+        console.error(`Error fetching ${url}:`, e?.response?.data || e.message);
+        recordFailure(url);
+        return { data: null };
+      }
+    };
+
+    const fetchDashboardData = async () => {
+      try {
+        setFailedEndpoints([]);
+        setDismissedError(false);
+
+        const monthRes = await safeGet('/summary/monthly/');
+        if (!isMounted) return;
+
+        if (monthRes.data) setMonthly(monthRes.data);
+        setLoading(false);
+
+        const [weekRes, trendRes, insightsRes, activityRes] = await Promise.all([
           safeGet('/summary/weekly/'),
           safeGet('/summary/trend/'),
           safeGet('/summary/insights/'),
           safeGet('/summary/activity/')
         ]);
 
-        if (monthRes.data) setMonthly(monthRes.data);
+        if (!isMounted) return;
         if (weekRes.data) setWeekly(weekRes.data);
         if (trendRes.data && Array.isArray(trendRes.data)) setTrend(trendRes.data);
         if (insightsRes.data) setInsights(insightsRes.data);
@@ -126,25 +165,34 @@ export default function DashboardPage() {
 
       } catch (error) {
         console.error("Failed to process dashboard data", error);
-        failures.push('general');
-      } finally {
-        setFailedEndpoints(failures);
-        setDismissedError(false);
-        setLoading(false);
+        recordFailure('general');
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchDashboardData();
-    
-    // Fetch categories for AI mapping
-    api.get('/categories/')
-      .then(res => setCategories(res.data))
-      .catch(err => console.error("Failed to fetch categories", err));
 
-    // Check telegram status
-    api.get('/telegram/status/')
-      .then(res => setIsTelegramConnected(res.data.connected))
-      .catch(() => setIsTelegramConnected(false));
+    const secondaryTimer = window.setTimeout(() => {
+      // Action-only data can load after the first dashboard paint.
+      api.get('/categories/')
+        .then(res => {
+          if (isMounted) setCategories(res.data);
+        })
+        .catch(err => console.error("Failed to fetch categories", err));
+
+      api.get('/telegram/status/')
+        .then(res => {
+          if (isMounted) setIsTelegramConnected(res.data.connected);
+        })
+        .catch(() => {
+          if (isMounted) setIsTelegramConnected(false);
+        });
+    }, 800);
+
+    return () => {
+      isMounted = false;
+      window.clearTimeout(secondaryTimer);
+    };
   }, []);
 
   const handleScanReceipt = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -450,46 +498,8 @@ export default function DashboardPage() {
             <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400">Income vs Spending</h3>
           </div>
           <div className="h-72">
-            {trend && trend.length > 0 && trend.some(t => t.amount > 0) ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#ffffff05' : '#00000005'} />
-                  <XAxis
-                    dataKey="month"
-                    stroke={theme === 'dark' ? '#52525b' : '#94a3b8'}
-                    fontSize={10}
-                    tickLine={false}
-                    axisLine={false}
-                    className="uppercase font-black italic tracking-tighter"
-                  />
-                  <YAxis
-                    stroke={theme === 'dark' ? '#52525b' : '#94a3b8'}
-                    fontSize={10}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(val) => `₹${val}`}
-                    className="font-black italic tracking-tighter"
-                  />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: theme === 'dark' ? '#000' : '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', backdropFilter: 'blur(20px)' }}
-                    itemStyle={{ fontWeight: 'bold' }}
-                    formatter={(value: any, name: any) => [formatCurrency(Number(value) || 0), String(name).toUpperCase()]}
-                  />
-                  <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'black', textTransform: 'uppercase', fontStyle: 'italic' }} />
-                  <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" name="Income" />
-                  <Area type="monotone" dataKey="expense" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" name="Spending" />
-                </AreaChart>
-              </ResponsiveContainer>
+            {trend && trend.length > 0 && trend.some(t => t.income > 0 || t.expense > 0) ? (
+              <CashflowTrendChart data={trend} theme={theme} />
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500">
                 <div className="text-xs font-black uppercase italic tracking-widest opacity-20">No Data</div>
@@ -503,33 +513,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400 mb-8">Where your money goes</h3>
           {monthly?.by_category && monthly.by_category.length > 0 ? (
             <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={monthly.by_category}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={85}
-                    outerRadius={115}
-                    paddingAngle={8}
-                    dataKey="amount"
-                  >
-                    {monthly.by_category.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ backgroundColor: theme === 'dark' ? '#000' : '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', backdropFilter: 'blur(20px)' }}
-                    formatter={(value: any) => [formatCurrency(Number(value) || 0), 'VAL']}
-                  />
-                  <Legend
-                    verticalAlign="bottom"
-                    height={36}
-                    iconType="circle"
-                    className="text-[10px] font-black uppercase italic tracking-widest opacity-50"
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <CategoryPieChart data={monthly.by_category} theme={theme} />
             </div>
           ) : (
             <div className="h-72 flex items-center justify-center text-zinc-700 font-black uppercase italic tracking-widest text-xs">
@@ -545,21 +529,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400 mb-8">Daily Activity</h3>
           <div className="h-64">
             {weekly && weekly.length > 0 && weekly.some(d => d.expense > 0 || d.income > 0) ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weekly} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#ffffff05' : '#00000005'} />
-                  <XAxis dataKey="day" stroke={theme === 'dark' ? '#52525b' : '#94a3b8'} fontSize={10} tickLine={false} axisLine={false} className="uppercase font-black italic tracking-tighter" />
-                  <YAxis stroke={theme === 'dark' ? '#52525b' : '#94a3b8'} fontSize={10} tickLine={false} axisLine={false} className="font-black italic tracking-tighter" tickFormatter={(value) => `₹${value}`} />
-                  <Tooltip
-                    cursor={{ fill: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}
-                    contentStyle={{ backgroundColor: theme === 'dark' ? '#000' : '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', backdropFilter: 'blur(20px)' }}
-                    formatter={(value: any, name: any) => [formatCurrency(Number(value) || 0), String(name).charAt(0).toUpperCase() + String(name).slice(1)]}
-                  />
-                  <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', paddingTop: '10px' }} />
-                  <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} name="Income" />
-                  <Bar dataKey="expense" fill="#f43f5e" radius={[4, 4, 0, 0]} name="Expense" />
-                </BarChart>
-              </ResponsiveContainer>
+              <WeeklyBreakdownChart data={weekly} theme={theme} />
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500">
                 <div className="text-xs font-black uppercase italic tracking-widest opacity-20">No activity yet</div>
