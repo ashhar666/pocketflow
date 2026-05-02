@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -59,8 +60,8 @@ export default function MinimalistFooter() {
           {/* Brand and Mission */}
           <div className="lg:col-span-2 space-y-6">
             <Link href="/" className="flex items-center gap-2 text-white">
-              <div className="w-5 h-5 rounded-md flex items-center justify-center overflow-hidden bg-white">
-                <img src="/logo.png" alt="PocketFlow Logo" className="size-full object-cover" />
+              <div className="w-5 h-5 rounded-md flex items-center justify-center overflow-hidden bg-white relative">
+                <Image src="/logo.png" alt="PocketFlow Logo" fill className="object-cover" />
               </div>
               <span className="text-xl font-bold tracking-tight">PocketFlow</span>
             </Link>
