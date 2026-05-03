@@ -99,7 +99,7 @@ ALLOWED_HOSTS += ['.ngrok-free.dev', '.ngrok.io', '.onrender.com']
 # ── CSRF Trusted Origins ────────────────────────────────────────────────────
 CSRF_TRUSTED_ORIGINS = os.getenv(
     'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000'
+    'http://localhost:3000,http://127.0.0.1:3000,https://www.pocket-flow.app,https://pocket-flow.app'
 ).split(',')
 
 if DEBUG:
@@ -312,7 +312,7 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = os.getenv(
     'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000'
+    'http://localhost:3000,http://127.0.0.1:3000,https://www.pocket-flow.app,https://pocket-flow.app'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
 

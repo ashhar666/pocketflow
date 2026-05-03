@@ -2,6 +2,8 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model, authenticate
 from django.conf import settings
@@ -363,6 +365,7 @@ class GoogleOAuthCallbackView(APIView):
         
         return response
 
+@method_decorator(csrf_exempt, name='dispatch')
 class SupportMessageView(APIView):
     """
     POST /api/auth/support/
