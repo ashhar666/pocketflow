@@ -9,6 +9,8 @@ from .views import (
     ResetPasswordConfirmView,
     CustomTokenRefreshView,
     SupportMessageView,
+    GoogleOAuthLoginView,
+    GoogleOAuthCallbackView,
 )
 
 urlpatterns = [
@@ -21,4 +23,6 @@ urlpatterns = [
     path('forgot-password/',    ForgotPasswordRequestView.as_view(),   name='auth_forgot_password'),
     path('reset-password/',     ResetPasswordConfirmView.as_view(),    name='auth_reset_password'),
     path('support/',            SupportMessageView.as_view(),           name='auth_support'),
+    path('google/login/',       GoogleOAuthLoginView.as_view(),         name='google_login'),
+    path('google/callback/',    GoogleOAuthCallbackView.as_view(),      name='google_callback'),
 ]
