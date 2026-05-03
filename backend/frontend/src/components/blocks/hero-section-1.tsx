@@ -375,9 +375,9 @@ export function HeroSection() {
                                         variants={transitionVariants}
                                         className="mt-8 max-w-5xl mx-auto text-balance text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.9]"
                                     >
-                                        <span className="sr-only">PocketFlow — AI-Powered Personal Expense Tracker. </span>
-                                        Track money fast. <br />
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/40">Spend less.</span>
+                                        <span className="sr-only">PocketFlow — Free AI-Powered Personal Expense Tracker. </span>
+                                        The easiest free <br />
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/40">AI expense tracker.</span>
                                     </motion.h1>
 
                                     <motion.p
@@ -398,7 +398,7 @@ export function HeroSection() {
                                             className="h-14 rounded-2xl px-10 text-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold border-none transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95"
                                         >
                                             <Link href="/register" aria-label="Sign up for PocketFlow — free expense tracking">
-                                                <span>Get Started</span>
+                                                <span>Get Started — It&apos;s Free</span>
                                             </Link>
                                         </Button>
                                         <Button

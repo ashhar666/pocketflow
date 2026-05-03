@@ -15,6 +15,7 @@ from .serializers import (
     ResetPasswordConfirmSerializer,
 )
 from .cookie_utils import set_jwt_cookies, clear_jwt_cookies
+from .models import SupportMessage
 from django.core.mail import send_mail
 
 User = get_user_model()
@@ -371,40 +372,48 @@ class SupportMessageView(APIView):
     throttle_classes = [AnonRateThrottle]
 
     def post(self, request):
-        message = request.data.get('message')
+        message = (request.data.get('message') or '').strip()
         
         # Try to identify the sender
-        user_email = "Anonymous"
+        user_email = ""
         if request.user and request.user.is_authenticated:
-            user_email = request.user.email
+            user_email = request.user.email or ""
         elif request.data.get('email'):
             user_email = request.data.get('email')
         
         if not message:
             return Response({"detail": "Message is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        support_message = SupportMessage.objects.create(
+            sender_email=user_email,
+            message=message,
+        )
         
         # Construct email body
-        full_message = f"Support Request from: {user_email}\n\nMessage:\n{message}"
+        sender_label = user_email or "Anonymous"
+        full_message = f"Support Request from: {sender_label}\n\nMessage:\n{message}"
         
-        # Use a clean email for the recipient (avoid 'Name <email>' format in recipient_list)
-        # We'll use EMAIL_HOST_USER if available, otherwise the official support mail
-        recipient = getattr(settings, 'EMAIL_HOST_USER', 'pocketflow.app@gmail.com')
-        if not recipient:
-            recipient = 'pocketflow.app@gmail.com'
+        # Keep this separate from EMAIL_HOST_USER, which may be an SMTP username.
+        recipient = getattr(settings, 'SUPPORT_EMAIL', 'pocketflow.app@gmail.com') or 'pocketflow.app@gmail.com'
 
         try:
             send_mail(
-                subject=f"PocketFlow Support: {user_email}",
+                subject=f"PocketFlow Support: {sender_label}",
                 message=full_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[recipient],
                 fail_silently=False,
             )
+            support_message.email_sent = True
+            support_message.save(update_fields=['email_sent'])
             return Response({"detail": "Message sent successfully."}, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"Support email error: {str(e)}")
-            # Return a more helpful error message including the fallback email
+            support_message.email_error = str(e)
+            support_message.save(update_fields=['email_error'])
+
+            # The complaint is safely stored for admin review even if SMTP is down.
             return Response(
-                {"detail": "We couldn't send your message automatically. Please email us directly at pocketflow.app@gmail.com"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"detail": "Message received. Our email alert is delayed, but your complaint has been saved."},
+                status=status.HTTP_202_ACCEPTED
             )

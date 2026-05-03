@@ -63,3 +63,22 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class SupportMessage(models.Model):
+    sender_email = models.EmailField(blank=True)
+    message = models.TextField()
+    email_sent = models.BooleanField(default=False)
+    email_error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["sender_email"]),
+        ]
+
+    def __str__(self):
+        sender = self.sender_email or "Anonymous"
+        return f"Support message from {sender} at {self.created_at:%Y-%m-%d %H:%M}"

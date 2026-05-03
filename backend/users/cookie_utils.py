@@ -55,6 +55,13 @@ def set_jwt_cookies(response, access_token, refresh_token):
     )
 
 
+def set_auth_cookies(response, access_token, refresh_token):
+    """
+    Backward-compatible alias used by the Google OAuth flow.
+    """
+    set_jwt_cookies(response, access_token, refresh_token)
+
+
 def clear_jwt_cookies(response):
     """
     Clear HTTP-only JWT cookies on logout.

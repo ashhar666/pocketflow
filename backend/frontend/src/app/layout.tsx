@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | PocketFlow"
   },
   description: "Track your expenses effortlessly with AI receipt scanning, real-time budgeting, and savings goals.",
-  keywords: ["expense tracker", "AI receipt scanner", "budget tracker", "personal finance", "PocketFlow", "money manager"],
+  keywords: ["free expense tracker", "AI receipt scanner", "budget tracker", "personal finance", "PocketFlow", "money manager"],
   authors: [{ name: "PocketFlow Team", url: SITE_URL }],
   creator: "PocketFlow",
   publisher: "PocketFlow",

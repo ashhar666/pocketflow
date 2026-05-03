@@ -18,8 +18,8 @@ export const Footer = () => {
 
     setIsSending(true);
     try {
-      await api.post("/auth/support/", { message });
-      toast.success("Message sent! We'll get back to you soon.");
+      const response = await api.post("/auth/support/", { message });
+      toast.success(response.data?.detail || "Message sent! We'll get back to you soon.");
       setMessage("");
     } catch (error: any) {
       console.error("Support submission error:", error);

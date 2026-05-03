@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
-from users.models import User
+from users.models import SupportMessage, User
 
 
 @admin.register(User)
@@ -31,3 +31,16 @@ class UserAdmin(BaseUserAdmin):
     )
 
     readonly_fields = ('last_login', 'date_joined')
+
+
+@admin.register(SupportMessage)
+class SupportMessageAdmin(admin.ModelAdmin):
+    list_display = ('sender_email_display', 'email_sent', 'created_at')
+    list_filter = ('email_sent', 'created_at')
+    search_fields = ('sender_email', 'message')
+    readonly_fields = ('sender_email', 'message', 'email_sent', 'email_error', 'created_at')
+    ordering = ('-created_at',)
+
+    @admin.display(description='Sender')
+    def sender_email_display(self, obj):
+        return obj.sender_email or 'Anonymous'
