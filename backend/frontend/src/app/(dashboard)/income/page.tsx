@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Modal } from '@/components/ui/Modal';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   TrendingUp,
   Wallet,
@@ -236,122 +237,170 @@ export default function IncomePage() {
       </div>
 
       {/* Filter Controls */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8 p-4 rounded-2xl bg-zinc-900/30 border border-zinc-800/50 backdrop-blur-sm">
-        <div className="flex items-center gap-2">
-          <Button
-            variant={viewMode === 'monthly' ? 'primary' : 'ghost'}
-            size="sm"
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 p-4 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 backdrop-blur-xl">
+        <div className="flex items-center p-1 bg-zinc-200/50 dark:bg-zinc-800/50 rounded-xl w-fit relative">
+          <motion.div
+            layout
+            className="absolute h-[calc(100%-8px)] bg-white dark:bg-zinc-700 rounded-lg shadow-sm z-0"
+            initial={false}
+            animate={{
+              x: viewMode === 'monthly' ? 4 : 112,
+              width: viewMode === 'monthly' ? 104 : 80
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          />
+          <button
             onClick={() => setViewMode('monthly')}
-            className="rounded-xl px-4"
+            className={`relative z-10 px-4 py-1.5 text-xs font-bold transition-colors w-[104px] ${
+              viewMode === 'monthly' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+            }`}
           >
             Monthly View
-          </Button>
-          <Button
-            variant={viewMode === 'all' ? 'primary' : 'ghost'}
-            size="sm"
+          </button>
+          <button
             onClick={() => setViewMode('all')}
-            className="rounded-xl px-4"
+            className={`relative z-10 px-4 py-1.5 text-xs font-bold transition-colors w-[80px] ${
+              viewMode === 'all' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+            }`}
           >
             All Time
-          </Button>
+          </button>
         </div>
 
         {viewMode === 'monthly' && (
-          <div className="flex items-center gap-3 md:ml-auto">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 md:ml-auto bg-white/50 dark:bg-white/5 p-1.5 pr-3 rounded-xl border border-black/5 dark:border-white/5"
+          >
             <Input
               label="Select Month"
               type="month"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="w-40 bg-zinc-950 border-zinc-800 h-9"
+              className="w-36 bg-transparent border-none h-7 focus:ring-0 text-[11px]"
             />
-          </div>
+          </motion.div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <Card glass className="relative overflow-hidden p-6 lg:col-span-2 border-indigo-500/20 bg-indigo-500/[0.02]">
-          <TrendingUp className="absolute -right-4 -bottom-4 size-32 text-indigo-500/5 -rotate-12 transition-transform group-hover:scale-110 duration-700" />
-          <div className="relative z-10 flex justify-between items-start mb-4">
-            <div className="flex items-center gap-4">
-              <div className="size-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 border border-indigo-500/20">
-                <Wallet className="size-4" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        <motion.div
+          whileHover={{ y: -5 }}
+          className="lg:col-span-2"
+        >
+          <Card glass className="relative overflow-hidden p-8 h-full border-emerald-500/20 bg-emerald-500/[0.02] group">
+            {/* Background Glow */}
+            <div className="absolute -right-20 -top-20 size-64 bg-emerald-500/10 blur-[100px] rounded-full group-hover:bg-emerald-500/20 transition-colors duration-700" />
+            <div className="absolute -left-20 -bottom-20 size-64 bg-emerald-500/5 blur-[100px] rounded-full" />
+            
+            <TrendingUp className="absolute -right-4 -bottom-4 size-40 text-emerald-500/5 -rotate-12 transition-transform group-hover:scale-110 duration-700" />
+            
+            <div className="relative z-10 flex flex-col h-full justify-between">
+              <div className="flex justify-between items-start mb-8">
+                <div className="flex items-center gap-5">
+                  <div className="size-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-inner">
+                    <Wallet className="size-6" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic mb-1">
+                      {viewMode === 'monthly' ? 'Income this Month' : 'Total Income Received'}
+                    </p>
+                    <AnimatePresence mode="wait">
+                      <motion.h2 
+                        key={viewMode + (summary?.current_income_total || 0)}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="text-4xl font-black tracking-tight flex items-baseline gap-1 italic"
+                      >
+                        <span className="text-emerald-500 text-2xl font-bold not-italic">₹</span>
+                        {parseFloat(
+                          viewMode === 'monthly' 
+                            ? (summary?.current_income_total || 0) 
+                            : (summary?.all_time_income || 0)
+                        ).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </motion.h2>
+                    </AnimatePresence>
+                  </div>
+                </div>
+                <div className="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-wider">
+                  Real-time Sync
+                </div>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 italic">
-                {viewMode === 'monthly' ? 'Total Income (Selected Month)' : 'Total Income (All Time)'}
-              </p>
-            </div>
-            {viewMode === 'monthly' && (
-              <div className="text-[10px] font-black text-emerald-500 uppercase italic flex items-center gap-1">
-                <ArrowUpRight className="size-3" />
-                {summary?.income_percentage_change?.toFixed(1) || 0}%
-              </div>
-            )}
-          </div>
-          <h3 className="relative z-10 text-3xl font-black text-foreground italic tracking-tighter">
-            {formatCurrency(viewMode === 'monthly' ? (summary?.current_income_total || 0) : (summary?.all_time_income || 0)).replace('₹', '')}
-            <span className="text-sm ml-2 text-zinc-600 font-bold not-italic">INR</span>
-          </h3>
-        </Card>
 
-        {/* Income Distribution Chart */}
-        <Card glass className="p-6 lg:col-span-2 border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01]">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-4">
-              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 italic">Where from?</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-4">
+                {[
+                  { label: 'Transactions', value: incomes.length, icon: History },
+                  { label: 'Categories', value: Array.from(new Set(incomes.map(i => i.category__name))).length, icon: MoreHorizontal },
+                  { label: 'Avg / Item', value: `₹${(parseFloat(viewMode === 'monthly' ? summary?.current_income_total : summary?.all_time_income) / (incomes.length || 1)).toFixed(0)}`, icon: CircleDollarSign },
+                  { label: 'Growth', value: `+${summary?.income_percentage_change?.toFixed(1) || 0}%`, icon: ArrowUpRight, color: 'text-emerald-500' }
+                ].map((stat, idx) => (
+                  <div key={idx} className="flex flex-col gap-1">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">{stat.label}</span>
+                    <span className={`text-sm font-black flex items-center gap-1 ${stat.color || 'text-zinc-800 dark:text-zinc-200'}`}>
+                      <stat.icon className="size-3 opacity-50" />
+                      {stat.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="h-28 w-full">
-            {summary?.income_by_category && summary.income_by_category.length > 0 ? (
+          </Card>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ y: -5 }}
+          className="lg:col-span-1"
+        >
+          <Card glass className="relative overflow-hidden p-6 h-full border-black/5 dark:border-white/5 bg-zinc-100/30 dark:bg-zinc-900/30">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic mb-6 px-2">Source Split</p>
+            <div className="h-[200px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={summary.income_by_category}
+                    data={summary?.income_by_category?.length > 0 ? summary.income_by_category : [{ category__name: 'No Data', total: 1 }]}
                     cx="50%"
                     cy="50%"
-                    innerRadius={35}
-                    outerRadius={50}
-                    paddingAngle={5}
-                    dataKey="amount"
-                    label={({ name, percent }: any) => (typeof window !== 'undefined' && window.innerWidth > 768) ? `${name} ${(percent * 100).toFixed(0)}%` : null}
-                    labelLine={typeof window !== 'undefined' && window.innerWidth > 768}
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={8}
+                    dataKey="total"
                   >
-                    {summary.income_by_category.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={2} stroke="currentColor" className="stroke-background" />
+                    {summary?.income_by_category?.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={entry.category__color || '#10b981'} stroke="none" />
                     ))}
+                    {(!summary?.income_by_category || summary.income_by_category.length === 0) && (
+                      <Cell fill="#3f3f46" stroke="none" />
+                    )}
                   </Pie>
-                  <RechartsTooltip
-                    contentStyle={{ backgroundColor: '#000', border: 'none', borderRadius: '12px', fontSize: '10px' }}
-                    itemStyle={{ color: '#fff', fontWeight: 'bold' }}
-                    formatter={(value: any) => [formatCurrency(Number(value)), '']}
+                  <RechartsTooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'rgba(9, 9, 11, 0.9)', 
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '12px',
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      color: '#fff'
+                    }}
+                    itemStyle={{ color: '#fff' }}
+                    formatter={(value: any) => [`₹${parseFloat(value).toLocaleString()}`, 'Amount']}
                   />
                 </PieChart>
               </ResponsiveContainer>
-            ) : (
-              <div className="h-full flex items-center justify-center text-[10px] font-black uppercase text-zinc-700 italic tracking-widest">
-                Categorization Data Unavailable
-              </div>
-            )}
-          </div>
-          {summary?.income_by_category && summary.income_by_category.length > 0 && (
-            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 gap-x-4 gap-y-2 pt-3 border-t border-dashed border-muted-foreground/20">
-              {summary.income_by_category.map((entry: any, index: number) => (
-                <div key={index} className="flex flex-col">
-                  <div className="flex items-center gap-1.5">
-                    <div
-                      className="h-1.5 w-1.5 rounded-full ring-1 ring-foreground/10"
-                      style={{ backgroundColor: entry.color }}
-                    />
-                    <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground truncate">{entry.name}</span>
-                  </div>
-                  <span className="text-xs font-black text-foreground tabular-nums">
-                    {formatCurrency(entry.amount)}
+            </div>
+            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 justify-center">
+              {summary?.income_by_category?.slice(0, 3).map((cat: any, idx: number) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <div className="size-2 rounded-full" style={{ backgroundColor: cat.category__color || '#10b981' }} />
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-tighter truncate max-w-[80px]">
+                    {cat.category__name}
                   </span>
                 </div>
               ))}
             </div>
-          )}
-        </Card>
+          </Card>
+        </motion.div>
       </div>
 
       <Card glass className="p-0 overflow-hidden border-black/5 dark:border-white/5">
@@ -376,44 +425,53 @@ export default function IncomePage() {
               <p className="text-[10px] font-black uppercase tracking-widest italic">No Inbound Transfers Detected</p>
             </div>
           ) : (
-            incomes.map((income) => (
-              <div key={income.id} className="p-6 space-y-4 hover:bg-black/[0.01] transition-colors">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-indigo-500/5 flex items-center justify-center text-indigo-500 border border-indigo-500/10 shrink-0">
-                      <ArrowUpRight className="size-5" />
+            <AnimatePresence mode="popLayout">
+              {incomes.map((income) => (
+                <motion.div 
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  key={income.id} 
+                  className="p-6 space-y-4 hover:bg-black/[0.01] transition-colors"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 rounded-xl bg-indigo-500/5 flex items-center justify-center text-indigo-500 border border-indigo-500/10 shrink-0">
+                        <ArrowUpRight className="size-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-black text-foreground uppercase italic tracking-tight leading-none mb-1 truncate">{income.source}</h4>
+                        <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest italic leading-none">
+                          {income.category?.name || 'UNCATEGORIZED'} • {new Date(income.date).toLocaleDateString().toUpperCase()}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="text-sm font-black text-foreground uppercase italic tracking-tight leading-none mb-1 truncate">{income.source}</h4>
-                      <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest italic leading-none">
-                        {income.category?.name || 'UNCATEGORIZED'} • {new Date(income.date).toLocaleDateString().toUpperCase()}
-                      </p>
+                    <div className="text-right">
+                      <div className="text-lg font-black text-emerald-400 italic tracking-tighter tabular-nums leading-none mb-1">
+                        +₹{parseFloat(income.amount).toLocaleString('en-IN')}
+                      </div>
+                      {income.is_recurring && (
+                        <span className="text-[8px] font-black text-emerald-500 uppercase italic opacity-80 tracking-widest">RECURRING</span>
+                      )}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-black text-emerald-400 italic tracking-tighter tabular-nums leading-none mb-1">
-                      +₹{parseFloat(income.amount).toLocaleString('en-IN')}
+                  <div className="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
+                    <div className="text-[9px] text-zinc-500 font-medium uppercase italic max-w-[60%] truncate">
+                      {income.description || 'No additional metadata'}
                     </div>
-                    {income.is_recurring && (
-                      <span className="text-[8px] font-black text-emerald-500 uppercase italic opacity-80 tracking-widest">RECURRING</span>
-                    )}
+                    <div className="flex items-center gap-4">
+                      <button onClick={() => openModal(income)} className="text-[10px] font-black uppercase italic text-zinc-500 hover:text-foreground flex items-center gap-1">
+                        <Pencil className="size-3" /> Edit
+                      </button>
+                      <button onClick={() => handleDelete(income.id)} className="text-[10px] font-black uppercase italic text-zinc-500 hover:text-red-500 flex items-center gap-1">
+                        <Trash2 className="size-3" /> Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
-                  <div className="text-[9px] text-zinc-500 font-medium uppercase italic max-w-[60%] truncate">
-                    {income.description || 'No additional metadata'}
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <button onClick={() => openModal(income)} className="text-[10px] font-black uppercase italic text-zinc-500 hover:text-foreground flex items-center gap-1">
-                      <Pencil className="size-3" /> Edit
-                    </button>
-                    <button onClick={() => handleDelete(income.id)} className="text-[10px] font-black uppercase italic text-zinc-500 hover:text-red-500 flex items-center gap-1">
-                      <Trash2 className="size-3" /> Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
+                </motion.div>
+              ))}
+            </AnimatePresence>
           )}
         </div>
 
@@ -447,51 +505,60 @@ export default function IncomePage() {
                   </td>
                 </tr>
               ) : (
-                incomes.map((income) => (
-                  <tr key={income.id} className="hover:bg-white/[0.02] transition-all group">
-                    <td className="px-8 py-6 text-[11px] font-bold text-zinc-500 uppercase italic tabular-nums">
-                      {new Date(income.date).toLocaleDateString().toUpperCase()}
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="size-8 rounded-lg bg-indigo-500/5 flex items-center justify-center text-indigo-500 border border-indigo-500/10 group-hover:scale-110 transition-transform">
-                          <ArrowUpRight className="size-4" />
+                <AnimatePresence mode="popLayout">
+                  {incomes.map((income) => (
+                    <motion.tr 
+                      layout
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
+                      key={income.id} 
+                      className="hover:bg-white/[0.02] transition-all group"
+                    >
+                      <td className="px-8 py-6 text-[11px] font-bold text-zinc-500 uppercase italic tabular-nums">
+                        {new Date(income.date).toLocaleDateString().toUpperCase()}
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          <div className="size-8 rounded-lg bg-emerald-500/5 flex items-center justify-center text-emerald-500 border border-emerald-500/10 group-hover:scale-110 transition-transform">
+                            <ArrowUpRight className="size-4" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-black text-foreground uppercase italic tracking-tight">{income.source}</span>
+                            <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-widest italic">
+                              {income.category?.name || 'UNCATEGORIZED'}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-black text-foreground uppercase italic tracking-tight">{income.source}</span>
-                          <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-widest italic">
-                            {income.category?.name || 'UNCATEGORIZED'}
-                          </span>
+                      </td>
+                      <td className="px-8 py-6">
+                        {income.is_recurring ? (
+                          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 w-fit">
+                            <History className="size-3 text-emerald-500" />
+                            <span className="text-[9px] font-black text-emerald-500 uppercase italic">RECURRING</span>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] font-bold text-zinc-600 uppercase italic opacity-50">One-time</span>
+                        )}
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className="text-lg font-black text-emerald-400 italic tracking-tighter tabular-nums">
+                          +₹{parseFloat(income.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => openModal(income)} className="size-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-foreground transition-all border border-black/5 dark:border-white/5">
+                            <Pencil className="size-3.5" />
+                          </button>
+                          <button onClick={() => handleDelete(income.id)} className="size-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-red-500 transition-all border border-black/5 dark:border-white/5">
+                            <Trash2 className="size-3.5" />
+                          </button>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      {income.is_recurring ? (
-                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 w-fit">
-                          <History className="size-3 text-emerald-500" />
-                          <span className="text-[9px] font-black text-emerald-500 uppercase italic">RECURRING</span>
-                        </div>
-                      ) : (
-                        <span className="text-[10px] font-bold text-zinc-600 uppercase italic opacity-50">One-time</span>
-                      )}
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="text-lg font-black text-emerald-400 italic tracking-tighter tabular-nums">
-                        +₹{parseFloat(income.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openModal(income)} className="size-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-foreground transition-all border border-black/5 dark:border-white/5">
-                          <Pencil className="size-3.5" />
-                        </button>
-                        <button onClick={() => handleDelete(income.id)} className="size-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-red-500 transition-all border border-black/5 dark:border-white/5">
-                          <Trash2 className="size-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
               )}
             </tbody>
           </table>
