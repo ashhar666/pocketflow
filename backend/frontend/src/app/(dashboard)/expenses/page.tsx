@@ -55,6 +55,8 @@ export default function ExpensesPage() {
     category_id: '',
     date: new Date().toISOString().split('T')[0],
     notes: '',
+    is_recurring: false,
+    recurrence_type: 'none',
   });
 
   const fetchExpenses = useCallback(async () => {
@@ -129,6 +131,8 @@ export default function ExpensesPage() {
         category_id: expense.category?.id?.toString() || '',
         date: expense.date,
         notes: expense.notes || '',
+        is_recurring: expense.is_recurring,
+        recurrence_type: expense.recurrence_type || 'none',
       });
     } else {
       setEditingId(null);
@@ -138,6 +142,8 @@ export default function ExpensesPage() {
         category_id: categories.length > 0 ? categories[0].id.toString() : '',
         date: new Date().toISOString().split('T')[0],
         notes: '',
+        is_recurring: false,
+        recurrence_type: 'none',
       });
     }
     setIsModalOpen(true);
@@ -372,6 +378,7 @@ export default function ExpensesPage() {
                   <th className="px-6 py-3 font-bold">Date</th>
                   <th className="px-6 py-3 font-bold">Description</th>
                   <th className="px-6 py-3 font-bold">Category</th>
+                  <th className="px-6 py-3 font-bold">Type</th>
                   <th className="px-6 py-3 font-bold">Amount</th>
                   <th className="px-6 py-3 font-bold text-right">Actions</th>
                 </tr>
@@ -423,6 +430,15 @@ export default function ExpensesPage() {
                         >
                           {expense.category?.name || 'Uncategorized'}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {expense.is_recurring ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                            Recurring
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 opacity-50">One-time</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap font-semibold tabular-nums text-red-500">
                         ₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -535,6 +551,26 @@ export default function ExpensesPage() {
               options={[
                 { value: '', label: 'Select category' },
                 ...categories.map(cat => ({ value: cat.id, label: cat.name }))
+              ]}
+            />
+
+            <Select
+              label="Recurrence"
+              value={formData.recurrence_type}
+              onChange={e => {
+                const val = e.target.value;
+                setFormData({ 
+                  ...formData, 
+                  recurrence_type: val,
+                  is_recurring: val !== 'none'
+                });
+              }}
+              required
+              options={[
+                { value: 'none', label: 'One-time' },
+                { value: 'daily', label: 'Daily' },
+                { value: 'weekly', label: 'Weekly' },
+                { value: 'monthly', label: 'Monthly' },
               ]}
             />
 

@@ -448,7 +448,14 @@ export default function IncomePage() {
               </label>
               <Select
                 value={formData.recurrence_type}
-                onChange={e => setFormData({ ...formData, recurrence_type: e.target.value })}
+                onChange={e => {
+                  const val = e.target.value;
+                  setFormData({ 
+                    ...formData, 
+                    recurrence_type: val,
+                    is_recurring: val !== 'none'
+                  });
+                }}
                 className="text-sm"
               >
                 <option value="none">One-time</option>

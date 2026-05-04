@@ -24,7 +24,7 @@ const testimonials = [
 
 export const TestimonialsSection = () => {
   return (
-    <section className="relative py-16 bg-[#030303] overflow-hidden border-t border-white/5">
+    <section id="testimonials" className="relative py-16 bg-[#030303] overflow-hidden border-t border-white/5">
       {/* Background Ambience */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-600/5 rounded-full blur-[120px] -z-10" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-600/5 rounded-full blur-[140px] -z-10" />
@@ -45,7 +45,7 @@ export const TestimonialsSection = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-6xl md:text-8xl font-black text-white tracking-tighter leading-[0.85] uppercase italic"
+            className="text-6xl md:text-8xl font-bold text-white tracking-tight leading-[1.05]"
           >
             User <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">reviews</span>

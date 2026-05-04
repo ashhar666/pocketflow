@@ -2,90 +2,86 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
+import { 
+  MessageSquarePlus, 
+  ScanLine, 
+  LineChart 
+} from 'lucide-react'
 
 const steps = [
   {
     title: "Connect",
-    description: "Connect your account to our Telegram bot in seconds.",
-    icon: "LNK",
-    number: "01"
+    description: "Link your account to our Telegram bot in seconds. No complex setup or forms.",
+    icon: MessageSquarePlus,
+    number: "01",
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/10"
   },
   {
-    title: "Track",
-    description: "Take a photo of a receipt or text the bot. Our AI reads it right away.",
-    icon: "CAP",
-    number: "02"
+    title: "Snap & Sync",
+    description: "Take a photo of a receipt or text the bot. Our AI extracts everything instantly.",
+    icon: ScanLine,
+    number: "02",
+    color: "text-blue-500",
+    bg: "bg-blue-500/10"
   },
   {
-    title: "See",
-    description: "See all your money in one place. Use our smart tools to save more.",
-    icon: "MST",
-    number: "03"
+    title: "Track & Save",
+    description: "View automated reports and insights on your dashboard. Start saving effortlessly.",
+    icon: LineChart,
+    number: "03",
+    color: "text-purple-500",
+    bg: "bg-purple-500/10"
   }
 ]
 
 export function HowItWorksSimple() {
   return (
-    <section className="bg-background py-16 px-6 relative overflow-hidden border-t border-border/10 transition-colors duration-400">
+    <section id="process" className="bg-black py-24 px-6 relative overflow-hidden border-t border-white/5">
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
-          <div className="max-w-2xl">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl md:text-6xl font-black text-foreground tracking-tighter uppercase italic mb-6"
-            >
-              How it <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-zinc-500">works</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-zinc-500 text-lg font-medium leading-relaxed"
-            >
-              Tracking money is now easy. Follow these 3 simple steps.
-            </motion.p>
-          </div>
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+        <div className="text-center mb-20">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="hidden lg:flex items-center gap-2 text-zinc-600 font-bold uppercase tracking-[0.2em] italic text-[10px]"
+            className="text-4xl md:text-6xl font-bold text-white tracking-tight mb-6"
           >
-            <span>Works together</span>
-            <div className="w-12 h-[1px] bg-zinc-800" />
-            <span>Updates fast</span>
-          </motion.div>
+            How it <span className="text-zinc-500 font-normal italic">works</span>
+          </motion.h2>
+          <p className="text-zinc-500 text-lg md:text-xl max-w-2xl mx-auto">
+            Tracking money is now as easy as sending a message. Follow these 3 simple steps.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24 relative">
-          {/* Connecting Line (Desktop) */}
-          <div className="hidden md:block absolute top-[60px] left-[15%] right-[15%] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent z-0" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+          {/* Subtle Connecting Line (Desktop) */}
+          <div className="hidden md:block absolute top-[48px] left-[10%] right-[10%] h-[1px] bg-white/5 z-0" />
 
           {steps.map((step, i) => (
             <motion.div
               key={step.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.2 }}
-              className="relative z-10 flex flex-col items-center text-center"
+              transition={{ delay: i * 0.1 }}
+              className="relative z-10 flex flex-col items-center text-center group"
             >
-              <div className="size-28 rounded-full bg-foreground/5 border border-border/10 flex items-center justify-center mb-8 relative group transition-all duration-500 hover:border-border/20">
-                <div className="absolute -top-4 -right-4 size-10 rounded-full bg-background border border-border/10 flex items-center justify-center text-[10px] font-black italic text-zinc-500 group-hover:text-foreground transition-colors">
+              <div className={cn(
+                "size-24 rounded-3xl flex items-center justify-center mb-8 relative transition-all duration-500 group-hover:scale-110",
+                step.bg,
+                step.color
+              )}>
+                <div className="absolute -top-3 -right-3 size-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-[10px] font-bold text-zinc-400 group-hover:text-white transition-colors">
                   {step.number}
                 </div>
-                <span className="text-xl font-black text-foreground transition-transform duration-500 group-hover:scale-110 italic">{step.icon}</span>
+                <step.icon className="size-10" strokeWidth={1.5} />
               </div>
               
-              <h3 className="text-2xl font-black text-foreground uppercase italic mb-4 tracking-tight">
+              <h3 className="text-2xl font-bold text-white mb-4 tracking-tight">
                 {step.title}
               </h3>
-              <p className="text-zinc-500 font-medium leading-relaxed max-w-[280px]">
+              <p className="text-zinc-500 font-medium leading-relaxed">
                 {step.description}
               </p>
             </motion.div>

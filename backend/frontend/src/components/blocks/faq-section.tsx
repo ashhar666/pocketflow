@@ -21,10 +21,6 @@ const faqs = [
     question: "Can I export my data for accounting?",
     answer: "Yes. You can download all your spending as an Excel file. This makes it easy to do your taxes or use other money tools.",
   },
-  {
-    question: "Is there a monthly subscription fee?",
-    answer: "We have a free plan and a paid plan for people who want more tools. Check the app to see all options.",
-  },
 ];
 
 export const FAQSection = () => {
@@ -32,7 +28,7 @@ export const FAQSection = () => {
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <section className="py-16 bg-background relative overflow-hidden border-t border-border/10 transition-colors duration-400">
+    <section id="faq" className="py-16 bg-background relative overflow-hidden border-t border-border/10 transition-colors duration-400">
       {/* Decorative Aurora Blob */}
       <div className="aurora-bg !opacity-5 dark:!opacity-10">
         <div className="aurora-blob w-[600px] h-[600px] bg-emerald-600/5 right-0 top-1/2 -translate-y-1/2" />
@@ -44,7 +40,7 @@ export const FAQSection = () => {
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-black text-foreground tracking-tighter uppercase italic mb-8"
+            className="text-4xl md:text-6xl font-bold text-foreground tracking-tight mb-8"
           >
             Common <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-zinc-500">questions</span>
@@ -76,7 +72,7 @@ export const FAQSection = () => {
                 className="w-full px-10 py-8 flex items-center justify-between text-left group"
               >
                 <span className={cn(
-                  "text-xl font-black uppercase tracking-tight italic transition-colors duration-500",
+                  "text-xl font-bold tracking-tight transition-colors duration-500",
                   openIndex === index ? "text-emerald-500" : "text-zinc-500 group-hover:text-zinc-300"
                 )}>
                   {faq.question}
@@ -97,7 +93,7 @@ export const FAQSection = () => {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <div className="px-10 pb-10 text-zinc-400 leading-relaxed font-semibold text-base max-w-3xl uppercase tracking-widest">
+                    <div className="px-10 pb-10 text-zinc-400 leading-relaxed font-medium text-base max-w-3xl">
                       {faq.answer}
                     </div>
                   </motion.div>

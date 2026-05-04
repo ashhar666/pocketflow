@@ -45,7 +45,7 @@ export function FeatureCardsSection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-5xl md:text-7xl font-black text-foreground tracking-tighter leading-none mb-6 uppercase italic"
+            className="text-5xl md:text-7xl font-bold text-foreground tracking-tight leading-tight mb-6"
           >
             What <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/20 text-glow">you get</span>

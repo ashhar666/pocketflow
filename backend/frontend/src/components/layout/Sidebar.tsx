@@ -106,14 +106,14 @@ export const Sidebar = () => {
 
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="md:hidden fixed bottom-4 inset-x-4 z-[10001] bg-background/80 dark:bg-black backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl safe-area-bottom px-2 overflow-visible transition-colors duration-400">
-        <div className="flex justify-around items-center h-16 relative">
+      <nav className="md:hidden fixed bottom-4 inset-x-4 z-[10001] bg-background/80 dark:bg-black backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl safe-area-bottom px-2 transition-colors duration-400">
+        <div className="flex items-center h-16 relative overflow-x-auto no-scrollbar gap-2 px-2">
           
-          {navItems.slice(0, 5).map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
-              <Link key={item.name} href={item.href} className="flex flex-col items-center justify-center w-full h-full relative transition-all duration-300">
+              <Link key={item.name} href={item.href} className="flex flex-col items-center justify-center min-w-[70px] h-full relative transition-all duration-300">
                 {isActive && (
                   <motion.div layoutId="mobile-active" className="absolute inset-0 bg-emerald-500/5 -z-10" />
                 )}

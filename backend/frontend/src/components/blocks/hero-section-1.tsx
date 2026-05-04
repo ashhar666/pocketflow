@@ -373,7 +373,7 @@ export function HeroSection() {
 
                                     <motion.h1
                                          variants={transitionVariants}
-                                         className="mt-8 max-w-5xl mx-auto text-balance text-6xl md:text-8xl font-bold tracking-tight uppercase leading-[0.95]"
+                                         className="mt-8 max-w-5xl mx-auto text-balance text-6xl md:text-8xl font-bold tracking-tight leading-[1.05]"
                                      >
                                          <span className="sr-only">PocketFlow — Free AI-Powered Personal Expense Tracker. </span>
                                          The easiest free <br />
@@ -426,10 +426,10 @@ export function HeroSection() {
 }
 
 const menuItems = [
+    { name: 'Features', href: '#features' },
     { name: 'How it Works', href: '#process' },
-    { name: 'Milestones', href: '#achievements' },
-    { name: 'Budgets', href: '#budgets' },
-    { name: 'Savings', href: '#savings' },
+    { name: 'Testimonials', href: '#testimonials' },
+    { name: 'FAQ', href: '#faq' },
 ]
 
 const HeroHeader = () => {
@@ -488,7 +488,7 @@ const HeroHeader = () => {
 
                         <div className={cn(
                             "flex items-center gap-4 transition-all duration-300",
-                            menuState ? "fixed inset-0 top-[72px] bg-background flex-col p-8 lg:static lg:bg-transparent lg:flex-row lg:p-0" : "hidden lg:flex"
+                            menuState ? "fixed inset-0 top-[72px] bg-background/95 backdrop-blur-xl flex-col p-8 lg:static lg:bg-transparent lg:flex-row lg:p-0 z-[100]" : "hidden lg:flex"
                         )}>
                             <div className="lg:hidden w-full space-y-4 mb-8">
                                 {menuItems.map((item, index) => (
