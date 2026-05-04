@@ -382,23 +382,22 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 pb-8 border-b border-black/5 dark:border-white/5">
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-black italic tracking-tighter text-foreground uppercase">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 pb-6 border-b border-black/5 dark:border-white/5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+          <div className="space-y-0.5">
+            <h1 className="text-lg font-black italic tracking-tight text-foreground uppercase whitespace-nowrap leading-none">
               Dashboard Summary
             </h1>
-            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest italic">
-              Overview of your money
+            <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em] italic opacity-70 leading-none">
+              Financial Overview
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4 items-center">
-            {/* View Toggle */}
-            <div className="bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-black/10 dark:border-white/10 flex items-center relative h-10 overflow-hidden">
+          <div className="flex items-center gap-3 bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-xl border border-black/5 dark:border-white/5 h-9">
+            <div className="relative flex items-center h-full w-[160px]">
               <button
                 onClick={() => setViewMode('monthly')}
-                className={`relative z-10 px-4 h-full text-[10px] font-black uppercase tracking-widest italic transition-colors duration-200 ${
+                className={`relative z-10 flex-1 h-full text-[9px] font-black uppercase tracking-widest italic transition-colors duration-300 ${
                   viewMode === 'monthly' ? 'text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -406,7 +405,7 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={() => setViewMode('all')}
-                className={`relative z-10 px-4 h-full text-[10px] font-black uppercase tracking-widest italic transition-colors duration-200 ${
+                className={`relative z-10 flex-1 h-full text-[9px] font-black uppercase tracking-widest italic transition-colors duration-300 ${
                   viewMode === 'all' ? 'text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -414,30 +413,32 @@ export default function DashboardPage() {
               </button>
               <motion.div
                 layoutId="dashboardViewToggle"
-                className="absolute inset-y-1 bg-emerald-500 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                className="absolute inset-y-0 bg-emerald-500 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.4)]"
                 initial={false}
                 animate={{
-                  left: viewMode === 'monthly' ? 4 : 76,
-                  width: viewMode === 'monthly' ? 70 : 76,
+                  left: viewMode === 'monthly' ? 0 : '50%',
+                  width: '50%',
                 }}
-                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
               />
             </div>
 
             <AnimatePresence mode="wait">
               {viewMode === 'monthly' && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.95, x: -10 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, x: -10 }}
                   transition={{ duration: 0.2 }}
+                  className="flex items-center"
                 >
+                  <div className="w-px h-4 bg-black/10 dark:white/10 mx-1" />
                   <Input
-                    label="Select Month"
+                    label=""
                     type="month"
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-[10px] font-black uppercase italic w-[140px] h-10"
+                    className="bg-transparent border-none focus:ring-0 text-[10px] font-black uppercase italic w-[120px] h-7 p-0"
                   />
                 </motion.div>
               )}

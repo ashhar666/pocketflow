@@ -11,13 +11,15 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className = '', label, error, leftIcon, rightIcon, id, ...props }, ref) => {
-    const inputId = id || label.toLowerCase().replace(/\s+/g, '-');
+    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : `input-${Math.random().toString(36).substring(7)}`);
     
     return (
-      <div className="w-full flex flex-col gap-0.5">
-        <label htmlFor={inputId} className="text-[10px] font-black uppercase tracking-tight text-zinc-500 group-focus-within:text-emerald-500 transition-colors italic px-1">
-          {label}
-        </label>
+      <div className={`w-full flex flex-col ${label ? 'gap-0.5' : ''}`}>
+        {label && (
+          <label htmlFor={inputId} className="text-[10px] font-black uppercase tracking-tight text-zinc-500 group-focus-within:text-emerald-500 transition-colors italic px-1">
+            {label}
+          </label>
+        )}
         <div className="relative group">
           {leftIcon && (
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-emerald-400 transition-colors">
