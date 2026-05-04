@@ -59,7 +59,7 @@ export default function ReportsPage() {
   const handleDownloadReport = async () => {
     setDownloading(true);
     try {
-      const response = await api.get('/summary/export/comparison/', {
+      const response = await api.get('/summary/comparison-report/', {
         responseType: 'blob'
       });
 
@@ -112,7 +112,7 @@ export default function ReportsPage() {
         <div className="flex justify-center mb-4">
           <LoadingSpinner size={32} />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic">Loading report data...</p>
+        <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Loading report data...</p>
       </div>
     );
   }
@@ -122,105 +122,90 @@ export default function ReportsPage() {
   const lastMonthTotal = data?.last_month_total || (data?.comparison.reduce((sum, item) => sum + item.last_month, 0) || 0);
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8 pb-12">
+    <div className="max-w-7xl mx-auto space-y-8 p-4 sm:p-6 lg:p-8">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="size-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center border border-black/5 dark:border-white/5 backdrop-blur-xl">
-              <FileText className="size-6 text-foreground" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-black italic tracking-tighter text-foreground uppercase leading-none">
-                Intelligence
-              </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest italic">Monthly Performance Review</p>
-                {data?.is_demo && (
-                  <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[7px] font-black uppercase tracking-widest italic">DEMO</span>
-                )}
-              </div>
-            </div>
-          </div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight uppercase">Reports & Insights</h1>
+          <p className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-wider">Comparative analysis of your spending habits.</p>
         </div>
-        
-        <div className="flex items-center gap-3 bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl border border-black/5 dark:border-white/5 backdrop-blur-xl">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-[9px] uppercase font-black italic tracking-widest px-4 h-9"
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 px-3"
+            leftIcon={<Calendar className="size-4" />}
           >
-            <Calendar className="size-3.5 mr-2" />
             Current Month
           </Button>
-          <div className="w-px h-4 bg-black/10 dark:bg-white/10" />
-          <Button 
-            variant="primary" 
-            size="sm" 
+          <Button
+            variant="primary"
+            size="sm"
             onClick={handleDownloadReport}
             isLoading={downloading}
-            className="text-[9px] uppercase font-black italic tracking-widest px-6 h-9"
+            className="h-9 px-4"
+            leftIcon={<Download className="size-4" />}
           >
-            <Download className="size-3.5 mr-2" />
-            Export Intelligence
+            Export PDF
           </Button>
         </div>
       </div>
 
       {/* High-Density Metric Row */}
+      {/* Stats Summary Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card glass className="p-6 col-span-1 md:col-span-2 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity -rotate-12 translate-x-4 -translate-y-4">
-            <TrendingUp className="size-32" />
-          </div>
-          <div className="flex flex-col h-full justify-between gap-6 relative z-10">
-            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">
-              <Sparkles className="size-3" /> Spending Pulse
+        <Card className="p-4 border-black/5 dark:border-white/10 dark:bg-black shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-indigo-500/10 rounded-xl">
+              <LineChart className="size-5 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <div className="flex items-end gap-12">
-              <div className="space-y-1">
-                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest italic">This Period</p>
-                <p className="text-4xl font-black text-foreground italic tracking-tighter leading-none">
-                  {formatCurrency(thisMonthTotal)}
-                </p>
-              </div>
-              <div className="space-y-1 opacity-50">
-                <p className="text-[9px] text-zinc-500 font-black uppercase tracking-widest italic">Previous</p>
-                <p className="text-2xl font-black text-foreground italic tracking-tighter leading-none">
-                  {formatCurrency(lastMonthTotal)}
-                </p>
-              </div>
+            <div>
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">This Month</p>
+              <h3 className="text-xl font-bold tracking-tight tabular-nums">
+                {formatCurrency(thisMonthTotal)}
+              </h3>
             </div>
           </div>
         </Card>
 
-        <Card glass className="p-6 relative overflow-hidden group">
-          <div className="flex flex-col h-full justify-between gap-4">
-            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-blue-500 italic">
-              <Zap className="size-3" /> Variation
+        <Card className="p-4 border-black/5 dark:border-white/10 dark:bg-black shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-zinc-500/10 rounded-xl">
+              <Calendar className="size-5 text-zinc-600 dark:text-zinc-400" />
             </div>
             <div>
-              <p className={`text-4xl font-black italic tracking-tighter leading-none ${isSaving ? 'text-emerald-500 text-glow-emerald' : 'text-red-500 text-glow-red'}`}>
-                {isSaving ? '-' : '+'}{formatCurrency(Math.abs(data?.total_net_diff || 0))}
-              </p>
-              <div className={`mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[8px] font-black uppercase italic ${isSaving ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
-                {isSaving ? <TrendingDown className="size-2.5" /> : <TrendingUp className="size-2.5" />}
-                {Math.abs(data?.total_net_diff_percent || 0).toFixed(1)}% {isSaving ? 'DECREASE' : 'INCREASE'}
-              </div>
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Previous</p>
+              <h3 className="text-xl font-bold tracking-tight tabular-nums">
+                {formatCurrency(lastMonthTotal)}
+              </h3>
             </div>
           </div>
         </Card>
 
-        <Card glass className="p-6 relative overflow-hidden group">
-          <div className="flex flex-col h-full justify-between gap-4">
-            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-amber-500 italic">
-              <BarChart3 className="size-3" /> Intensity
+        <Card className="p-4 border-black/5 dark:border-white/10 dark:bg-black shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className={`p-2.5 rounded-xl ${isSaving ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`}>
+              {isSaving ? <TrendingDown className={`size-5 text-emerald-600`} /> : <TrendingUp className={`size-5 text-rose-600`} />}
             </div>
             <div>
-              <p className="text-4xl font-black text-foreground italic tracking-tighter leading-none uppercase">
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Variation</p>
+              <h3 className={`text-xl font-bold tracking-tight tabular-nums ${isSaving ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {Math.abs(data?.total_net_diff_percent || 0).toFixed(1)}%
+              </h3>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4 border-black/5 dark:border-white/10 dark:bg-black shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-amber-500/10 rounded-xl">
+              <BarChart3 className="size-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Categories</p>
+              <h3 className="text-xl font-bold tracking-tight tabular-nums">
                 {data?.comparison.length || 0}
-              </p>
-              <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest italic mt-2">Active Categories</p>
+              </h3>
             </div>
           </div>
         </Card>
@@ -230,18 +215,18 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Comparison Engine */}
-        <Card glass className="lg:col-span-8 p-8 border-black/5 dark:border-white/5 relative overflow-hidden">
-          <div className="flex items-center justify-between mb-10 relative z-10">
-            <div className="space-y-1">
-              <h3 className="text-lg font-black uppercase italic tracking-tighter">Comparative Engine</h3>
-              <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest italic">Performance Delta over time</p>
+        <Card className="lg:col-span-8 p-6 border-black/5 dark:border-white/10 dark:bg-black shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <div className="space-y-0.5">
+              <h3 className="text-sm font-semibold tracking-tight">Spending Comparison</h3>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">This month vs Last month</p>
             </div>
-            <div className="flex items-center gap-4 text-[9px] font-black uppercase italic">
+            <div className="flex items-center gap-4 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
               <div className="flex items-center gap-2">
-                <div className="size-2 rounded-full bg-indigo-500/60" /> Last Period
+                <div className="size-2 rounded-full bg-indigo-500/30" /> Last Period
               </div>
               <div className="flex items-center gap-2">
-                <div className="size-2 rounded-full bg-emerald-500" /> Current
+                <div className="size-2 rounded-full bg-indigo-600" /> Current
               </div>
             </div>
           </div>
@@ -254,7 +239,7 @@ export default function ReportsPage() {
                   dataKey="category" 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#71717a', fontSize: 9, fontWeight: 900 }}
+                  tick={{ fill: '#71717a', fontSize: 9, fontWeight: 700 }}
                   interval={0}
                   angle={-45}
                   textAnchor="end"
@@ -262,7 +247,7 @@ export default function ReportsPage() {
                 <YAxis 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#71717a', fontSize: 9, fontWeight: 900 }}
+                  tick={{ fill: '#71717a', fontSize: 9, fontWeight: 700 }}
                   tickFormatter={(val) => `₹${val >= 1000 ? (val/1000).toFixed(0) + 'K' : val}`}
                 />
                 <Tooltip 
@@ -272,9 +257,8 @@ export default function ReportsPage() {
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: '16px',
                     fontSize: '10px',
-                    fontWeight: '900',
+                    fontWeight: '600',
                     textTransform: 'uppercase',
-                    fontStyle: 'italic',
                     padding: '12px'
                   }}
                   itemStyle={{ padding: '2px 0' }}
@@ -299,10 +283,10 @@ export default function ReportsPage() {
         </Card>
 
         {/* Category Breakdown List */}
-        <Card glass className="lg:col-span-4 p-0 overflow-hidden border-black/5 dark:border-white/5 flex flex-col h-full">
-          <div className="p-6 border-b border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01]">
-            <h3 className="text-sm font-black uppercase italic tracking-tighter">Drill-Down Analysis</h3>
-            <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest">Efficiency metrics per track</p>
+        <Card className="lg:col-span-4 p-0 overflow-hidden border-black/5 dark:border-white/10 dark:bg-black shadow-sm flex flex-col h-full">
+          <div className="p-5 border-b dark:border-white/10 dark:bg-black">
+            <h3 className="text-sm font-semibold tracking-tight">Category Breakdown</h3>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">Monthly allocation</p>
           </div>
           <div className="flex-1 overflow-y-auto max-h-[440px] scrollbar-hide">
             {(data?.comparison || []).map((row, idx) => {
@@ -312,17 +296,17 @@ export default function ReportsPage() {
                   <div className="flex items-center gap-4 min-w-0">
                     <div className="size-1 rounded-full shrink-0" style={{ backgroundColor: row.color }}></div>
                     <div className="min-w-0">
-                      <p className="text-[11px] font-black italic uppercase tracking-tight text-foreground truncate">{row.category}</p>
-                      <p className="text-[8px] text-zinc-500 font-bold uppercase tracking-widest italic">
+                      <p className="text-[11px] font-semibold uppercase tracking-tight text-foreground truncate">{row.category}</p>
+                      <p className="text-[8px] text-muted-foreground font-bold uppercase tracking-widest">
                         Ratio: {((row.this_month / thisMonthTotal) * 100).toFixed(0)}%
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-[11px] font-black italic tracking-tighter text-foreground">
+                    <p className="text-[11px] font-bold tracking-tighter text-foreground">
                       {formatCurrency(row.this_month)}
                     </p>
-                    <div className={`flex items-center justify-end gap-1 text-[8px] font-black uppercase italic ${isUp ? 'text-red-500' : 'text-emerald-500'}`}>
+                    <div className={`flex items-center justify-end gap-1 text-[8px] font-bold uppercase ${isUp ? 'text-red-500' : 'text-emerald-500'}`}>
                       {isUp ? '+' : '-'}{Math.abs(row.diff_percent).toFixed(1)}%
                     </div>
                   </div>
@@ -333,11 +317,11 @@ export default function ReportsPage() {
         </Card>
 
         {/* Distribution Map */}
-        <Card glass className="lg:col-span-4 p-8 border-black/5 dark:border-white/5 relative overflow-hidden group">
+        <Card className="lg:col-span-4 p-8 border-black/5 dark:border-white/10 dark:bg-black relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none">
             <PieChart className="size-32" />
           </div>
-          <h3 className="text-sm font-black uppercase italic tracking-tighter mb-8">Allocation Map</h3>
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-8">Allocation Map</h3>
           <div className="h-[280px] w-full relative">
             <ResponsiveContainer width="100%" height="100%">
               <RePieChart>
@@ -362,17 +346,16 @@ export default function ReportsPage() {
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: '16px',
                     fontSize: '9px',
-                    fontWeight: '900',
+                    fontWeight: '700',
                     textTransform: 'uppercase',
-                    fontStyle: 'italic',
                     padding: '8px 12px'
                   }}
                 />
               </RePieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <p className="text-[7px] text-zinc-500 font-black uppercase tracking-[0.3em] mb-1">TOTAL</p>
-              <p className="text-lg font-black italic tracking-tighter text-foreground">
+              <p className="text-[7px] text-zinc-500 font-bold uppercase tracking-[0.3em] mb-1">TOTAL</p>
+              <p className="text-lg font-bold tracking-tighter text-foreground">
                 {(thisMonthTotal/1000).toFixed(1)}K
               </p>
             </div>
@@ -380,19 +363,19 @@ export default function ReportsPage() {
         </Card>
 
         {/* Detailed Comparison Matrix */}
-        <Card glass className="lg:col-span-8 p-0 overflow-hidden border-black/5 dark:border-white/5 h-full">
-          <div className="p-6 border-b border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] flex items-center justify-between">
-            <h3 className="text-sm font-black uppercase italic tracking-tighter text-blue-500">Execution Matrix</h3>
-            <p className="text-[8px] text-zinc-600 font-black uppercase italic tracking-widest">Performance audit</p>
+        <Card className="lg:col-span-8 p-0 overflow-hidden border-black/5 dark:border-white/10 dark:bg-black shadow-sm h-full">
+          <div className="p-5 border-b dark:border-white/10 dark:bg-black flex items-center justify-between">
+            <h3 className="text-sm font-semibold tracking-tight">Execution Matrix</h3>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">Performance Audit</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic bg-black/[0.02] dark:bg-white/[0.02]">
-                  <th className="px-8 py-4">Data Track</th>
-                  <th className="px-8 py-4 text-right">Last Period</th>
-                  <th className="px-8 py-4 text-right">Current Execution</th>
-                  <th className="px-8 py-4 text-right">Delta State</th>
+                <tr className="dark:bg-black text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 border-b dark:border-white/10">
+                  <th className="px-8 py-3">Category</th>
+                  <th className="px-8 py-3 text-right">Last Period</th>
+                  <th className="px-8 py-3 text-right">Current</th>
+                  <th className="px-8 py-3 text-right">Variation</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-black/5 dark:divide-white/5">
@@ -402,20 +385,20 @@ export default function ReportsPage() {
                     <tr key={idx} className="group hover:bg-black/[0.03] dark:hover:bg-white/[0.03] transition-all duration-300">
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
-                          <div className="size-1.5 rounded-full ring-2 ring-offset-2 ring-offset-transparent ring-black/5 dark:ring-white/5 group-hover:scale-125 transition-transform" style={{ backgroundColor: row.color }}></div>
-                          <span className="text-[11px] font-black italic uppercase tracking-tight text-foreground">{row.category}</span>
+                          <div className="size-1.5 rounded-full" style={{ backgroundColor: row.color }}></div>
+                          <span className="text-[11px] font-semibold uppercase tracking-tight text-foreground">{row.category}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-5 text-right font-black italic tracking-tighter text-zinc-500 text-[10px] opacity-40">
+                      <td className="px-8 py-5 text-right font-medium tracking-tighter text-muted-foreground/50 text-[10px]">
                         {Math.round(row.last_month).toLocaleString()}
                       </td>
                       <td className="px-8 py-5 text-right">
-                        <span className="text-[11px] font-black italic tracking-tighter text-foreground bg-black/5 dark:bg-white/5 px-2 py-1 rounded-lg">
+                        <span className="text-[11px] font-bold tracking-tighter text-foreground bg-muted/50 px-2 py-1 rounded-lg">
                           {Math.round(row.this_month).toLocaleString()}
                         </span>
                       </td>
                       <td className="px-8 py-5 text-right">
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[9px] font-black uppercase italic ${isUp ? 'bg-red-500/10 text-red-500 border border-red-500/20' : row.diff === 0 ? 'bg-zinc-500/10 text-zinc-500 border border-zinc-500/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'}`}>
+                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[9px] font-bold uppercase ${isUp ? 'bg-red-500/10 text-red-500' : row.diff === 0 ? 'bg-zinc-500/10 text-zinc-500' : 'bg-emerald-500/10 text-emerald-500'}`}>
                           {isUp ? <ArrowUpRight className="size-3" /> : row.diff === 0 ? '--' : <ArrowDownRight className="size-3" />}
                           {Math.abs(row.diff_percent).toFixed(1)}%
                         </div>

@@ -136,14 +136,14 @@ export default function SavingsPage() {
     <div className="space-y-12">
       <div className="flex flex-col md:flex-row justify-between items-end gap-6 pb-8 border-b border-white/5">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground uppercase">
             Savings Goals
           </h1>
-          <p className="text-zinc-500 text-sm font-medium">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
             Track your progress towards financial milestones
           </p>
         </div>
-        <Button variant="primary" size="lg" onClick={() => openModal()}>
+        <Button variant="primary" size="md" onClick={() => openModal()} className="px-6 font-bold uppercase tracking-widest text-[10px]">
           Add Goal
         </Button>
       </div>
@@ -153,10 +153,10 @@ export default function SavingsPage() {
           <LoadingSpinner size={32} />
         </div>
       ) : savings.length === 0 ? (
-        <Card glass className="flex flex-col items-center justify-center p-24 text-center border-dashed border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01]">
-          <h2 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">No savings goals yet</h2>
-          <p className="text-zinc-500 max-w-md mt-4 mb-10 text-sm font-medium uppercase tracking-tight">Add your first savings goal to start tracking your milestones.</p>
-          <Button variant="primary" size="lg" onClick={() => openModal()}>Create Goal</Button>
+        <Card className="flex flex-col items-center justify-center p-24 text-center border-dashed border-white/10 dark:bg-black">
+          <h2 className="text-2xl font-bold text-foreground uppercase tracking-tight">No savings goals yet</h2>
+          <p className="text-zinc-500 max-w-md mt-4 mb-10 text-[10px] font-bold uppercase tracking-widest">Add your first savings goal to start tracking your milestones.</p>
+          <Button variant="primary" size="md" onClick={() => openModal()} className="font-bold uppercase tracking-widest text-[10px]">Create Goal</Button>
         </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -169,48 +169,47 @@ export default function SavingsPage() {
 
             
             return (
-              <Card key={goal.id} glass className="relative overflow-hidden group border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 transition-all duration-500">
-
+              <Card key={goal.id} className="relative overflow-hidden group border-white/10 dark:bg-black transition-all duration-500 p-8">
                 
-                <div className="flex justify-between items-start mb-10 relative z-20">
+                <div className="flex justify-between items-start mb-8 relative z-20">
                   <div className="flex items-center gap-5">
-                    <div className="size-14 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5 flex items-center justify-center text-zinc-500 group-hover:text-foreground transition-all group-hover:scale-110 duration-500 text-xs font-black uppercase italic">
+                    <div className="size-12 rounded-xl bg-white/5 flex items-center justify-center text-muted-foreground group-hover:text-foreground transition-all duration-500 text-[10px] font-bold uppercase tracking-widest">
                        SAVE
                     </div>
-                    <div className="pr-12">
-                       <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 italic mb-1">Goal ID / {goal.id.toString().padStart(4, '0')}</h5>
-                      <h3 className="text-2xl font-black text-foreground uppercase italic tracking-tighter flex items-center gap-3">
+                    <div className="pr-4">
+                       <h5 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Goal #{goal.id.toString().padStart(4, '0')}</h5>
+                      <h3 className="text-xl font-bold text-foreground uppercase tracking-tight flex items-center gap-3">
                         {goal.title}
                         {isCompleted && <div className="size-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />}
                       </h3>
                       {goal.deadline && (
-                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 italic mt-2">
-                          Target Date: {new Date(goal.deadline).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase()}
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-2">
+                          Target: {new Date(goal.deadline).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase()}
                         </p>
                       )}
                     </div>
                   </div>
                    <div className="flex gap-2">
-                    <button onClick={() => openModal(goal)} className="px-3 py-1 text-[10px] font-black uppercase italic text-zinc-500 hover:text-foreground bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 transition-all">
+                    <button onClick={() => openModal(goal)} className="px-3 py-1 text-[10px] font-bold uppercase text-muted-foreground hover:text-foreground bg-white/5 rounded-lg border border-white/10 transition-all">
                       Edit
                     </button>
-                    <button onClick={() => handleDelete(goal.id)} className="px-3 py-1 text-[10px] font-black uppercase italic text-zinc-500 hover:text-red-500 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 transition-all">
+                    <button onClick={() => handleDelete(goal.id)} className="px-3 py-1 text-[10px] font-bold uppercase text-muted-foreground hover:text-red-500 bg-white/5 rounded-lg border border-white/10 transition-all">
                       Del
                     </button>
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                 <div className="space-y-6">
                   <div className="flex justify-between items-end mb-2">
                     <div className="flex flex-col">
                         <div className="flex items-baseline gap-2">
-                           <span className="text-4xl font-black text-foreground italic tracking-tighter">
+                           <span className="text-3xl font-bold text-foreground tracking-tighter">
                             {current.toLocaleString('en-IN').replace('₹', '')}
                            </span>
-                           <span className="text-xs font-black text-zinc-600 uppercase italic">INR Saved</span>
+                           <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">INR Saved</span>
                         </div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic mt-1">
-                            Target Amount: {formatCurrency(target)}
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mt-1">
+                            Target: {formatCurrency(target)}
                         </p>
                     </div>
                     {!isCompleted && (
@@ -220,7 +219,7 @@ export default function SavingsPage() {
                     )}
                   </div>
 
-                  <div className="relative h-2 w-full bg-black/[0.03] dark:bg-white/[0.03] rounded-full overflow-hidden border border-black/5 dark:border-white/5 shadow-inner">
+                  <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/10 shadow-inner">
                     <motion.div 
                       initial={{ width: 0 }}
                       whileInView={{ width: `${percentage}%` }}
@@ -228,10 +227,10 @@ export default function SavingsPage() {
                       className={`absolute h-full rounded-full bg-gradient-to-r ${isCompleted ? 'from-emerald-600 to-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'from-indigo-600 to-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.4)]'}`} 
                     />
                   </div>
-                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
-                    <span className="text-zinc-800">Goal Progress: {percentage.toFixed(2)}%</span>
-                    {!isCompleted && <span className="text-zinc-500">{formatCurrency(target - current)} REMAINING</span>}
-                    {isCompleted && <span className="text-emerald-500 animate-pulse">Savings Completed!</span>}
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                    <span className="text-muted-foreground/80">Progress: {percentage.toFixed(1)}%</span>
+                    {!isCompleted && <span className="text-muted-foreground/60">{formatCurrency(target - current)} TO GO</span>}
+                    {isCompleted && <span className="text-emerald-500">Savings Completed!</span>}
                   </div>
                 </div>
               </Card>

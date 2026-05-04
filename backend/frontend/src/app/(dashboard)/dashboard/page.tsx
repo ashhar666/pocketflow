@@ -44,8 +44,8 @@ interface MonthlySummary {
 }
 
 const ChartSkeleton = ({ label = 'Loading chart' }: { label?: string }) => (
-  <div className="h-full min-h-64 animate-pulse rounded-2xl bg-zinc-200/70 dark:bg-zinc-800/70 flex items-center justify-center">
-    <span className="text-[10px] font-black uppercase italic tracking-widest text-zinc-400">{label}</span>
+  <div className="h-full min-h-64 animate-pulse rounded-2xl bg-zinc-200/70 dark:bg-black flex items-center justify-center">
+    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">{label}</span>
   </div>
 );
 
@@ -329,15 +329,15 @@ export default function DashboardPage() {
         <div key="auto-save-card" className="fixed top-20 right-4 sm:top-24 sm:right-8 z-[100] animate-in fade-in slide-in-from-right-8 duration-500 max-w-[calc(100vw-2rem)] sm:max-w-xs">
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative bg-black/90 dark:bg-zinc-950/90 backdrop-blur-3xl border border-white/10 rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col items-center gap-3 sm:gap-4 min-w-[200px] sm:min-w-[240px]">
+            <div className="relative bg-black/90 dark:bg-black border border-white/20 rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col items-center gap-3 sm:gap-4 min-w-[200px] sm:min-w-[240px]">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-inner">
                 <ReceiptText className="size-5 sm:size-6" />
               </div>
               <div className="text-center">
-                <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/60 italic mb-1">Receipt Saved</p>
-                <p className="text-xs sm:text-sm font-black uppercase italic tracking-tight text-white mb-1 truncate max-w-[160px] sm:max-w-[200px]">{autoSavedData?.title}</p>
-                <p className="text-xl sm:text-2xl font-black text-white italic tracking-tighter">₹{autoSavedData?.amount}</p>
-                <div className="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest italic text-zinc-400 border border-white/10 px-3 py-1 rounded-full bg-white/5">
+                <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500/60 mb-1">Receipt Saved</p>
+                <p className="text-xs sm:text-sm font-bold uppercase tracking-tight text-white mb-1 truncate max-w-[160px] sm:max-w-[200px]">{autoSavedData?.title}</p>
+                <p className="text-xl sm:text-2xl font-bold text-white tracking-tighter">₹{autoSavedData?.amount}</p>
+                <div className="mt-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-zinc-400 border border-white/10 px-3 py-1 rounded-full bg-white/5">
                   {autoSavedData?.category_name}
                 </div>
               </div>
@@ -349,12 +349,12 @@ export default function DashboardPage() {
       {/* Scanning Overlay */}
       {isScanning && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-2xl border border-black/5 dark:border-white/5 flex flex-col items-center gap-6">
+          <div className="bg-white dark:bg-black p-8 rounded-3xl shadow-2xl border border-black/5 dark:border-white/10 flex flex-col items-center gap-6">
             <div className="relative">
               <LoadingSpinner size={48} />
             </div>
             <div className="text-center">
-              <h3 className="text-lg font-bold mb-1 italic">Scanning...</h3>
+              <h3 className="text-lg font-bold mb-1">Scanning...</h3>
               <p className="text-sm text-zinc-500 font-medium">Extracting financial data from your receipt</p>
             </div>
           </div>
@@ -385,10 +385,10 @@ export default function DashboardPage() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 pb-6 border-b border-black/5 dark:border-white/5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
           <div className="space-y-0.5">
-            <h1 className="text-lg font-black italic tracking-tight text-foreground uppercase whitespace-nowrap leading-none">
+            <h1 className="text-lg font-bold tracking-tight text-foreground uppercase whitespace-nowrap leading-none">
               Dashboard Summary
             </h1>
-            <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em] italic opacity-70 leading-none">
+            <p className="text-zinc-500 text-[9px] font-bold uppercase tracking-[0.2em] opacity-70 leading-none">
               Financial Overview
             </p>
           </div>
@@ -397,7 +397,7 @@ export default function DashboardPage() {
             <div className="relative flex items-center h-full w-[160px]">
               <button
                 onClick={() => setViewMode('monthly')}
-                className={`relative z-10 flex-1 h-full text-[9px] font-black uppercase tracking-widest italic transition-colors duration-300 ${
+                className={`relative z-10 flex-1 h-full text-[9px] font-bold uppercase tracking-widest transition-colors duration-300 ${
                   viewMode === 'monthly' ? 'text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -405,7 +405,7 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={() => setViewMode('all')}
-                className={`relative z-10 flex-1 h-full text-[9px] font-black uppercase tracking-widest italic transition-colors duration-300 ${
+                className={`relative z-10 flex-1 h-full text-[9px] font-bold uppercase tracking-widest transition-colors duration-300 ${
                   viewMode === 'all' ? 'text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                 }`}
               >
@@ -438,7 +438,7 @@ export default function DashboardPage() {
                     type="month"
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="bg-transparent border-none focus:ring-0 text-[10px] font-black uppercase italic w-[120px] h-7 p-0"
+                    className="bg-transparent border-none focus:ring-0 text-[10px] font-bold uppercase w-[120px] h-7 p-0"
                   />
                 </motion.div>
               )}
@@ -499,121 +499,58 @@ export default function DashboardPage() {
         </div>
       </div>
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Wallet / Balance */}
-        <Card glass className="relative overflow-hidden group border-emerald-500/20 bg-emerald-500/[0.02]">
-          <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Wallet className="size-12 rotate-12" />
-          </div>
-          <CardHeader className="pb-2 pt-6">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-emerald-500 italic">Net Balance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              <div className="text-3xl font-black tracking-tighter italic">
+      {/* Compact KPI Summary Row */}
+      <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-3 mb-8 no-scrollbar pb-2">
+        <Card className="p-3 border-black/5 dark:border-white/5 bg-background shadow-sm hover:shadow-md transition-shadow min-w-[160px] flex-1 lg:min-w-0">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Balance</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-bold tracking-tight tabular-nums">
                 {monthly ? formatCurrency(monthly.total_balance).replace('₹', '') : '---'}
-                <span className="text-xs ml-2 text-zinc-500 font-bold not-italic">INR</span>
-              </div>
-              <p className="text-[10px] text-zinc-500 font-bold uppercase italic">Available Funds</p>
+              </span>
+              <span className="text-[8px] text-zinc-500 font-medium">INR</span>
             </div>
-          </CardContent>
-          <div className="absolute bottom-0 left-0 h-1 bg-emerald-500 w-full opacity-30" />
+          </div>
         </Card>
 
-        {/* Money In */}
-        <Card glass className="relative overflow-hidden group border-indigo-500/20 bg-indigo-500/[0.02]">
-          <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-            <TrendingUp className="size-12 -rotate-12" />
-          </div>
-          <CardHeader className="pb-2 pt-6">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-500 italic">
-              {viewMode === 'monthly' ? 'Month In' : 'Total In'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              <div className="text-3xl font-black tracking-tighter italic">
+        <Card className="p-3 border-black/5 dark:border-white/5 bg-background shadow-sm hover:shadow-md transition-shadow min-w-[160px] flex-1 lg:min-w-0">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-indigo-500">
+              {viewMode === 'monthly' ? 'Income' : 'Total In'}
+            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-bold tracking-tight tabular-nums text-indigo-600 dark:text-indigo-400">
                 {monthly ? formatCurrency(viewMode === 'all' ? monthly.all_time_income : monthly.current_income_total).replace('₹', '') : '---'}
-                <span className="text-xs ml-2 text-zinc-500 font-bold not-italic">INR</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {viewMode === 'monthly' && monthly && monthly.income_percentage_change !== 0 && (
-                  <>
-                    {monthly.income_percentage_change > 0 ? (
-                      <ArrowUpRight className="size-3 text-emerald-500" />
-                    ) : (
-                      <ArrowDownRight className="size-3 text-red-500" />
-                    )}
-                    <span className={`text-[10px] font-black italic ${monthly.income_percentage_change > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                      {Math.abs(monthly.income_percentage_change).toFixed(1)}%
-                    </span>
-                  </>
-                )}
-                <span className="text-[10px] text-zinc-500 font-bold uppercase italic">
-                  {viewMode === 'monthly' ? 'vs last month' : 'All time revenue'}
-                </span>
-              </div>
+              </span>
+              <span className="text-[8px] text-zinc-500 font-medium">INR</span>
             </div>
-          </CardContent>
-          <div className="absolute bottom-0 left-0 h-1 bg-indigo-500 w-full opacity-30" />
+          </div>
         </Card>
 
-        {/* Money Out */}
-        <Card glass className="relative overflow-hidden group border-orange-500/20 bg-orange-500/[0.02]">
-          <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-            <TrendingDown className="size-12 rotate-6" />
-          </div>
-          <CardHeader className="pb-2 pt-6">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-orange-500 italic">
-              {viewMode === 'monthly' ? 'Month Out' : 'Total Out'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              <div className="text-3xl font-black tracking-tighter italic">
+        <Card className="p-3 border-black/5 dark:border-white/5 bg-background shadow-sm hover:shadow-md transition-shadow min-w-[160px] flex-1 lg:min-w-0">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-rose-500">
+              {viewMode === 'monthly' ? 'Expenses' : 'Total Out'}
+            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-bold tracking-tight tabular-nums text-rose-600 dark:text-rose-400">
                 {monthly ? formatCurrency(viewMode === 'all' ? monthly.all_time_expenses : monthly.current_month_total).replace('₹', '') : '---'}
-                <span className="text-xs ml-2 text-zinc-500 font-bold not-italic">INR</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {viewMode === 'monthly' && monthly && monthly.percentage_change !== 0 && (
-                  <>
-                    {monthly.percentage_change < 0 ? (
-                      <ArrowDownRight className="size-3 text-emerald-500" />
-                    ) : (
-                      <ArrowUpRight className="size-3 text-red-500" />
-                    )}
-                    <span className={`text-[10px] font-black italic ${monthly.percentage_change < 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                      {Math.abs(monthly.percentage_change).toFixed(1)}%
-                    </span>
-                  </>
-                )}
-                <span className="text-[10px] text-zinc-500 font-bold uppercase italic">
-                  {viewMode === 'monthly' ? 'vs last month' : 'All time spending'}
-                </span>
-              </div>
+              </span>
+              <span className="text-[8px] text-zinc-500 font-medium">INR</span>
             </div>
-          </CardContent>
-          <div className="absolute bottom-0 left-0 h-1 bg-orange-500 w-full opacity-30" />
+          </div>
         </Card>
 
-        {/* Savings */}
-        <Card glass className="relative overflow-hidden group border-blue-500/20 bg-blue-500/[0.02]">
-          <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-            <PiggyBank className="size-12 -rotate-6" />
-          </div>
-          <CardHeader className="pb-2 pt-6">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-500 italic">Total Savings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              <div className="text-3xl font-black tracking-tighter italic">
+        <Card className="p-3 border-black/5 dark:border-white/5 bg-background shadow-sm hover:shadow-md transition-shadow min-w-[160px] flex-1 lg:min-w-0">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-blue-500">Savings</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-bold tracking-tight tabular-nums text-blue-600 dark:text-blue-400">
                 {monthly ? formatCurrency(monthly.total_savings).replace('₹', '') : '---'}
-                <span className="text-xs ml-2 text-zinc-500 font-bold not-italic">INR</span>
-              </div>
-              <p className="text-[10px] text-zinc-500 font-bold uppercase italic">Financial Cushion</p>
+              </span>
+              <span className="text-[8px] text-zinc-500 font-medium">INR</span>
             </div>
-          </CardContent>
-          <div className="absolute bottom-0 left-0 h-1 bg-blue-500 w-full opacity-30" />
+          </div>
         </Card>
       </div>
 
@@ -621,21 +558,21 @@ export default function DashboardPage() {
         {/* Cashflow Trend (Area Chart) */}
         <Card glass className="relative">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400">Income vs Spending</h3>
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Income vs Spending</h3>
           </div>
           <div className="h-72">
             {trend && trend.length > 0 && trend.some(t => t.income > 0 || t.expense > 0) ? (
               <CashflowTrendChart data={trend} theme={theme} />
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500">
-                <div className="text-xs font-black uppercase italic tracking-widest opacity-20">No Data</div>
+                <div className="text-[9px] font-bold uppercase tracking-widest opacity-20">No Data</div>
               </div>
             )}
           </div>
         </Card>
 
         <Card glass>
-          <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400 mb-8">
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-8">
             {viewMode === 'all' ? 'All-Time Spending' : 'Monthly Spending'}
           </h3>
           {monthly?.by_category && monthly.by_category.length > 0 ? (
@@ -643,7 +580,7 @@ export default function DashboardPage() {
               <CategoryPieChart data={monthly.by_category} theme={theme} />
             </div>
           ) : (
-            <div className="h-72 flex items-center justify-center text-zinc-700 font-black uppercase italic tracking-widest text-xs">
+            <div className="h-72 flex items-center justify-center text-zinc-700 font-bold uppercase tracking-widest text-[9px]">
               No transactions found
             </div>
           )}
@@ -653,13 +590,13 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Weekly Breakdown */}
         <Card glass className="lg:col-span-2">
-          <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400 mb-8">Daily Activity</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-8">Daily Activity</h3>
           <div className="h-64">
             {weekly && weekly.length > 0 && weekly.some(d => d.expense > 0 || d.income > 0) ? (
               <WeeklyBreakdownChart data={weekly} theme={theme} />
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500">
-                <div className="text-xs font-black uppercase italic tracking-widest opacity-20">No activity yet</div>
+                <div className="text-[9px] font-bold uppercase tracking-widest opacity-20">No activity yet</div>
               </div>
             )}
           </div>
@@ -668,7 +605,7 @@ export default function DashboardPage() {
         {/* Recent Activity */}
         <Card glass className="lg:col-span-1">
           <div className="flex justify-between items-center mb-8">
-            <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400">Latest Changes</h3>
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Latest Changes</h3>
             <Link href="/expenses">
               <Button variant="ghost" size="sm">View All</Button>
             </Link>
@@ -676,24 +613,24 @@ export default function DashboardPage() {
           <div className="space-y-3">
             {recentActivity.length > 0 ? (
               recentActivity.map((item) => (
-                <div key={`${item.type}-${item.id}`} className="flex items-center justify-between p-4 rounded-2xl border border-black/5 dark:border-white/5 bg-zinc-500/5 dark:bg-white/[0.01] hover:bg-zinc-500/10 dark:hover:bg-white/[0.03] transition-all group">
+                <div key={`${item.type}-${item.id}`} className="flex items-center justify-between p-4 rounded-2xl border border-black/5 dark:border-white/10 bg-zinc-500/5 dark:bg-black hover:bg-zinc-500/10 dark:hover:bg-zinc-900 transition-all group">
                   <div className="flex items-center gap-4">
                     <div className={`p-2 rounded-xl scale-90 group-hover:scale-100 transition-transform ${item.type === 'income' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-500/10 text-zinc-500'}`}>
                       {item.type === 'income' ? <ArrowUpRight className="size-4" /> : <ArrowDownRight className="size-4" />}
                     </div>
                     <div>
-                      <p className="font-bold text-xs text-foreground uppercase italic tracking-tight truncate max-w-[120px]">{item.title}</p>
-                      <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest">{new Date(item.date).toLocaleDateString()}</p>
+                       <p className="font-bold text-[10px] text-foreground uppercase tracking-tight truncate max-w-[120px]">{item.title}</p>
+                       <p className="text-[9px] text-zinc-500 font-medium uppercase tracking-widest">{new Date(item.date).toLocaleDateString()}</p>
                     </div>
                   </div>
-                  <span className={`font-black text-xs italic tracking-tighter ${item.type === 'income' ? 'text-emerald-500' : 'text-foreground'}`}>
-                    {item.type === 'income' ? '+' : '-'}{formatCurrency(item.amount).replace('₹', '')} <span className="text-[8px] text-zinc-500 not-italic">INR</span>
-                  </span>
+                   <span className={`font-bold text-[10px] tracking-tight ${item.type === 'income' ? 'text-emerald-500' : 'text-foreground'}`}>
+                     {item.type === 'income' ? '+' : '-'}{formatCurrency(item.amount).replace('₹', '')} <span className="text-[8px] text-zinc-500">INR</span>
+                   </span>
                 </div>
               ))
             ) : (
               <div className="text-center py-12 text-zinc-700 flex flex-col items-center">
-                <p className="text-[10px] font-black uppercase tracking-widest italic opacity-20">No history yet</p>
+                 <p className="text-[9px] font-bold uppercase tracking-widest opacity-20">No history yet</p>
               </div>
             )}
           </div>

@@ -11,24 +11,27 @@ import api from '@/lib/api';
 import { formatScanFailure } from '@/lib/scanError';
 import toast from 'react-hot-toast';
 import {
+  TrendingDown,
+  Wallet,
   Plus,
   Scan,
-  Download,
-  Receipt,
   Trash2,
   Pencil,
-  History,
   Search,
   CheckCircle2,
-  AlertCircle,
   FileDown,
-  Loader2
+  Receipt,
+  Filter
 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import {
+  PieChart, Pie, Cell, ResponsiveContainer
+} from 'recharts';
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   // Pagination & Filtering state
@@ -60,7 +63,7 @@ export default function ExpensesPage() {
       const results = await Promise.allSettled([
         api.get(`/expenses/?page=${page}&search=${search}&ordering=${ordering}`),
         api.get('/categories/'),
-        api.get('/summary/monthly/')
+        api.get(`/summary/monthly/?t=${Date.now()}`)
       ]);
 
       if (results[0].status === 'fulfilled') {
@@ -75,60 +78,43 @@ export default function ExpensesPage() {
         setCategories(results[1].value.data);
       }
 
+      if (results[2].status === 'fulfilled') {
+        setSummary(results[2].value.data);
+      }
+
     } catch (error) {
-      toast.error('Critical failure in data synchronization');
+      toast.error('Data synchronization failed');
     } finally {
       setLoading(false);
     }
   }, [page, search, ordering]);
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const res = await api.get('/categories/');
-      setCategories(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
-
   useEffect(() => {
     fetchExpenses();
   }, [fetchExpenses]);
 
-  // fetchCategories call is redundant now due to fetchExpenses using allSettled, 
-  // but I'll keep it for safe migrations if needed, or remove it.
-  // Actually, I'll remove it as fetchExpenses now handles Categories.
-
   const handleExport = async () => {
     let url = '';
     try {
-      toast.loading('Generating PDF...', { id: 'export-loading' });
-      // Add timestamp to bypass cache
+      toast.loading('Generating report...', { id: 'export-loading' });
       const response = await api.get(`/expenses/export/?t=${Date.now()}`, { responseType: 'blob' });
 
-      // If the backend returns JSON error, Axios might still treat it as a blob
       if (response.data.type === 'application/json') {
         const text = await response.data.text();
         const errorData = JSON.parse(text);
         throw new Error(errorData.error || 'Export failed');
       }
 
-      // Basic integrity check: A valid PDF should be at least a few hundred bytes
-      if (response.data.size < 100) {
-        throw new Error('Received corrupt or empty PDF file');
-      }
-
       url = window.URL.createObjectURL(response.data);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `Expense_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+      link.setAttribute('download', `Expenses_${new Date().toISOString().split('T')[0]}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
       toast.success('Report downloaded', { id: 'export-loading' });
     } catch (error: any) {
-      console.error('Export Error:', error);
-      toast.error(error.message || 'Failed to export expenses', { id: 'export-loading' });
+      toast.error(error.message || 'Export failed', { id: 'export-loading' });
     } finally {
       if (url) window.URL.revokeObjectURL(url);
     }
@@ -163,15 +149,15 @@ export default function ExpensesPage() {
     try {
       if (editingId) {
         await api.put(`/expenses/${editingId}/`, formData);
-        toast.success('Expense updated');
+        toast.success('Updated');
       } else {
         await api.post('/expenses/', formData);
-        toast.success('Expense created');
+        toast.success('Saved');
       }
       setIsModalOpen(false);
       fetchExpenses();
     } catch (error) {
-      toast.error('Failed to save expense');
+      toast.error('Save failed');
     } finally {
       setIsSubmitting(false);
     }
@@ -182,27 +168,20 @@ export default function ExpensesPage() {
     if (!file) return;
 
     setIsScanning(true);
-    setIsModalOpen(true); // Open modal to show scanning status
-    setEditingId(null); // Ensure we are creating new
+    setIsModalOpen(true);
+    setEditingId(null);
 
     const uploadData = new FormData();
     uploadData.append('image', file);
 
     try {
       const res = await api.post('/expenses/scan_receipt/', uploadData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       const data = res.data;
-      console.log('AI Extraction Result:', data);
+      if (data.error) throw new Error(data.error);
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      // Find best category match
       const matchedCategory = categories.find(c =>
         c.name.toLowerCase() === data.category_suggestion?.toLowerCase() ||
         data.title?.toLowerCase().includes(c.name.toLowerCase())
@@ -214,301 +193,323 @@ export default function ExpensesPage() {
         amount: data.amount || '0.00',
         category_id: categoryId,
         date: data.date || new Date().toISOString().split('T')[0],
-        notes: data.notes || `AI_AUTO_SAVE: ${data.category_suggestion || 'UNCATEGORIZED'}`,
+        notes: data.notes || `AI Scan: ${data.category_suggestion || 'Unknown'}`,
       };
 
-      // Perform Auto-Save immediately
       await api.post('/expenses/', newExpense);
-
-      setAutoSavedData({
-        ...newExpense,
-        category_name: matchedCategory?.name || 'Default'
-      });
+      setAutoSavedData({ ...newExpense, category_name: matchedCategory?.name || 'Uncategorized' });
       setIsAutoSaved(true);
       fetchExpenses();
-      toast.success('Receipt scanned & saved automatically!');
+      toast.success('Scanned & Saved');
 
-      // Close modal after delay
       setTimeout(() => {
         setIsModalOpen(false);
         setIsAutoSaved(false);
         setAutoSavedData(null);
-      }, 2500);
+      }, 2000);
 
     } catch (error: any) {
-      console.error('Scan Error Details:', error.response?.data || error);
-      const errorMessage = formatScanFailure(error);
-      toast.error(`Scan Failure: ${errorMessage}`);
-      setIsModalOpen(false); // Close on hard fail so they can try again or manual
+      toast.error(formatScanFailure(error));
+      setIsModalOpen(false);
     } finally {
       setIsScanning(false);
-      // Reset file input
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this expense?')) {
+    if (window.confirm('Delete this expense?')) {
       try {
         await api.delete(`/expenses/${id}/`);
-        toast.success('Expense deleted');
+        toast.success('Deleted');
         fetchExpenses();
       } catch (error) {
-        toast.error('Failed to delete expense');
+        toast.error('Delete failed');
       }
     }
   };
 
   return (
-    <div className="space-y-12">
-      <div className="flex flex-col md:flex-row justify-between items-end gap-6 pb-8 border-b border-white/5">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            Expenses History
-          </h1>
-          <p className="text-zinc-500 text-sm font-medium">
-            Track your recent spending
-          </p>
+    <div className="max-w-7xl mx-auto space-y-8 p-4 sm:p-6 lg:p-8">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight uppercase">Expenses</h1>
+          <p className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-wider">Manage and track your outgoings.</p>
         </div>
-        <div className="flex gap-4 w-full md:w-auto">
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={handleScanReceipt}
-          />
+        <div className="flex items-center gap-2">
+          <input type="file" className="hidden" ref={fileInputRef} onChange={handleScanReceipt} accept="image/*" />
           <Button
-            variant="glass"
-            size="md"
-            leftIcon={<Scan className="size-4" />}
+            variant="outline"
+            size="sm"
+            className="h-9 px-3"
             onClick={() => fileInputRef.current?.click()}
-            className="border-emerald-500/20 hover:border-emerald-500/40 text-[10px] uppercase font-black italic tracking-widest px-6"
+            leftIcon={<Scan className="size-4" />}
           >
-            Scan Receipt
+            Scan
           </Button>
           <Button
-            variant="secondary"
-            size="md"
-            leftIcon={<FileDown className="size-4" />}
+            variant="outline"
+            size="sm"
+            className="h-9 px-3"
             onClick={handleExport}
-            className="text-[10px] uppercase font-black italic tracking-widest px-6"
+            leftIcon={<FileDown className="size-4" />}
           >
-            Export PDF
+            Export
           </Button>
           <Button
-            variant="primary"
-            size="md"
-            leftIcon={<Plus className="size-4" />}
             onClick={() => openModal()}
-            className="text-[10px] uppercase font-black italic tracking-widest px-6"
+            variant="primary"
+            size="sm"
+            className="h-9 px-4"
+            leftIcon={<Plus className="size-4" />}
           >
             Add Expense
           </Button>
         </div>
       </div>
 
-      <Card glass className="p-0 overflow-hidden border-black/5 dark:border-white/5">
-        <div className="p-6 border-b border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-500 italic">
-            <History className="size-3 text-zinc-500" />
-            Expense History
+      {/* Stats Summary Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-4 border-black/5 dark:border-white/10 dark:bg-black shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-rose-500/10 rounded-xl">
+              <TrendingDown className="size-5 text-rose-600 dark:text-rose-400" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Monthly Spend</p>
+              <h3 className="text-xl font-bold tracking-tight tabular-nums">
+                ₹{parseFloat(summary?.current_month_total || 0).toLocaleString('en-IN')}
+              </h3>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3 text-zinc-500" />
-              <Input
-                label=""
-                placeholder="Search history..."
-                className="w-full pl-9 !bg-transparent border-black/5 dark:border-white/5 text-[10px] font-bold uppercase italic"
+        </Card>
+
+        <Card className="p-4 border-black/5 dark:border-white/10 dark:bg-black shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-blue-500/10 rounded-xl">
+              <Wallet className="size-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Avg. Entry</p>
+              <h3 className="text-xl font-bold tracking-tight tabular-nums">
+                ₹{(expenses.length > 0 ? (parseFloat(summary?.current_month_total || 0) / expenses.length) : 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </h3>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4 border-black/5 dark:border-white/10 dark:bg-black shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Category Mix</p>
+              <div className="h-[40px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={summary?.by_category?.length > 0 ? summary.by_category : [{ name: 'No Data', amount: 1 }]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={12}
+                      outerRadius={20}
+                      paddingAngle={2}
+                      dataKey="amount"
+                    >
+                      {summary?.by_category?.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={entry.color || '#f43f5e'} />
+                      ))}
+                      {(!summary?.by_category || summary.by_category.length === 0) && (
+                        <Cell fill="var(--muted)" />
+                      )}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Entries</p>
+              <h3 className="text-xl font-bold tracking-tight">{expenses.length || 0}</h3>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="grid grid-cols-1 gap-6">
+        <Card className="border-black/5 dark:border-white/10 shadow-sm overflow-hidden dark:bg-black">
+          {/* Table Header / Filters */}
+          <div className="p-4 border-b dark:border-white/10 dark:bg-black flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full pl-9 pr-4 py-2 bg-background dark:bg-black border dark:border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               />
             </div>
-            <div className="w-full sm:w-48">
-              <Select
-                label=""
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Filter className="size-4 text-muted-foreground hidden sm:block" />
+              <select
+                className="bg-background dark:bg-black border dark:border-white/10 rounded-lg text-sm p-2 focus:outline-none focus:ring-1 focus:ring-primary min-w-[140px]"
                 value={ordering}
                 onChange={(e) => { setOrdering(e.target.value); setPage(1); }}
-                options={[
-                  { value: '-date', label: 'NEWEST FIRST' },
-                  { value: 'date', label: 'OLDEST FIRST' },
-                  { value: '-amount', label: 'HIGHEST AMOUNT' },
-                  { value: 'amount', label: 'LOWEST AMOUNT' },
-                  { value: 'title', label: 'TITLE (A-Z)' },
-                ]}
-                className="!bg-transparent border-black/5 dark:border-white/5 text-[10px] font-bold uppercase italic"
-              />
+              >
+                <option value="-date">Newest</option>
+                <option value="date">Oldest</option>
+                <option value="-amount">Highest</option>
+                <option value="amount">Lowest</option>
+              </select>
             </div>
           </div>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-black/[0.02] dark:bg-white/[0.02] border-b border-black/5 dark:border-white/5 transition-colors text-zinc-500">
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic whitespace-nowrap">
-                  Date
-                </th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic">Title / Index</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic">Category</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic">Amount</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-black/5 dark:divide-white/5">
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-8 py-24 text-center">
-                    <div className="flex justify-center mb-4">
-                      <LoadingSpinner size={32} />
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic">Updating list...</p>
-                  </td>
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left border-collapse">
+              <thead>
+                <tr className="dark:bg-black text-muted-foreground/70 border-b dark:border-white/10 uppercase text-[10px] font-bold tracking-widest">
+                  <th className="px-6 py-3 font-bold">Date</th>
+                  <th className="px-6 py-3 font-bold">Description</th>
+                  <th className="px-6 py-3 font-bold">Category</th>
+                  <th className="px-6 py-3 font-bold">Amount</th>
+                  <th className="px-6 py-3 font-bold text-right">Actions</th>
                 </tr>
-              ) : expenses.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-8 py-24 text-center text-zinc-700">
-                    <Receipt className="size-12 mx-auto mb-4 opacity-5" />
-                    <p className="text-[10px] font-black uppercase tracking-widest italic">No expenses found</p>
-                  </td>
-                </tr>
-              ) : (
-                expenses.map((expense) => (
-                  <tr key={expense.id} className="hover:bg-white/[0.02] transition-all group">
-                    <td className="px-8 py-6 whitespace-nowrap text-[11px] font-bold text-zinc-500 uppercase italic tabular-nums">
-                      {new Date(expense.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase()}
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="size-9 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 group-hover:bg-emerald-500/10 group-hover:text-emerald-500 transition-all border border-black/5 dark:border-white/5">
-                          <Receipt className="size-4" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-black text-foreground uppercase italic tracking-tight">{expense.title}</span>
-                          {expense.notes && <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-widest truncate max-w-[200px] italic">{expense.notes}</span>}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 whitespace-nowrap">
-                      <span
-                        className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest italic border transition-colors duration-300"
-                        style={{
-                          backgroundColor: `${expense.category?.color || '#a1a1aa'}10`,
-                          color: expense.category?.color || '#a1a1aa',
-                          borderColor: `${expense.category?.color || '#a1a1aa'}20`
-                        }}
-                      >
-                        {expense.category?.name || 'Uncategorized'}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 whitespace-nowrap">
-                      <span className="text-lg font-black text-foreground italic tracking-tighter tabular-nums">
-                        ₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 whitespace-nowrap text-right">
-                      <div className="flex items-center justify-end gap-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                        <button onClick={() => openModal(expense)} className="size-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-emerald-500 transition-all border border-black/5 dark:border-white/5">
-                          <Pencil className="size-3.5" />
-                        </button>
-                        <button onClick={() => handleDelete(expense.id)} className="size-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-red-500 transition-all border border-black/5 dark:border-white/5">
-                          <Trash2 className="size-3.5" />
-                        </button>
+              </thead>
+              <tbody className="divide-y">
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-20 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <LoadingSpinner size={24} />
+                        <span className="text-xs text-muted-foreground">Loading...</span>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {!loading && totalPages > 1 && (
-          <div className="p-8 border-t border-black/5 dark:border-white/5 flex items-center justify-between bg-black/[0.01] dark:bg-white/[0.01]">
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 italic">Page {page} of {totalPages}</span>
-            <div className="flex gap-4">
-              <Button
-                variant="outline" size="sm"
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-              >
-                PREV
-              </Button>
-              <Button
-                variant="outline" size="sm"
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-              >
-                NEXT
-              </Button>
-            </div>
+                ) : expenses.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-20 text-center text-muted-foreground">
+                      No records found.
+                    </td>
+                  </tr>
+                ) : (
+                  expenses.map((expense) => (
+                    <tr key={expense.id} className="hover:bg-muted/10 transition-colors group">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs tabular-nums">
+                        {new Date(expense.date).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: '2-digit'
+                        })}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-foreground">{expense.title}</span>
+                          {expense.notes && (
+                            <span className="text-[10px] text-muted-foreground truncate max-w-[200px]">
+                              {expense.notes}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className="px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                          style={{
+                            backgroundColor: `${expense.category?.color || '#a1a1aa'}10`,
+                            color: expense.category?.color || '#a1a1aa',
+                            borderColor: `${expense.category?.color || '#a1a1aa'}30`
+                          }}
+                        >
+                          {expense.category?.name || 'Uncategorized'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap font-semibold tabular-nums text-red-500">
+                        ₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => openModal(expense)}
+                            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Pencil className="size-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(expense.id)}
+                            className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
-      </Card>
+
+          {/* Pagination */}
+          {!loading && totalPages > 1 && (
+            <div className="p-4 border-t dark:border-white/10 flex items-center justify-between dark:bg-black">
+              <span className="text-xs text-muted-foreground">
+                Page {page} of {totalPages}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </Card>
+      </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={isAutoSaved ? 'Saved!' : (isScanning ? 'Scanning...' : (editingId ? 'Edit Expense' : 'Add Expense'))}
+        title={isAutoSaved ? 'Saved!' : (isScanning ? 'Scanning...' : (editingId ? 'Edit' : 'Add'))}
       >
         {isAutoSaved ? (
-          <div className="py-8 space-y-6 flex flex-col items-center">
-            <div className="size-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-              <CheckCircle2 className="size-8" />
+          <div className="py-8 text-center space-y-4">
+            <div className="size-12 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto text-emerald-500">
+              <CheckCircle2 className="size-6" />
             </div>
-            <div className="text-center space-y-2">
-              <h3 className="text-lg font-black uppercase tracking-tighter italic text-emerald-500">Saved Successfully</h3>
-              <div className="bg-black/20 dark:bg-white/5 p-6 rounded-2xl border border-white/5 space-y-2 min-w-[280px]">
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest italic">{autoSavedData?.date}</p>
-                <div className="flex items-center justify-center gap-2">
-                  <Receipt className="size-3 text-zinc-400" />
-                  <p className="text-sm font-black uppercase italic tracking-tight">{autoSavedData?.title}</p>
-                </div>
-                <p className="text-2xl font-black text-white italic tracking-tighter">₹{autoSavedData?.amount}</p>
-                <div className="flex items-center justify-center gap-2 pt-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest italic text-zinc-400 border border-white/10 px-3 py-1 rounded-full">
-                    {autoSavedData?.category_name}
-                  </span>
-                </div>
-              </div>
+            <div>
+              <p className="font-medium">{autoSavedData?.title}</p>
+              <p className="text-2xl font-bold">₹{autoSavedData?.amount}</p>
+              <p className="text-xs text-muted-foreground mt-1">{autoSavedData?.category_name}</p>
             </div>
-            <p className="text-[9px] text-zinc-600 font-medium uppercase tracking-[0.2em] animate-pulse">Closing in 2s...</p>
           </div>
         ) : isScanning ? (
-          <div className="py-12 flex flex-col items-center justify-center space-y-6">
-            <div className="flex justify-center mb-4">
-              <LoadingSpinner size={48} />
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-black uppercase tracking-widest italic text-foreground">Scanning receipt...</p>
-              <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-[0.2em] mt-1">Reading details...</p>
-            </div>
+          <div className="py-12 text-center space-y-4">
+            <LoadingSpinner size={32} className="mx-auto" />
+            <p className="text-sm text-muted-foreground">Extracting receipt details...</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-1.5">
-            {!editingId && (
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="group cursor-pointer mb-6 p-4 rounded-2xl border-2 border-dashed border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] hover:bg-emerald-500/[0.02] hover:border-emerald-500/20 transition-all flex flex-col items-center justify-center gap-2"
-              >
-                <div className="size-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500/10 transition-all font-black text-xs italic text-zinc-500 group-hover:text-emerald-500">
-                  SCAN
-                </div>
-                <div className="text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 italic">Scan Another Receipt</p>
-                  <p className="text-[8px] text-zinc-600 font-medium uppercase tracking-[0.15em]">AI-Powered Data Extraction</p>
-                </div>
-              </div>
-            )}
+          <form onSubmit={handleSubmit} className="space-y-4 pt-4">
             <Input
-              label="Title"
+              label="Description"
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
               required
-              placeholder="E.g., Grocery Shopping"
+              placeholder="e.g. Grocery store"
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <Input
                 label="Amount (₹)"
                 type="number"
@@ -516,7 +517,6 @@ export default function ExpensesPage() {
                 value={formData.amount}
                 onChange={e => setFormData({ ...formData, amount: e.target.value })}
                 required
-                placeholder="0.00"
               />
               <Input
                 label="Date"
@@ -533,7 +533,7 @@ export default function ExpensesPage() {
               onChange={e => setFormData({ ...formData, category_id: e.target.value })}
               required
               options={[
-                { value: '', label: 'Select a category...' },
+                { value: '', label: 'Select category' },
                 ...categories.map(cat => ({ value: cat.id, label: cat.name }))
               ]}
             />
@@ -542,14 +542,16 @@ export default function ExpensesPage() {
               label="Notes"
               value={formData.notes}
               onChange={e => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="ENTRY_NOTES"
-              className="h-16 uppercase font-medium italic"
+              placeholder="Optional notes"
+              className="h-20"
             />
 
-            <div className="pt-2 flex justify-end gap-2">
-              <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)} className="border border-black/5 dark:border-white/5 uppercase text-[9px] font-black tracking-widest italic py-1.5 px-3">Cancel</Button>
-              <Button type="submit" isLoading={isSubmitting} className="bg-red-600 hover:bg-red-500 border border-white/10 uppercase text-[9px] font-black tracking-widest italic py-1.5 px-4">
-                {editingId ? 'Save Changes' : 'Save Expense'}
+            <div className="pt-4 flex justify-end gap-2">
+              <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" isLoading={isSubmitting}>
+                {editingId ? 'Update' : 'Save'}
               </Button>
             </div>
           </form>

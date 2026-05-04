@@ -42,9 +42,9 @@ const formatCurrency = (val: number | string | undefined | null) => {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(num));
 };
 
-const gridStroke = (theme: ThemeName) => (theme === 'dark' ? '#ffffff05' : '#00000005');
-const axisStroke = (theme: ThemeName) => (theme === 'dark' ? '#52525b' : '#94a3b8');
-const tooltipBackground = (theme: ThemeName) => (theme === 'dark' ? '#000' : '#fff');
+const gridStroke = (theme: ThemeName) => (theme === 'dark' ? '#ffffff10' : '#00000005');
+const axisStroke = (theme: ThemeName) => (theme === 'dark' ? '#3f3f46' : '#94a3b8');
+const tooltipBackground = (theme: ThemeName) => (theme === 'dark' ? '#000000' : '#ffffff');
 
 export function CashflowTrendChart({ data, theme }: { data: TrendPoint[]; theme: ThemeName }) {
   return (
@@ -67,7 +67,7 @@ export function CashflowTrendChart({ data, theme }: { data: TrendPoint[]; theme:
           fontSize={10}
           tickLine={false}
           axisLine={false}
-          className="uppercase font-black italic tracking-tighter"
+          className="uppercase font-bold tracking-widest opacity-60"
         />
         <YAxis
           stroke={axisStroke(theme)}
@@ -75,14 +75,14 @@ export function CashflowTrendChart({ data, theme }: { data: TrendPoint[]; theme:
           tickLine={false}
           axisLine={false}
           tickFormatter={(val) => `INR ${val}`}
-          className="font-black italic tracking-tighter"
+          className="font-bold tracking-widest opacity-60"
         />
         <Tooltip
-          contentStyle={{ backgroundColor: tooltipBackground(theme), border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', backdropFilter: 'blur(20px)' }}
-          itemStyle={{ fontWeight: 'bold' }}
+          contentStyle={{ backgroundColor: tooltipBackground(theme), border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0px' }}
+          itemStyle={{ fontWeight: 'bold', fontSize: '10px' }}
           formatter={(value: any, name: any) => [formatCurrency(Number(value) || 0), String(name).toUpperCase()]}
         />
-        <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'black', textTransform: 'uppercase', fontStyle: 'italic' }} />
+        <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }} />
         <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" name="Income" />
         <Area type="monotone" dataKey="expense" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" name="Spending" />
       </AreaChart>
@@ -108,14 +108,14 @@ export function CategoryPieChart({ data, theme }: { data: CategoryPoint[]; theme
           ))}
         </Pie>
         <Tooltip
-          contentStyle={{ backgroundColor: tooltipBackground(theme), border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', backdropFilter: 'blur(20px)' }}
+          contentStyle={{ backgroundColor: tooltipBackground(theme), border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0px' }}
           formatter={(value: any) => [formatCurrency(Number(value) || 0), 'VAL']}
         />
         <Legend
           verticalAlign="bottom"
           height={36}
           iconType="circle"
-          className="text-[10px] font-black uppercase italic tracking-widest opacity-50"
+          className="text-[10px] font-bold uppercase tracking-widest opacity-60"
         />
       </PieChart>
     </ResponsiveContainer>
@@ -127,11 +127,11 @@ export function WeeklyBreakdownChart({ data, theme }: { data: WeeklyPoint[]; the
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridStroke(theme)} />
-        <XAxis dataKey="day" stroke={axisStroke(theme)} fontSize={10} tickLine={false} axisLine={false} className="uppercase font-black italic tracking-tighter" />
-        <YAxis stroke={axisStroke(theme)} fontSize={10} tickLine={false} axisLine={false} className="font-black italic tracking-tighter" tickFormatter={(value) => `INR ${value}`} />
+        <XAxis dataKey="day" stroke={axisStroke(theme)} fontSize={10} tickLine={false} axisLine={false} className="uppercase font-bold tracking-widest opacity-60" />
+        <YAxis stroke={axisStroke(theme)} fontSize={10} tickLine={false} axisLine={false} className="font-bold tracking-widest opacity-60" tickFormatter={(value) => `INR ${value}`} />
         <Tooltip
-          cursor={{ fill: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}
-          contentStyle={{ backgroundColor: tooltipBackground(theme), border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', backdropFilter: 'blur(20px)' }}
+          cursor={{ fill: theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}
+          contentStyle={{ backgroundColor: tooltipBackground(theme), border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0px' }}
           formatter={(value: any, name: any) => [formatCurrency(Number(value) || 0), String(name).charAt(0).toUpperCase() + String(name).slice(1)]}
         />
         <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', paddingTop: '10px' }} />

@@ -3,7 +3,7 @@
 import React from 'react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   error?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -16,7 +16,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={`w-full flex flex-col ${label ? 'gap-0.5' : ''}`}>
         {label && (
-          <label htmlFor={inputId} className="text-[10px] font-black uppercase tracking-tight text-zinc-500 group-focus-within:text-emerald-500 transition-colors italic px-1">
+          <label htmlFor={inputId} className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-focus-within:text-emerald-500 transition-colors px-1">
             {label}
           </label>
         )}
@@ -30,7 +30,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={`
-              w-full rounded-xl border bg-zinc-100/50 dark:bg-zinc-900/80 backdrop-blur-md border-black/10 dark:border-white/10 px-3 py-1.5 text-sm text-foreground
+              w-full rounded-xl border bg-zinc-100/50 dark:bg-black border-black/10 dark:border-white/10 px-3 py-1.5 text-sm text-foreground
               transition-all duration-300 placeholder:text-zinc-500 dark:placeholder:text-zinc-400
               focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/40
               ${error ? 'border-red-500/50 focus:ring-red-500/20 focus:border-red-500/30' : ''}
@@ -47,7 +47,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mt-1 italic px-1">{error}</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-red-500 mt-1 px-1">{error}</span>
         )}
       </div>
     );

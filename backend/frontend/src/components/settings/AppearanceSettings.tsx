@@ -25,7 +25,7 @@ export default function AppearanceSettings() {
   };
 
   return (
-    <Card glass className="relative overflow-hidden group border-white/5 transition-all duration-500">
+    <Card className="relative overflow-hidden group border-white/10 dark:bg-black transition-all duration-500">
       <div className="flex items-center gap-4 mb-10 relative z-10">
         <div className="size-10 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-foreground border border-black/10 dark:border-white/10 shadow-inner font-black italic text-xs">
           ...

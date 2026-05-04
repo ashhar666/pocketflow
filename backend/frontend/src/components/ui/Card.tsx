@@ -19,8 +19,8 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         className={`
           rounded-[32px] p-8 transition-all duration-500
           ${glass 
-            ? 'bg-white/[0.01] dark:bg-zinc-950/20 border border-black/5 dark:border-white/5 backdrop-blur-3xl shadow-sm dark:shadow-[0_0_50px_-12px_rgba(255,255,255,0.1)]' 
-            : 'bg-zinc-50/50 dark:bg-white/[0.02] border border-black/5 dark:border-white/5 hover:bg-zinc-100/50 dark:hover:bg-white/[0.04]'}
+            ? 'bg-white/80 dark:bg-black border border-black/10 dark:border-white/10 backdrop-blur-3xl shadow-sm' 
+            : 'bg-white dark:bg-black border border-black/10 dark:border-white/10 hover:border-black/20 dark:hover:border-white/20'}
           ${className}
         `}
         {...props}
@@ -37,7 +37,7 @@ export const CardHeader = ({ className = '', children }: { className?: string; c
 );
 
 export const CardTitle = ({ className = '', children }: { className?: string; children: React.ReactNode }) => (
-  <h3 className={`font-black tracking-tight ${className}`}>{children}</h3>
+  <h3 className={`font-bold tracking-tight ${className}`}>{children}</h3>
 );
 
 export const CardContent = ({ className = '', children }: { className?: string; children: React.ReactNode }) => (

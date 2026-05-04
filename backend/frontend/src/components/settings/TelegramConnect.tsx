@@ -102,21 +102,21 @@ export default function TelegramConnect() {
     return (
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="size-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shrink-0">
+          <div className="size-8 rounded-lg bg-white/5 flex items-center justify-center text-emerald-500 border border-white/10 shrink-0">
             <LoadingSpinner size={14} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-black uppercase italic tracking-tight text-foreground text-sm">
+              <h3 className="font-bold uppercase tracking-tight text-foreground text-xs">
                 Telegram Connected
               </h3>
-              <span className="inline-flex items-center gap-1 px-1.5 py-0 rounded-md bg-emerald-500/10 text-emerald-500 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0 rounded-md bg-emerald-500/10 text-emerald-500 text-[8px] font-bold uppercase tracking-widest border border-emerald-500/20">
                 <span className="size-1 rounded-full bg-emerald-500 animate-pulse" />
                 Active
               </span>
             </div>
-            <p className="text-[10px] text-zinc-500 truncate max-w-[200px] sm:max-w-md">
-              Log instantly. Try: <code className="text-zinc-400 bg-zinc-900 px-1 py-px rounded">150 Food Lunch</code>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">
+              Log instantly. Try: <code className="text-zinc-300 bg-white/5 px-1 py-px rounded border border-white/5">150 Food Lunch</code>
             </p>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function TelegramConnect() {
         <button
           onClick={handleDisconnect}
           disabled={disconnecting}
-          className="shrink-0 px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-[10px] font-black uppercase italic tracking-wider hover:bg-red-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+          className="shrink-0 px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
         >
           {disconnecting ? 'Disconnecting…' : 'Disconnect'}
         </button>
@@ -137,14 +137,14 @@ export default function TelegramConnect() {
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="size-8 rounded-lg bg-[#2196f3]/10 flex items-center justify-center border border-[#2196f3]/20 shrink-0 font-black italic text-[10px] text-[#2196f3]">
+        <div className="size-8 rounded-lg bg-blue-500/5 flex items-center justify-center border border-blue-500/10 shrink-0 font-bold text-[10px] text-blue-500">
           TG
         </div>
         <div>
-          <h3 className="font-black uppercase italic tracking-tight text-foreground text-sm">
+          <h3 className="font-bold uppercase tracking-tight text-foreground text-xs">
             Connect Telegram
           </h3>
-          <p className="text-[10px] text-zinc-500">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">
             Log expenses instantly via bot message
           </p>
         </div>
@@ -155,7 +155,7 @@ export default function TelegramConnect() {
         <button
           onClick={handleConnect}
           disabled={generating}
-          className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#2196f3] text-white text-[10px] font-black uppercase italic tracking-wider hover:bg-[#1976d2] active:scale-95 transition-all w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+          className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500 active:scale-95 transition-all w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {generating ? (
             <>

@@ -32,14 +32,14 @@ export default function SettingsPage() {
       case 'profile': return <ProfileSettings />;
       case 'security': return <SecuritySettings />;
       case 'integrations': return (
-        <Card glass className="relative overflow-hidden group border-white/5 transition-all duration-500">
+        <Card className="relative overflow-hidden group border-white/10 dark:bg-black transition-all duration-500">
           <div className="flex items-center gap-4 mb-10 relative z-10">
             <div className="size-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.1)] font-black italic text-[10px]">
               ...
             </div>
             <div>
-              <h2 className="text-xl font-black text-foreground uppercase italic tracking-tighter">Integrations</h2>
-              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 italic">Connected Services</p>
+              <h2 className="text-xl font-bold text-foreground uppercase tracking-tight">Integrations</h2>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Connected Services</p>
             </div>
           </div>
           <TelegramConnect />
@@ -57,13 +57,12 @@ export default function SettingsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-end gap-6 pb-12">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-emerald-500 mb-2">
-            <div className="size-4 border border-emerald-500/20 rounded flex items-center justify-center bg-emerald-500/5 font-black italic text-[8px]">Set</div>
-            <span className="text-[10px] font-black uppercase tracking-widest italic">App Preferences</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">App Preferences</span>
           </div>
-          <h1 className="text-4xl font-black tracking-tighter text-foreground uppercase italic">
-            App <span className="text-emerald-500">Settings</span>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground uppercase">
+            Account <span className="text-emerald-500">Settings</span>
           </h1>
-          <p className="text-zinc-500 text-sm font-medium italic">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
             Manage your profile, security, and appearance preferences.
           </p>
         </div>
@@ -73,8 +72,8 @@ export default function SettingsPage() {
         {/* Floating Rail Navigation */}
         <div className="lg:col-span-3">
           <div className="sticky top-24 space-y-2">
-            <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic mb-4 px-4 flex items-center gap-2">
-              Menu
+            <h5 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4 px-4 flex items-center gap-2">
+              Configuration
             </h5>
             <div className="flex flex-col gap-2">
               {SECTIONS.map((section) => {
@@ -89,11 +88,11 @@ export default function SettingsPage() {
                       group relative overflow-hidden flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-300
                       ${isActive 
                         ? 'bg-emerald-500/10 text-emerald-500 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.2)]' 
-                        : 'bg-black/5 dark:bg-white/[0.02] text-zinc-500 hover:text-foreground hover:bg-black/10 dark:hover:bg-white/[0.05]'}
+                        : 'bg-white/[0.02] text-zinc-500 hover:text-foreground hover:bg-white/[0.05]'}
                     `}
                   >
                     <div className="flex items-center gap-4 relative z-10">
-                      <span className={`text-xs font-black uppercase italic tracking-wider transition-all ${isActive ? 'translate-x-1' : ''}`}>
+                      <span className={`text-[11px] font-bold uppercase tracking-wider transition-all ${isActive ? 'translate-x-1' : ''}`}>
                         {section.label}
                       </span>
                     </div>

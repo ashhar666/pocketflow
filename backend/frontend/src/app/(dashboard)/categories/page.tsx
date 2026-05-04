@@ -108,14 +108,14 @@ export default function CategoriesPage() {
     <div className="space-y-12">
       <div className="flex flex-col md:flex-row justify-between items-end gap-6 pb-8 border-b border-white/5">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground uppercase">
             Categories
           </h1>
-          <p className="text-zinc-500 text-sm font-medium">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
             Organize your transactions into groups
           </p>
         </div>
-        <Button variant="primary" size="md" onClick={() => openModal()} className="px-6 font-black uppercase italic tracking-widest text-[10px]">
+        <Button variant="primary" size="md" onClick={() => openModal()} className="px-6 font-bold uppercase tracking-widest text-[10px]">
           Add Category
         </Button>
       </div>
@@ -129,7 +129,7 @@ export default function CategoriesPage() {
           {categories.map((cat) => (
             <Card
               key={cat.id}
-              className="flex flex-col relative group border-black/5 dark:border-white/5 transition-all duration-300 p-6"
+              className="flex flex-col relative group border-white/10 dark:bg-black transition-all duration-300 p-6"
             >
               <div className="flex justify-between items-start mb-4">
                 <div
@@ -139,20 +139,20 @@ export default function CategoriesPage() {
                   }}
                 />
                 <div className="flex gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => openModal(cat)} className="text-[10px] font-black uppercase italic text-zinc-500 hover:text-foreground">Edit</button>
-                  <button onClick={() => handleDelete(cat.id)} className="text-[10px] font-black uppercase italic text-zinc-500 hover:text-red-500">Delete</button>
+                  <button onClick={() => openModal(cat)} className="text-[10px] font-bold uppercase text-muted-foreground hover:text-foreground">Edit</button>
+                  <button onClick={() => handleDelete(cat.id)} className="text-[10px] font-bold uppercase text-muted-foreground hover:text-red-500">Delete</button>
                 </div>
               </div>
 
-              <h3 className="text-lg font-semibold tracking-tight text-foreground truncate">{cat.name}</h3>
+              <h3 className="text-lg font-bold tracking-tight text-foreground truncate uppercase">{cat.name}</h3>
               <div className="flex justify-between items-end mt-2">
                 <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-500">
                   {cat.transaction_count || 0} {cat.transaction_count === 1 ? 'Entry' : 'Entries'}
                 </p>
-                <span className={`text-[8px] font-black tracking-[0.2em] uppercase italic px-2 py-0.5 rounded border ${
+                <span className={`text-[8px] font-bold tracking-[0.2em] uppercase px-2 py-0.5 rounded border ${
                    cat.category_type === 'INCOME' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
                    cat.category_type === 'BOTH' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-500' :
-                   'bg-zinc-500/10 border-zinc-500/20 text-zinc-500'
+                   'bg-muted/50 border-muted text-muted-foreground'
                 }`}>
                   {cat.category_type || 'EXPENSE'}
                 </span>
@@ -162,9 +162,9 @@ export default function CategoriesPage() {
 
           <button
             onClick={() => openModal()}
-            className="flex flex-col items-center justify-center border-2 border-dashed border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 rounded-2xl p-8 transition-all group min-h-[140px]"
+            className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 hover:border-white/20 rounded-2xl p-8 transition-all group min-h-[140px] dark:bg-black"
           >
-            <p className="text-[10px] font-black uppercase italic tracking-widest text-zinc-500 group-hover:text-foreground transition-colors">Add New Category</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors">Add New Category</p>
           </button>
         </div>
       )}
@@ -184,7 +184,7 @@ export default function CategoriesPage() {
               onChange={e => setFormData({ ...formData, name: e.target.value })}
               required
               placeholder="E.g., Groceries"
-              className="uppercase font-black italic tracking-tight"
+              className="uppercase font-semibold tracking-tight"
             />
             <Select
               label="Type"
@@ -196,12 +196,12 @@ export default function CategoriesPage() {
                 { value: 'INCOME', label: 'INCOME ONLY' },
                 { value: 'BOTH', label: 'BOTH' },
               ]}
-              className="font-black italic tracking-tight"
+              className="font-semibold tracking-tight"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 block mb-3 italic px-1">Theme Color</label>
+            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground block mb-3 px-1">Theme Color</label>
             <div className="grid grid-cols-8 gap-3">
               {COLORS.map(color => (
                 <button

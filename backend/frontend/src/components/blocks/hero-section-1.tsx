@@ -362,23 +362,23 @@ export function HeroSection() {
                                 >
                                     <motion.div variants={transitionVariants}>
                                         <Link
-                                            href="/register"
-                                            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1 px-3 text-sm font-medium text-zinc-300 hover:bg-white/10 transition-colors backdrop-blur-md"
-                                        >
-                                            <span className="text-[10px] font-black text-emerald-400 italic">[NEW]</span>
-                                            <span>New: Use AI and Telegram to track money</span>
-                                            <span className="text-[10px] font-black text-zinc-500 italic">[&gt;]</span>
-                                        </Link>
+                                             href="/register"
+                                             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1 px-3 text-sm font-medium text-zinc-300 hover:bg-white/10 transition-colors backdrop-blur-md"
+                                         >
+                                             <span className="text-[10px] font-bold text-emerald-400 uppercase">[NEW]</span>
+                                             <span>New: Use AI and Telegram to track money</span>
+                                             <span className="text-[10px] font-bold text-zinc-500 uppercase">[&gt;]</span>
+                                         </Link>
                                     </motion.div>
 
                                     <motion.h1
-                                        variants={transitionVariants}
-                                        className="mt-8 max-w-5xl mx-auto text-balance text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.9]"
-                                    >
-                                        <span className="sr-only">PocketFlow — Free AI-Powered Personal Expense Tracker. </span>
-                                        The easiest free <br />
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/40">AI expense tracker.</span>
-                                    </motion.h1>
+                                         variants={transitionVariants}
+                                         className="mt-8 max-w-5xl mx-auto text-balance text-6xl md:text-8xl font-bold tracking-tight uppercase leading-[0.95]"
+                                     >
+                                         <span className="sr-only">PocketFlow — Free AI-Powered Personal Expense Tracker. </span>
+                                         The easiest free <br />
+                                         <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/40">AI expense tracker.</span>
+                                     </motion.h1>
 
                                     <motion.p
                                         variants={transitionVariants}
@@ -455,21 +455,21 @@ const HeroHeader = () => {
                 )}>
                     <div className="relative flex items-center justify-between gap-6">
                         <div className="flex w-full justify-between lg:w-auto">
-                            <Link href="/" className="flex items-center group/logo">
-                                <div className="flex flex-col -space-y-1">
-                                    <span className="font-black text-xl tracking-tighter hidden sm:block text-foreground uppercase italic font-display">PocketFlow</span>
-                                    <div className="flex items-center gap-2">
-                                        <div className="size-1 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-600 italic">v1.4.0 / Systems Active</span>
-                                    </div>
-                                </div>
-                            </Link>
+                             <Link href="/" className="flex items-center group/logo">
+                                 <div className="flex flex-col -space-y-1">
+                                     <span className="font-bold text-xl tracking-tight hidden sm:block text-foreground uppercase font-display">PocketFlow</span>
+                                     <div className="flex items-center gap-2">
+                                         <div className="size-1 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                         <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-600">v1.4.0 / Systems Active</span>
+                                     </div>
+                                 </div>
+                             </Link>
 
-                             <button
-                                onClick={() => setMenuState(!menuState)}
-                                className="relative z-20 block cursor-pointer p-2 lg:hidden text-[10px] font-black uppercase tracking-widest text-white italic border border-white/10 rounded-lg px-3">
-                                {menuState ? 'CLOSE' : 'MENU'}
-                            </button>
+                              <button
+                                 onClick={() => setMenuState(!menuState)}
+                                 className="relative z-20 block cursor-pointer p-2 lg:hidden text-[10px] font-bold uppercase tracking-widest text-white border border-white/10 rounded-lg px-3">
+                                 {menuState ? 'CLOSE' : 'MENU'}
+                             </button>
                         </div>
 
                         <div className="hidden lg:block">

@@ -107,16 +107,49 @@ export default function IncomePage() {
     fetchIncomes();
   }, [fetchIncomes]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      if (editingId) {
+        await api.put(`/income/${editingId}/`, formData);
+        toast.success('Income entry updated');
+      } else {
+        await api.post('/income/', formData);
+        toast.success('Income entry recorded');
+      }
+      setIsModalOpen(false);
+      fetchIncomes();
+    } catch (error) {
+      toast.error('Failed to save entry');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this entry?')) return;
+
+    try {
+      await api.delete(`/income/${id}/`);
+      toast.success('Entry deleted');
+      fetchIncomes();
+    } catch (error) {
+      toast.error('Deletion failed');
+    }
+  };
+
   const openModal = (income?: any) => {
     if (income) {
       setEditingId(income.id);
       setFormData({
         source: income.source,
-        amount: income.amount,
+        amount: income.amount.toString(),
         category_id: income.category?.id?.toString() || '',
         date: income.date,
         description: income.description || '',
-        is_recurring: income.is_recurring || false,
+        is_recurring: income.is_recurring,
         recurrence_type: income.recurrence_type || 'none',
       });
     } else {
@@ -134,453 +167,221 @@ export default function IncomePage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      if (editingId) {
-        await api.put(`/income/${editingId}/`, formData);
-        toast.success('Income entry updated');
-      } else {
-        await api.post('/income/', formData);
-        toast.success('Income entry created');
-      }
-      setIsModalOpen(false);
-      fetchIncomes();
-    } catch (error: any) {
-      toast.error('Failed to save income entry');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Delete this income record? This will decrease your total balance.')) {
-      try {
-        await api.delete(`/income/${id}/`);
-        toast.success('Entry removed');
-        fetchIncomes();
-      } catch (error) {
-        toast.error('Failed to delete entry');
-      }
-    }
-  };
-
-  const handleExport = async () => {
-    let url = '';
-    try {
-      toast.loading('Generating PDF...', { id: 'export-loading' });
-      // Add timestamp to bypass cache
-      const response = await api.get(`/income/export/?t=${Date.now()}`, { responseType: 'blob' });
-
-      // If the backend returns JSON error, Axios might still treat it as a blob
-      if (response.data.type === 'application/json') {
-        const text = await response.data.text();
-        const errorData = JSON.parse(text);
-        throw new Error(errorData.error || 'Export failed');
-      }
-
-      // Basic integrity check: A valid PDF should be at least a few hundred bytes
-      if (response.data.size < 100) {
-        throw new Error('Received corrupt or empty PDF file');
-      }
-
-      url = window.URL.createObjectURL(response.data);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `Income_Report_${new Date().toISOString().split('T')[0]}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      toast.success('Report downloaded', { id: 'export-loading' });
-    } catch (error: any) {
-      console.error('Export Error:', error);
-      toast.error(error.message || 'Failed to export income data', { id: 'export-loading' });
-    } finally {
-      if (url) window.URL.revokeObjectURL(url);
-    }
-  };
-
-  const formatCurrency = (val: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val);
-
   return (
-    <div className="space-y-6 md:space-y-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 md:pb-8 border-b border-white/5">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            Income Overview
-          </h1>
-          <p className="text-zinc-500 text-sm font-medium">
-            Manage and track your incoming cash flow
+    <div className="max-w-7xl mx-auto space-y-8 p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight uppercase">Income</h1>
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">
+            Revenue tracking & distribution
           </p>
         </div>
-        <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
-          <Button
-            variant="secondary"
-            size="md"
-            leftIcon={<Download className="size-3" />}
-            className="w-full sm:w-auto justify-center print:hidden border-black/10 dark:border-white/10 px-6 font-black uppercase italic tracking-widest text-[10px]"
-            onClick={handleExport}
-          >
-            Export PDF
-          </Button>
-          <Button
-            variant="primary"
-            size="md"
-            leftIcon={<Plus className="size-3" />}
-            className="w-full sm:w-auto justify-center bg-indigo-600 hover:bg-indigo-500 border-indigo-400/20 print:hidden px-6 font-black uppercase italic tracking-widest text-[10px]"
-            onClick={() => openModal()}
-          >
-            Add Income
-          </Button>
-        </div>
-      </div>
-
-      {/* Filter Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 p-4 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 backdrop-blur-xl">
-        <div className="flex items-center p-1 bg-zinc-200/50 dark:bg-zinc-800/50 rounded-xl w-fit relative">
-          <motion.div
-            layout
-            className="absolute h-[calc(100%-8px)] bg-white dark:bg-zinc-700 rounded-lg shadow-sm z-0"
-            initial={false}
-            animate={{
-              x: viewMode === 'monthly' ? 4 : 112,
-              width: viewMode === 'monthly' ? 104 : 80
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          />
-          <button
-            onClick={() => setViewMode('monthly')}
-            className={`relative z-10 px-4 py-1.5 text-xs font-bold transition-colors w-[104px] ${
-              viewMode === 'monthly' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-            }`}
-          >
-            Monthly View
-          </button>
-          <button
-            onClick={() => setViewMode('all')}
-            className={`relative z-10 px-4 py-1.5 text-xs font-bold transition-colors w-[80px] ${
-              viewMode === 'all' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-            }`}
-          >
-            All Time
-          </button>
-        </div>
-
-        {viewMode === 'monthly' && (
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3 md:ml-auto bg-white/50 dark:bg-white/5 p-1.5 pr-3 rounded-xl border border-black/5 dark:border-white/5"
-          >
-            <Input
-              label="Select Month"
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="w-36 bg-transparent border-none h-7 focus:ring-0 text-[11px]"
-            />
-          </motion.div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-        <motion.div
-          whileHover={{ y: -5 }}
-          className="lg:col-span-2"
-        >
-          <Card glass className="relative overflow-hidden p-8 h-full border-emerald-500/20 bg-emerald-500/[0.02] group">
-            {/* Background Glow */}
-            <div className="absolute -right-20 -top-20 size-64 bg-emerald-500/10 blur-[100px] rounded-full group-hover:bg-emerald-500/20 transition-colors duration-700" />
-            <div className="absolute -left-20 -bottom-20 size-64 bg-emerald-500/5 blur-[100px] rounded-full" />
-            
-            <TrendingUp className="absolute -right-4 -bottom-4 size-40 text-emerald-500/5 -rotate-12 transition-transform group-hover:scale-110 duration-700" />
-            
-            <div className="relative z-10 flex flex-col h-full justify-between">
-              <div className="flex justify-between items-start mb-8">
-                <div className="flex items-center gap-5">
-                  <div className="size-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-inner">
-                    <Wallet className="size-6" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic mb-1">
-                      {viewMode === 'monthly' ? 'Income this Month' : 'Total Income Received'}
-                    </p>
-                    <AnimatePresence mode="wait">
-                      <motion.h2 
-                        key={viewMode + (summary?.current_income_total || 0)}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="text-4xl font-black tracking-tight flex items-baseline gap-1 italic"
-                      >
-                        <span className="text-emerald-500 text-2xl font-bold not-italic">₹</span>
-                        {parseFloat(
-                          viewMode === 'monthly' 
-                            ? (summary?.current_income_total || 0) 
-                            : (summary?.all_time_income || 0)
-                        ).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </motion.h2>
-                    </AnimatePresence>
-                  </div>
-                </div>
-                <div className="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-wider">
-                  Real-time Sync
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-4">
-                {[
-                  { label: 'Transactions', value: incomes.length, icon: History },
-                  { label: 'Categories', value: Array.from(new Set(incomes.map(i => i.category__name))).length, icon: MoreHorizontal },
-                  { label: 'Avg / Item', value: `₹${(parseFloat(viewMode === 'monthly' ? summary?.current_income_total : summary?.all_time_income) / (incomes.length || 1)).toFixed(0)}`, icon: CircleDollarSign },
-                  { label: 'Growth', value: `+${summary?.income_percentage_change?.toFixed(1) || 0}%`, icon: ArrowUpRight, color: 'text-emerald-500' }
-                ].map((stat, idx) => (
-                  <div key={idx} className="flex flex-col gap-1">
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">{stat.label}</span>
-                    <span className={`text-sm font-black flex items-center gap-1 ${stat.color || 'text-zinc-800 dark:text-zinc-200'}`}>
-                      <stat.icon className="size-3 opacity-50" />
-                      {stat.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          whileHover={{ y: -5 }}
-          className="lg:col-span-1"
-        >
-          <Card glass className="relative overflow-hidden p-6 h-full border-black/5 dark:border-white/5 bg-zinc-100/30 dark:bg-zinc-900/30">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic mb-6 px-2">Source Split</p>
-            <div className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={summary?.income_by_category?.length > 0 ? summary.income_by_category : [{ category__name: 'No Data', total: 1 }]}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={8}
-                    dataKey="total"
-                  >
-                    {summary?.income_by_category?.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={entry.category__color || '#10b981'} stroke="none" />
-                    ))}
-                    {(!summary?.income_by_category || summary.income_by_category.length === 0) && (
-                      <Cell fill="#3f3f46" stroke="none" />
-                    )}
-                  </Pie>
-                  <RechartsTooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'rgba(9, 9, 11, 0.9)', 
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '12px',
-                      fontSize: '10px',
-                      fontWeight: 'bold',
-                      color: '#fff'
-                    }}
-                    itemStyle={{ color: '#fff' }}
-                    formatter={(value: any) => [`₹${parseFloat(value).toLocaleString()}`, 'Amount']}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 justify-center">
-              {summary?.income_by_category?.slice(0, 3).map((cat: any, idx: number) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <div className="size-2 rounded-full" style={{ backgroundColor: cat.category__color || '#10b981' }} />
-                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-tighter truncate max-w-[80px]">
-                    {cat.category__name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </motion.div>
-      </div>
-
-      <Card glass className="p-0 overflow-hidden border-black/5 dark:border-white/5">
-        <div className="p-6 border-b border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] flex justify-between items-center">
-          <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500 italic">
-            Income History
+        
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center p-1 dark:bg-black border dark:border-white/10 rounded-lg">
+            <button
+              onClick={() => setViewMode('monthly')}
+              className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${
+                viewMode === 'monthly' ? 'dark:bg-white dark:text-black shadow-sm' : 'text-zinc-500 hover:text-foreground'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setViewMode('all')}
+              className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${
+                viewMode === 'all' ? 'dark:bg-white dark:text-black shadow-sm' : 'text-zinc-500 hover:text-foreground'
+              }`}
+            >
+              All Time
+            </button>
           </div>
-        </div>
 
-        {/* Mobile View: Card List */}
-        <div className="md:hidden divide-y divide-black/5 dark:divide-white/5">
-          {loading ? (
-            <div className="px-6 py-12 text-center">
-              <div className="size-12 border border-indigo-500/20 rounded-xl flex items-center justify-center font-black italic text-[10px] text-indigo-500 animate-spin mx-auto mb-4 border-t-indigo-500">
-                <History className="size-5" />
-              </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic">Loading income...</p>
-            </div>
-          ) : incomes.length === 0 ? (
-            <div className="px-6 py-12 text-center text-zinc-700">
-              <CircleDollarSign className="size-12 mx-auto mb-4 opacity-5 text-zinc-500" />
-              <p className="text-[10px] font-black uppercase tracking-widest italic">No Inbound Transfers Detected</p>
-            </div>
-          ) : (
-            <AnimatePresence mode="popLayout">
-              {incomes.map((income) => (
-                <motion.div 
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  key={income.id} 
-                  className="p-6 space-y-4 hover:bg-black/[0.01] transition-colors"
+          <AnimatePresence mode="wait">
+            {viewMode === 'monthly' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+              >
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="h-9 bg-background dark:bg-black border border-black/10 dark:border-white/10 rounded-lg px-3 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition-all"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <Button 
+            size="sm" 
+            onClick={() => openModal()}
+            className="text-[10px] font-bold uppercase tracking-widest h-9 bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-lg shadow-emerald-900/20 px-4"
+          >
+            <Plus className="size-3.5 mr-2" /> Add Entry
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats and Chart Grid */}
+      {/* Stats Summary Row */}
+      <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 mb-12">
+        <Card className="p-4 border-black/10 dark:border-white/10 dark:bg-black shadow-sm min-w-[180px] flex-shrink-0">
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Total Revenue</p>
+          <h3 className="text-2xl font-bold tracking-tight tabular-nums flex items-baseline gap-1">
+            ₹{parseFloat(viewMode === 'monthly' ? (summary?.current_income_total || 0) : (summary?.all_time_income || 0)).toLocaleString('en-IN')}
+            <span className="text-[10px] text-zinc-500">INR</span>
+          </h3>
+        </Card>
+
+        <Card className="p-4 border-black/10 dark:border-white/10 dark:bg-black shadow-sm min-w-[180px] flex-shrink-0">
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Avg. Entry</p>
+          <h3 className="text-2xl font-bold tracking-tight tabular-nums flex items-baseline gap-1">
+            ₹{(incomes.length > 0 ? (parseFloat(viewMode === 'monthly' ? (summary?.current_income_total || 0) : (summary?.all_time_income || 0)) / incomes.length) : 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+            <span className="text-[10px] text-zinc-500">INR</span>
+          </h3>
+        </Card>
+
+        <Card className="p-4 border-black/10 dark:border-white/10 dark:bg-black shadow-sm min-w-[240px] flex-shrink-0 flex items-center justify-between gap-6">
+          <div>
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Source Mix</p>
+            <h3 className="text-2xl font-bold tracking-tight tabular-nums">
+              {incomes.length || 0} <span className="text-[10px] text-zinc-500">Entries</span>
+            </h3>
+          </div>
+          <div className="h-[48px] w-[64px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={summary?.income_by_category?.length > 0 ? summary.income_by_category : [{ category__name: 'No Data', total: 1 }]}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={14}
+                  outerRadius={22}
+                  paddingAngle={2}
+                  dataKey="total"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-xl bg-indigo-500/5 flex items-center justify-center text-indigo-500 border border-indigo-500/10 shrink-0">
-                        <ArrowUpRight className="size-5" />
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="text-sm font-black text-foreground uppercase italic tracking-tight leading-none mb-1 truncate">{income.source}</h4>
-                        <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest italic leading-none">
-                          {income.category?.name || 'UNCATEGORIZED'} • {new Date(income.date).toLocaleDateString().toUpperCase()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-black text-emerald-400 italic tracking-tighter tabular-nums leading-none mb-1">
-                        +₹{parseFloat(income.amount).toLocaleString('en-IN')}
-                      </div>
-                      {income.is_recurring && (
-                        <span className="text-[8px] font-black text-emerald-500 uppercase italic opacity-80 tracking-widest">RECURRING</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
-                    <div className="text-[9px] text-zinc-500 font-medium uppercase italic max-w-[60%] truncate">
-                      {income.description || 'No additional metadata'}
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <button onClick={() => openModal(income)} className="text-[10px] font-black uppercase italic text-zinc-500 hover:text-foreground flex items-center gap-1">
-                        <Pencil className="size-3" /> Edit
-                      </button>
-                      <button onClick={() => handleDelete(income.id)} className="text-[10px] font-black uppercase italic text-zinc-500 hover:text-red-500 flex items-center gap-1">
-                        <Trash2 className="size-3" /> Delete
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          )}
+                  {summary?.income_by_category?.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.category__color || '#10b981'} />
+                  ))}
+                  {(!summary?.income_by_category || summary.income_by_category.length === 0) && (
+                    <Cell fill="var(--muted)" />
+                  )}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </div>
+
+      <Card className="overflow-hidden border-black/10 dark:border-white/10 dark:bg-black shadow-sm">
+        <div className="p-6 border-b border-black/10 dark:border-white/10 flex justify-between items-center dark:bg-black">
+          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Transaction History</h2>
         </div>
 
-        {/* Desktop View: Table */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-black/[0.02] dark:bg-white/[0.02] border-b border-black/5 dark:border-white/5 text-zinc-500">
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic">Timestamp</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic">Source / Category</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic">Type</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic">Amount</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest italic text-right">Actions</th>
+              <tr className="dark:bg-black border-b dark:border-white/10 text-muted-foreground/70">
+                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest">Date</th>
+                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest">Source</th>
+                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest">Category</th>
+                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest">Type</th>
+                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest">Amount</th>
+                <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-black/5 dark:divide-white/5">
+            <tbody className="divide-y">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-24 text-center">
-                    <div className="flex justify-center mb-4">
-                      <LoadingSpinner size={32} className="text-indigo-500/40" />
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-700 italic">Updating list...</p>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <LoadingSpinner className="mx-auto text-primary" />
+                    <p className="text-sm text-muted-foreground mt-2">Loading transactions...</p>
                   </td>
                 </tr>
               ) : incomes.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-24 text-center text-zinc-700">
-                    <CircleDollarSign className="size-12 mx-auto mb-4 opacity-10 text-zinc-500" />
-                    <p className="text-[10px] font-black uppercase tracking-widest italic">No income found</p>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center opacity-40">
+                      <CircleDollarSign className="size-10 mb-2" />
+                      <p className="text-sm font-medium">No income recorded</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                <AnimatePresence mode="popLayout">
-                  {incomes.map((income) => (
-                    <motion.tr 
-                      layout
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      key={income.id} 
-                      className="hover:bg-white/[0.02] transition-all group"
-                    >
-                      <td className="px-8 py-6 text-[11px] font-bold text-zinc-500 uppercase italic tabular-nums">
-                        {new Date(income.date).toLocaleDateString().toUpperCase()}
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-4">
-                          <div className="size-8 rounded-lg bg-emerald-500/5 flex items-center justify-center text-emerald-500 border border-emerald-500/10 group-hover:scale-110 transition-transform">
-                            <ArrowUpRight className="size-4" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-black text-foreground uppercase italic tracking-tight">{income.source}</span>
-                            <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-widest italic">
-                              {income.category?.name || 'UNCATEGORIZED'}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        {income.is_recurring ? (
-                          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 w-fit">
-                            <History className="size-3 text-emerald-500" />
-                            <span className="text-[9px] font-black text-emerald-500 uppercase italic">RECURRING</span>
-                          </div>
-                        ) : (
-                          <span className="text-[10px] font-bold text-zinc-600 uppercase italic opacity-50">One-time</span>
-                        )}
-                      </td>
-                      <td className="px-8 py-6">
-                        <span className="text-lg font-black text-emerald-400 italic tracking-tighter tabular-nums">
-                          +₹{parseFloat(income.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                incomes.map((income) => (
+                  <tr key={income.id} className="hover:bg-muted/30 transition-colors group">
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {new Date(income.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-medium text-foreground">{income.source}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="size-2 rounded-full" style={{ backgroundColor: income.category?.color || '#cbd5e1' }} />
+                        <span className="text-xs font-medium text-muted-foreground">{income.category?.name || 'Uncategorized'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {income.is_recurring ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                          Recurring
                         </span>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openModal(income)} className="size-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-foreground transition-all border border-black/5 dark:border-white/5">
-                            <Pencil className="size-3.5" />
-                          </button>
-                          <button onClick={() => handleDelete(income.id)} className="size-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-red-500 transition-all border border-black/5 dark:border-white/5">
-                            <Trash2 className="size-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">One-time</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                        +₹{parseFloat(income.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => openModal(income)}
+                          className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(income.id)}
+                          className="p-1.5 rounded-md hover:bg-red-50 dark:hover:bg-red-950/30 text-muted-foreground hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
         </div>
 
         {!loading && totalPages > 1 && (
-          <div className="p-8 border-t border-black/5 dark:border-white/5 flex items-center justify-between bg-black/[0.01] dark:bg-white/[0.01]">
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 italic">Page {page} of {totalPages}</span>
-            <div className="flex gap-4">
+          <div className="p-4 border-t dark:border-white/10 flex items-center justify-between dark:bg-black">
+            <p className="text-xs text-muted-foreground">
+              Page {page} of {totalPages}
+            </p>
+            <div className="flex gap-2">
               <Button
-                variant="outline" size="sm"
+                variant="outline" 
+                size="sm"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="text-[9px] font-black uppercase italic tracking-widest px-4"
+                className="h-8 text-xs px-3"
               >
                 Previous
               </Button>
               <Button
-                variant="outline" size="sm"
+                variant="outline" 
+                size="sm"
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="text-[9px] font-black uppercase italic tracking-widest px-4"
+                className="h-8 text-xs px-3"
               >
                 Next
               </Button>
@@ -594,81 +395,93 @@ export default function IncomePage() {
         onClose={() => setIsModalOpen(false)}
         title={editingId ? 'Edit Income' : 'Add Income'}
       >
-        <form onSubmit={handleSubmit} className="space-y-1.5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Source"
             value={formData.source}
             onChange={e => setFormData({ ...formData, source: e.target.value })}
             required
-            placeholder="E.G., SALARY, DIVIDENDS"
-            className="uppercase font-black italic tracking-tight"
+            placeholder="e.g., Salary, Freelancing"
+            className="text-sm"
           />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Volume (INR)"
+              label="Amount (INR)"
               type="number"
               step="0.01"
               value={formData.amount}
               onChange={e => setFormData({ ...formData, amount: e.target.value })}
               required
               placeholder="0.00"
-              className="text-emerald-400 font-black italic tabular-nums"
+              className="text-sm"
             />
             <Input
-              label="Timeline"
+              label="Date"
               type="date"
               value={formData.date}
               onChange={e => setFormData({ ...formData, date: e.target.value })}
               required
+              className="text-sm"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-zinc-500 tracking-widest italic flex items-center gap-2 mb-1">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-muted-foreground">
                 Category
               </label>
               <Select
                 value={formData.category_id}
                 onChange={e => setFormData({ ...formData, category_id: e.target.value })}
-                className="bg-black/20 border-white/5 text-[11px] font-bold uppercase italic"
+                className="text-sm"
               >
-                <option value="">UNCATEGORIZED</option>
+                <option value="">Uncategorized</option>
                 {categories.map((cat: any) => (
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </Select>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-zinc-500 tracking-widest italic flex items-center gap-2 mb-1">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-muted-foreground">
                 Recurrence
               </label>
               <Select
                 value={formData.recurrence_type}
                 onChange={e => setFormData({ ...formData, recurrence_type: e.target.value })}
-                className="bg-black/20 border-white/5 text-[11px] font-bold uppercase italic"
+                className="text-sm"
               >
-                <option value="none">ONE-TIME</option>
-                <option value="daily">DAILY</option>
-                <option value="weekly">WEEKLY</option>
-                <option value="monthly">MONTHLY</option>
+                <option value="none">One-time</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
               </Select>
             </div>
           </div>
 
           <Textarea
-            label="Notes"
+            label="Description"
             value={formData.description}
             onChange={e => setFormData({ ...formData, description: e.target.value })}
-            placeholder="ENTRY_NOTES"
-            className="h-16 uppercase italic font-medium"
+            placeholder="Add some details..."
+            className="h-24 text-sm"
           />
 
-          <div className="pt-2 flex justify-end gap-2">
-            <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)} className="border border-black/5 dark:border-white/5 uppercase text-[9px] font-black tracking-widest italic py-1.5 px-3">Cancel</Button>
-            <Button type="submit" isLoading={isSubmitting} className="bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/20 uppercase text-[9px] font-black tracking-widest italic py-1.5 px-4">
-              {editingId ? 'Save Changes' : 'Save Income'}
+          <div className="pt-4 flex justify-end gap-3">
+            <Button 
+              variant="outline" 
+              type="button" 
+              onClick={() => setIsModalOpen(false)}
+              className="text-sm h-10 px-4"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              isLoading={isSubmitting}
+              className="text-sm h-10 px-6"
+            >
+              {editingId ? 'Save Changes' : 'Add Income'}
             </Button>
           </div>
         </form>

@@ -41,7 +41,7 @@ const GlassInputWrapper = ({ children, label, className }: { children: React.Rea
   )}>
     {label && (
       <div className="pl-5 flex items-center justify-center pointer-events-none">
-        <span className="text-[8px] font-black italic tracking-tighter text-zinc-500 group-focus-within/input:text-emerald-500 transition-colors uppercase border border-zinc-500/20 group-focus-within/input:border-emerald-500/20 px-1 rounded-sm">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-focus-within/input:text-emerald-500 transition-colors uppercase border border-zinc-500/20 group-focus-within/input:border-emerald-500/20 px-1 rounded-sm">
           {label}
         </span>
       </div>
@@ -101,14 +101,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         >
           <div className="flex flex-col gap-10">
             <motion.div variants={itemVariants} className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-[0.2em] italic mb-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">
                    <span>
                     {mode === 'login' ? 'LOG IN' : 
                      mode === 'register' ? 'REGISTER' : 
                      mode === 'forgot-password' ? 'RECOVERY' : 'RESET'}
                    </span>
                 </div>
-                <h1 className="text-5xl md:text-7xl font-black leading-[0.85] tracking-[-0.08em] uppercase italic text-white whitespace-pre-line">
+                <h1 className="text-4xl md:text-5xl font-bold leading-[1.1] tracking-tight uppercase text-white whitespace-pre-line">
                     {title || (
                       mode === 'login' ? "Welcome \nBack" : 
                       mode === 'register' ? "Create \nAccount" :
@@ -134,7 +134,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   {mode === 'register' && (
                     <motion.div variants={itemVariants} className="space-y-6">
                       <div>
-                        <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">User Details</label>
+                        <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1">User Details</label>
                         <GlassInputWrapper label="USER">
 
                           <input name="username" type="text" placeholder="Username" required className="w-full bg-transparent text-xs p-4 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
@@ -152,7 +152,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   )}
 
                   <motion.div variants={itemVariants}>
-                    {(mode === 'login' || mode === 'forgot-password') && <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1 italic">
+                    {(mode === 'login' || mode === 'forgot-password') && <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.25em] mb-3 block ml-1">
                       {mode === 'login' ? 'Login Details' : 'Account Details'}
                     </label>}
                     <GlassInputWrapper label="EMAIL">
@@ -167,7 +167,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
                           <div className="relative flex-1">
                               <input name="password" type={showPassword ? 'text' : 'password'} placeholder={mode === 'reset-password' ? "New Password" : "Password"} required className="w-full bg-transparent text-xs p-4 pr-16 focus:outline-none placeholder:text-zinc-700 font-bold tracking-tight" />
-                              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-4 flex items-center text-[10px] font-black italic text-zinc-600 hover:text-emerald-500 transition-colors uppercase tracking-tighter">
+                              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-4 flex items-center text-[10px] font-bold text-zinc-600 hover:text-emerald-500 transition-colors uppercase tracking-tight">
                                   {showPassword ? "HIDE" : "SHOW"}
                               </button>
                           </div>
@@ -190,7 +190,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                           <input type="checkbox" name="rememberMe" className="custom-checkbox" />
                           <span className="text-zinc-600 font-bold uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Remember Me</span>
                         </label>
-                        <Link href="/forgot-password" className="font-black text-emerald-500 hover:text-emerald-400 transition-colors uppercase tracking-[0.15em] italic">Forgot Password?</Link>
+                        <Link href="/forgot-password" university-link className="font-bold text-emerald-500 hover:text-emerald-400 transition-colors uppercase tracking-[0.15em]">Forgot Password?</Link>
                     </motion.div>
                   )}
 
@@ -201,7 +201,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     whileTap={{ scale: 0.98 }}
                     type="submit" 
                     disabled={isLoading}
-                    className="w-full rounded-2xl bg-white text-black py-5 font-black hover:bg-emerald-500 hover:text-white transition-all active:scale-[0.98] flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-[0.3em] italic"
+                    className="w-full rounded-2xl bg-white text-black py-5 font-bold hover:bg-emerald-500 hover:text-white transition-all active:scale-[0.98] flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-[0.2em]"
                   >
                     {isLoading ? "LOADING..." : (
                       mode === 'login' ? "Log In" : 
@@ -217,7 +217,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   <>
                     <motion.div variants={itemVariants} className="relative flex items-center justify-center">
                       <span className="w-full border-t border-white/5"></span>
-                      <span className="px-6 text-[9px] font-black uppercase tracking-[0.4em] text-zinc-700 bg-[#030303] absolute italic">Or continue with</span>
+                      <span className="px-6 text-[9px] font-bold uppercase tracking-[0.4em] text-zinc-700 bg-[#030303] absolute">Or continue with</span>
                     </motion.div>
 
                     <motion.button 
@@ -226,7 +226,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       type="button" 
                       onClick={onGoogleClick}
                       disabled={isGoogleLoading || isLoading}
-                      className="w-full flex items-center justify-center gap-3 border border-white/5 rounded-2xl py-4 transition-all font-black text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-white italic disabled:opacity-50"
+                      className="w-full flex items-center justify-center gap-3 border border-white/5 rounded-2xl py-4 transition-all font-bold text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-white disabled:opacity-50"
                     >
                         <GoogleIcon />
                         <span>{isGoogleLoading ? 'CONNECTING...' : 'Google'}</span>
@@ -265,8 +265,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             <div className="absolute inset-0 bg-gradient-to-r from-[#030303] via-transparent to-transparent opacity-90" />
             
             <div className="absolute bottom-12 left-12 right-12">
-               <div className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] mb-4 italic border-l border-emerald-500 pl-4">System Verification</div>
-               <h2 className="text-4xl font-black text-white uppercase italic leading-none tracking-tighter mb-4">Autonomous <br/>Wealth Management</h2>
+               <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.4em] mb-4 border-l border-emerald-500 pl-4">System Verification</div>
+               <h2 className="text-4xl font-bold text-white uppercase leading-none tracking-tight mb-4">Autonomous <br/>Wealth Management</h2>
                <p className="text-zinc-400 text-xs uppercase tracking-[0.2em] max-w-sm leading-relaxed">Financial infrastructure built for high-density capital distribution and systematic accumulation.</p>
             </div>
         </motion.div>

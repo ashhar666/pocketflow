@@ -13,7 +13,7 @@ export default function DangerZone() {
   };
 
   return (
-    <Card glass className="relative overflow-hidden group border-red-500/10 bg-red-500/[0.01] transition-colors hover:bg-red-500/[0.03] duration-500">
+    <Card className="relative overflow-hidden group border-red-500/20 dark:bg-black transition-colors duration-500">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
         <div className="flex items-center gap-4">
           <div className="size-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] font-black italic text-xs">
