@@ -26,7 +26,7 @@ import {
 import { useTheme } from '@/context/ThemeContext';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/Input';
 import { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 
 interface MonthlySummary {
@@ -433,6 +433,7 @@ export default function DashboardPage() {
                   transition={{ duration: 0.2 }}
                 >
                   <Input
+                    label="Select Month"
                     type="month"
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
