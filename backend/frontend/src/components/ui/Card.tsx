@@ -31,3 +31,15 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   }
 );
 Card.displayName = 'Card';
+
+export const CardHeader = ({ className = '', children }: { className?: string; children: React.ReactNode }) => (
+  <div className={`space-y-1.5 ${className}`}>{children}</div>
+);
+
+export const CardTitle = ({ className = '', children }: { className?: string; children: React.ReactNode }) => (
+  <h3 className={`font-black tracking-tight ${className}`}>{children}</h3>
+);
+
+export const CardContent = ({ className = '', children }: { className?: string; children: React.ReactNode }) => (
+  <div className={className}>{children}</div>
+);

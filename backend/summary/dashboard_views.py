@@ -146,8 +146,18 @@ class MonthlySummaryView(APIView):
         all_expenses = Expense.objects.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or 0
         total_balance = float(all_income) - float(all_expenses)
 
+        # Decide whether to return monthly or all-time category data
+        is_all_time = request.query_params.get('mode') == 'all'
+        
+        if is_all_time:
+            category_qs = Expense.objects.filter(user=request.user)
+            income_category_qs = Income.objects.filter(user=request.user)
+        else:
+            category_qs = current_expenses
+            income_category_qs = current_incomes
+
         category_data = []
-        category_sums = current_expenses.values('category__name', 'category__color').annotate(amount=Sum('amount'))
+        category_sums = category_qs.values('category__name', 'category__color').annotate(amount=Sum('amount'))
         for entry in category_sums:
             if entry['category__name']:
                 category_data.append({
@@ -157,7 +167,7 @@ class MonthlySummaryView(APIView):
                 })
 
         income_category_data = []
-        income_category_sums = current_incomes.values('category__name', 'category__color').annotate(amount=Sum('amount'))
+        income_category_sums = income_category_qs.values('category__name', 'category__color').annotate(amount=Sum('amount'))
         for entry in income_category_sums:
             if entry['category__name']:
                 income_category_data.append({
@@ -179,6 +189,7 @@ class MonthlySummaryView(APIView):
             'current_income_total': float(current_income_total),
             'income_percentage_change': income_percentage_change,
             'all_time_income': float(all_income),
+            'all_time_expenses': float(all_expenses),
             'total_savings': float(total_savings),
             'total_balance': float(total_balance),
             'by_category': category_data,

@@ -25,6 +25,9 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Input } from '@/components/ui/input';
+import { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 
 interface MonthlySummary {
   current_month_total: number;
@@ -32,9 +35,12 @@ interface MonthlySummary {
   percentage_change: number;
   current_income_total: number;
   income_percentage_change: number;
+  all_time_income: number;
+  all_time_expenses: number;
   total_savings: number;
   total_balance: number;
   by_category: { name: string; amount: number; color: string }[];
+  income_by_category?: { name: string; amount: number; color: string }[];
 }
 
 const ChartSkeleton = ({ label = 'Loading chart' }: { label?: string }) => (
@@ -71,7 +77,6 @@ const formatCurrency = (val: number | string | undefined | null) => {
   const num = typeof val === 'string' ? parseFloat(val) : (val || 0);
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(num));
 };
-
 export default function DashboardPage() {
   const [monthly, setMonthly] = useState<MonthlySummary | null>(null);
   const [weekly, setWeekly] = useState<any[]>([]);
@@ -89,6 +94,8 @@ export default function DashboardPage() {
   const [autoSavedData, setAutoSavedData] = useState<any>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [viewMode, setViewMode] = useState<'monthly' | 'all'>('monthly');
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const { theme } = useTheme();
 
   const handleDownloadReport = async () => {
@@ -143,8 +150,20 @@ export default function DashboardPage() {
       try {
         setFailedEndpoints([]);
         setDismissedError(false);
+        setLoading(true);
 
-        const monthRes = await safeGet('/summary/monthly/');
+        let summaryUrl = `/summary/monthly/?t=${Date.now()}`;
+        if (viewMode === 'monthly') {
+          const [year, month] = selectedMonth.split('-');
+          const startDate = `${selectedMonth}-01`;
+          const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+          const endDate = `${selectedMonth}-${lastDay}`;
+          summaryUrl += `&start_date=${startDate}&end_date=${endDate}`;
+        } else {
+          summaryUrl += `&mode=all`;
+        }
+
+        const monthRes = await safeGet(summaryUrl);
         if (!isMounted) return;
 
         if (monthRes.data) setMonthly(monthRes.data);
@@ -193,7 +212,7 @@ export default function DashboardPage() {
       isMounted = false;
       window.clearTimeout(secondaryTimer);
     };
-  }, []);
+  }, [viewMode, selectedMonth]);
 
   const handleScanReceipt = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -363,14 +382,66 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-8 border-b border-black/5 dark:border-white/5">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-black italic tracking-tighter text-foreground uppercase">
-            Dashboard Summary
-          </h1>
-          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest italic">
-            Overview of your money
-          </p>
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 pb-8 border-b border-black/5 dark:border-white/5">
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black italic tracking-tighter text-foreground uppercase">
+              Dashboard Summary
+            </h1>
+            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest italic">
+              Overview of your money
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-4 items-center">
+            {/* View Toggle */}
+            <div className="bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-black/10 dark:border-white/10 flex items-center relative h-10 overflow-hidden">
+              <button
+                onClick={() => setViewMode('monthly')}
+                className={`relative z-10 px-4 h-full text-[10px] font-black uppercase tracking-widest italic transition-colors duration-200 ${
+                  viewMode === 'monthly' ? 'text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setViewMode('all')}
+                className={`relative z-10 px-4 h-full text-[10px] font-black uppercase tracking-widest italic transition-colors duration-200 ${
+                  viewMode === 'all' ? 'text-white' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+                }`}
+              >
+                All-Time
+              </button>
+              <motion.div
+                layoutId="dashboardViewToggle"
+                className="absolute inset-y-1 bg-emerald-500 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                initial={false}
+                animate={{
+                  left: viewMode === 'monthly' ? 4 : 76,
+                  width: viewMode === 'monthly' ? 70 : 76,
+                }}
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            </div>
+
+            <AnimatePresence mode="wait">
+              {viewMode === 'monthly' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Input
+                    type="month"
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    className="bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-[10px] font-black uppercase italic w-[140px] h-10"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
         <div className="flex flex-wrap gap-3 items-center justify-start sm:justify-end w-full sm:w-auto">
           <input 
@@ -425,7 +496,6 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
-
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Wallet / Balance */}
@@ -433,61 +503,115 @@ export default function DashboardPage() {
           <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
             <Wallet className="size-12 rotate-12" />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic mb-1 pt-6">My Balance</p>
-          <h3 className="text-3xl font-black text-foreground italic tracking-tighter pb-6">
-            {formatCurrency(monthly?.total_balance || 0).replace('₹', '')}
-            <span className="text-sm ml-2 text-zinc-500 font-bold not-italic">INR</span>
-          </h3>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500/50 to-transparent" />
+          <CardHeader className="pb-2 pt-6">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-emerald-500 italic">Net Balance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-3xl font-black tracking-tighter italic">
+                {monthly ? formatCurrency(monthly.total_balance).replace('₹', '') : '---'}
+                <span className="text-xs ml-2 text-zinc-500 font-bold not-italic">INR</span>
+              </div>
+              <p className="text-[10px] text-zinc-500 font-bold uppercase italic">Available Funds</p>
+            </div>
+          </CardContent>
+          <div className="absolute bottom-0 left-0 h-1 bg-emerald-500 w-full opacity-30" />
         </Card>
 
-        {/* Income */}
+        {/* Money In */}
         <Card glass className="relative overflow-hidden group border-indigo-500/20 bg-indigo-500/[0.02]">
           <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
             <TrendingUp className="size-12 -rotate-12" />
           </div>
-          <div className="flex justify-between items-start mb-4 pt-6">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic mb-1">Money In (Month)</p>
-            <div className="flex items-center gap-1 text-[10px] font-black text-emerald-500 uppercase italic">
-              <ArrowUpRight className="size-3" /> {((monthly?.income_percentage_change || 0)).toFixed(1)}%
+          <CardHeader className="pb-2 pt-6">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-500 italic">
+              {viewMode === 'monthly' ? 'Month In' : 'Total In'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-3xl font-black tracking-tighter italic">
+                {monthly ? formatCurrency(viewMode === 'all' ? monthly.all_time_income : monthly.current_income_total).replace('₹', '') : '---'}
+                <span className="text-xs ml-2 text-zinc-500 font-bold not-italic">INR</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {viewMode === 'monthly' && monthly && monthly.income_percentage_change !== 0 && (
+                  <>
+                    {monthly.income_percentage_change > 0 ? (
+                      <ArrowUpRight className="size-3 text-emerald-500" />
+                    ) : (
+                      <ArrowDownRight className="size-3 text-red-500" />
+                    )}
+                    <span className={`text-[10px] font-black italic ${monthly.income_percentage_change > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                      {Math.abs(monthly.income_percentage_change).toFixed(1)}%
+                    </span>
+                  </>
+                )}
+                <span className="text-[10px] text-zinc-500 font-bold uppercase italic">
+                  {viewMode === 'monthly' ? 'vs last month' : 'All time revenue'}
+                </span>
+              </div>
             </div>
-          </div>
-          <h3 className="text-3xl font-black text-foreground italic tracking-tighter pb-6">
-            {formatCurrency(monthly?.current_income_total || 0).replace('₹', '')}
-            <span className="text-sm ml-2 text-zinc-500 font-bold not-italic">INR</span>
-          </h3>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500/50 to-transparent" />
+          </CardContent>
+          <div className="absolute bottom-0 left-0 h-1 bg-indigo-500 w-full opacity-30" />
         </Card>
 
-        {/* Expense */}
-        <Card glass className="relative overflow-hidden group border-zinc-500/20 bg-zinc-500/[0.02] transition-all duration-500">
+        {/* Money Out */}
+        <Card glass className="relative overflow-hidden group border-orange-500/20 bg-orange-500/[0.02]">
           <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-            <TrendingDown className="size-12 rotate-12" />
+            <TrendingDown className="size-12 rotate-6" />
           </div>
-          <div className="flex justify-between items-start mb-4 pt-6">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic mb-1">Money Out (Month)</p>
-            <div className="flex items-center gap-1 text-[10px] font-black text-red-500 uppercase italic">
-              <ArrowDownRight className="size-3" /> {((monthly?.percentage_change || 0)).toFixed(1)}%
+          <CardHeader className="pb-2 pt-6">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-orange-500 italic">
+              {viewMode === 'monthly' ? 'Month Out' : 'Total Out'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-3xl font-black tracking-tighter italic">
+                {monthly ? formatCurrency(viewMode === 'all' ? monthly.all_time_expenses : monthly.current_month_total).replace('₹', '') : '---'}
+                <span className="text-xs ml-2 text-zinc-500 font-bold not-italic">INR</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {viewMode === 'monthly' && monthly && monthly.percentage_change !== 0 && (
+                  <>
+                    {monthly.percentage_change < 0 ? (
+                      <ArrowDownRight className="size-3 text-emerald-500" />
+                    ) : (
+                      <ArrowUpRight className="size-3 text-red-500" />
+                    )}
+                    <span className={`text-[10px] font-black italic ${monthly.percentage_change < 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                      {Math.abs(monthly.percentage_change).toFixed(1)}%
+                    </span>
+                  </>
+                )}
+                <span className="text-[10px] text-zinc-500 font-bold uppercase italic">
+                  {viewMode === 'monthly' ? 'vs last month' : 'All time spending'}
+                </span>
+              </div>
             </div>
-          </div>
-          <h3 className="text-3xl font-black text-foreground italic tracking-tighter pb-6">
-            {formatCurrency(monthly?.current_month_total || 0).replace('₹', '')}
-            <span className="text-sm ml-2 text-zinc-500 font-bold not-italic">INR</span>
-          </h3>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500/50 to-transparent" />
+          </CardContent>
+          <div className="absolute bottom-0 left-0 h-1 bg-orange-500 w-full opacity-30" />
         </Card>
 
         {/* Savings */}
-        <Card glass className="relative overflow-hidden group border-amber-500/20 bg-amber-500/[0.02]">
+        <Card glass className="relative overflow-hidden group border-blue-500/20 bg-blue-500/[0.02]">
           <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-            <PiggyBank className="size-12 -rotate-12" />
+            <PiggyBank className="size-12 -rotate-6" />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic mb-1 pt-6">Saved Money</p>
-          <h3 className="text-3xl font-black text-foreground italic tracking-tighter pb-6">
-            {formatCurrency(monthly?.total_savings || 0).replace('₹', '')}
-            <span className="text-sm ml-2 text-zinc-500 font-bold not-italic">INR</span>
-          </h3>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500/50 to-transparent" />
+          <CardHeader className="pb-2 pt-6">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-500 italic">Total Savings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-3xl font-black tracking-tighter italic">
+                {monthly ? formatCurrency(monthly.total_savings).replace('₹', '') : '---'}
+                <span className="text-xs ml-2 text-zinc-500 font-bold not-italic">INR</span>
+              </div>
+              <p className="text-[10px] text-zinc-500 font-bold uppercase italic">Financial Cushion</p>
+            </div>
+          </CardContent>
+          <div className="absolute bottom-0 left-0 h-1 bg-blue-500 w-full opacity-30" />
         </Card>
       </div>
 
@@ -508,9 +632,10 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* Expenses by Category (Pie Chart) */}
         <Card glass>
-          <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400 mb-8">Where your money goes</h3>
+          <h3 className="text-sm font-black uppercase italic tracking-widest text-zinc-400 mb-8">
+            {viewMode === 'all' ? 'All-Time Spending' : 'Monthly Spending'}
+          </h3>
           {monthly?.by_category && monthly.by_category.length > 0 ? (
             <div className="h-72">
               <CategoryPieChart data={monthly.by_category} theme={theme} />
