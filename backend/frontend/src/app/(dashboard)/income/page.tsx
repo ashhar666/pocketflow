@@ -258,8 +258,8 @@ export default function IncomePage() {
 
         {viewMode === 'monthly' && (
           <div className="flex items-center gap-3 md:ml-auto">
-            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 italic">Select Month</label>
             <Input
+              label="Select Month"
               type="month"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
