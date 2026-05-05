@@ -293,54 +293,7 @@ export function HeroSection() {
             {/* Dark Overlay for Text Legibility */}
             <div className="absolute inset-0 bg-black/40 mix-blend-multiply z-[2] pointer-events-none"></div>
 
-            {/* Nixie Temperature HUD (Absolute to Hero) */}
-            <div className="absolute bottom-10 right-10 z-50 flex items-end gap-6 select-none pointer-events-none hidden md:flex">
-                <div className="flex flex-col items-end">
-                    <div className="text-[10px] uppercase tracking-[0.2em] mb-1 font-mono transition-colors duration-300" style={{ color: activeColor, opacity: 0.5 }}>Module Temp</div>
-                    <div className="flex items-baseline gap-1 font-mono">
-                        <AnimatePresence mode="wait">
-                            <motion.span
-                                key={Math.floor(3000 + temperature * 9000)}
-                                initial={{ opacity: 0.5, filter: 'blur(2px)' }}
-                                animate={{
-                                    opacity: 1,
-                                    filter: 'blur(0px)',
-                                    color: activeColor,
-                                    textShadow: `0 0 15px ${glowColor}, 0 0 5px ${activeColor}`
-                                }}
-                                className="text-4xl font-bold"
-                            >
-                                {Math.floor(3000 + temperature * 9000).toLocaleString()}
-                            </motion.span>
-                        </AnimatePresence>
-                        <span className="text-xl font-bold transition-colors duration-300" style={{ color: activeColor, opacity: 0.8 }}>K</span>
-                    </div>
-                </div>
 
-                {/* Vertical Slider Control */}
-                <div className="pointer-events-auto flex flex-col items-center h-48 group pb-2">
-                    <div className="relative h-full w-1 bg-white/10 rounded-full overflow-hidden">
-                        <motion.div
-                            className="absolute bottom-0 w-full transition-colors duration-300"
-                            style={{
-                                height: `${temperature * 100}%`,
-                                backgroundColor: activeColor,
-                                boxShadow: `0 0 10px ${glowColor}`
-                            }}
-                        />
-                        <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.01"
-                            value={temperature}
-                            onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                            style={{ WebkitAppearance: 'none', appearance: 'none', padding: 0, writingMode: 'vertical-lr', direction: 'rtl' }}
-                        />
-                    </div>
-                </div>
-            </div>
 
             <HeroHeader />
             <main className="relative z-10">
@@ -461,10 +414,7 @@ const HeroHeader = () => {
                              <Link href="/" className="flex items-center group/logo">
                                  <div className="flex flex-col -space-y-1">
                                      <span className="font-bold text-xl tracking-tight hidden sm:block text-foreground uppercase font-display">PocketFlow</span>
-                                     <div className="flex items-center gap-2">
-                                         <div className="size-1 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                         <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-600">v1.4.0 / Systems Active</span>
-                                     </div>
+
                                  </div>
                              </Link>
 
