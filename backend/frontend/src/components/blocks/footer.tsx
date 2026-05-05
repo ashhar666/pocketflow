@@ -109,10 +109,6 @@ export const Footer = () => {
             <Link href="/dashboard" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-emerald-500 transition-colors italic">
               Access Dashboard
             </Link>
-            <div className="flex items-center gap-2.5 bg-white/[0.03] border border-white/5 px-4 py-2 rounded-full">
-              <div className="size-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">Systems Live</span>
-            </div>
           </div>
         </div>
       </div>
