@@ -30,15 +30,15 @@ def test_expense_pagination_cap(auth_client, test_user):
 
 @pytest.mark.django_db
 def test_expense_create(auth_client, test_user):
-    category = baker.make(Category, user=test_user, name="Food")
+    category = Category.objects.get(user=test_user, name="Food")
     url = reverse('expense-list')
     data = {
         "title": "Lunch",
-        "amount": 50.0,
+        "amount": "50.00",
         "date": "2024-01-01",
-        "category": category.id
+        "category_id": category.id
     }
-    response = auth_client.post(url, data)
+    response = auth_client.post(url, data, format='json')
     assert response.status_code == 201
     assert Expense.objects.filter(user=test_user, title="Lunch").exists()
 
