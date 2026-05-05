@@ -103,6 +103,8 @@ export const Footer = () => {
             <span>All rights reserved</span>
             <span className="hidden md:block opacity-30">•</span>
             <span className="text-zinc-700">Crafted in Kerala</span>
+            <span className="hidden md:block opacity-30">•</span>
+            <span className="text-[8px] opacity-30 normal-case tracking-normal">All trademarks are property of their respective owners.</span>
           </div>
           
           <div className="flex items-center gap-8">
