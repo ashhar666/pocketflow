@@ -102,8 +102,6 @@ export const Footer = () => {
             <span className="hidden md:block opacity-30">•</span>
             <span>All rights reserved</span>
             <span className="hidden md:block opacity-30">•</span>
-            <span className="text-zinc-700">Crafted in Kerala</span>
-            <span className="hidden md:block opacity-30">•</span>
             <span className="text-[8px] opacity-30 normal-case tracking-normal">All trademarks are property of their respective owners.</span>
           </div>
           
@@ -113,7 +111,7 @@ export const Footer = () => {
             </Link>
             <div className="flex items-center gap-2.5 bg-white/[0.03] border border-white/5 px-4 py-2 rounded-full">
               <div className="size-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">Systems Live</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">Systems Live • Crafted in Kerala</span>
             </div>
           </div>
         </div>
