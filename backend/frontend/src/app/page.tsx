@@ -4,6 +4,7 @@ import { FeatureCardsSection } from '@/components/blocks/feature-cards-section';
 import { HowItWorksSimple } from '@/components/blocks/how-it-works-simple';
 import { TestimonialsSection } from '@/components/blocks/testimonials-section';
 import { FAQSection } from '@/components/blocks/faq-section';
+import { ComparisonSection } from '@/components/blocks/comparison-section';
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -34,6 +35,7 @@ export default function Home() {
         <div className="relative z-10">
           <FeatureCardsSection />
           <HowItWorksSimple />
+          <ComparisonSection />
           <TestimonialsSection />
           <FAQSection />
         </div>

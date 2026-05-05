@@ -14,11 +14,11 @@ const SITE_URL = "https://www.pocket-flow.app";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "PocketFlow | Smart AI Expense Tracker",
+    default: "PocketFlow | AI Expense Tracker & Money Manager",
     template: "%s | PocketFlow"
   },
-  description: "Track your expenses effortlessly with AI receipt scanning, real-time budgeting, and savings goals.",
-  keywords: ["free expense tracker", "AI receipt scanner", "budget tracker", "personal finance", "PocketFlow", "money manager"],
+  description: "Dominating personal finance with AI receipt scanning, real-time budgeting, and automated expense tracking. PocketFlow is the smartest free tool to manage your money.",
+  keywords: ["free expense tracker", "AI receipt scanner", "budget tracker", "personal finance", "PocketFlow", "money manager", "YNAB alternative", "Rocket Money alternative"],
   authors: [{ name: "PocketFlow Team", url: SITE_URL }],
   creator: "PocketFlow",
   publisher: "PocketFlow",
@@ -31,20 +31,21 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: "PocketFlow",
-    title: "PocketFlow | Smart AI Expense Tracker",
-    description: "Track your expenses effortlessly with AI receipt scanning.",
+    title: "PocketFlow | AI Expense Tracker & Smart Budgeting",
+    description: "Track expenses effortlessly with AI. Automated receipt scanning, Telegram integration, and real-time financial insights.",
     images: [{ 
       url: "/og-image.png", 
       width: 1200, 
       height: 630, 
-      alt: "PocketFlow AI Expense Tracker Dashboard" 
+      alt: "PocketFlow AI Expense Tracker — Dashboard Overview" 
     }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PocketFlow | Smart AI Expense Tracker",
-    description: "Track your expenses effortlessly with AI receipt scanning.",
+    title: "PocketFlow | AI Expense Tracker & Smart Budgeting",
+    description: "The smartest way to track your money. AI receipt scanning and automated budgeting for everyone.",
     images: ["/og-image.png"],
+    creator: "@PocketFlowApp"
   },
   icons: {
     icon: "/favicon.ico",
@@ -64,8 +65,8 @@ const jsonLd = {
   applicationCategory: "FinanceApplication",
   operatingSystem: "Web, iOS, Android",
   url: SITE_URL,
-  description: "Advanced AI-powered expense tracking and budget management system with real-time Telegram integration.",
-  softwareVersion: "1.0.0",
+  description: "Advanced AI-powered expense tracking and budget management system with real-time Telegram integration. The smartest free tool for personal finance management.",
+  softwareVersion: "1.4.0",
   offers: {
     "@type": "Offer",
     price: "0",
@@ -79,6 +80,7 @@ const jsonLd = {
     "Savings Goals",
     "Telegram Bot Integration",
     "Financial Reports",
+    "Multi-currency Support"
   ],
 };
 
@@ -91,7 +93,7 @@ const faqJsonLd = {
       name: "How do I log expenses with the Telegram bot?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Just link your account to @PaisaTrackerBot and send a text message or photo of your receipt. The bot instantly syncs with your dashboard."
+        text: "Connect your account to @PaisaTrackerBot and send a text or receipt photo. The AI automatically parses the data and syncs it to your dashboard in real-time."
       }
     },
     {
@@ -99,8 +101,50 @@ const faqJsonLd = {
       name: "Is my financial data secure?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes, we employ bank-grade AES-256 encryption and a secure architecture ensuring only you have access to your data."
+        text: "PocketFlow uses bank-grade AES-256 encryption. We ensure your data is secure, private, and accessible only by you through our zero-trust architecture."
       }
+    }
+  ]
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "PocketFlow",
+  "url": SITE_URL,
+  "logo": `${SITE_URL}/icon.png`,
+  "sameAs": [
+    "https://twitter.com/PocketFlowApp",
+    "https://github.com/PocketFlow",
+    "https://www.linkedin.com/company/pocketflow"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "support@pocket-flow.app",
+    "contactType": "customer support"
+  }
+};
+
+const howToJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to track an expense in PocketFlow",
+  "description": "Learn how to easily log and categorize your spending using AI scanning.",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "Open the Dashboard",
+      "text": "Log in to your PocketFlow account and navigate to the main dashboard."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Upload a Receipt",
+      "text": "Click 'Add Expense' and upload a photo of your receipt for AI processing."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Verify and Save",
+      "text": "Review the AI-extracted details (amount, category, date) and confirm the entry."
     }
   ]
 };
@@ -119,13 +163,8 @@ export default function RootLayout({
             __html: JSON.stringify([
               jsonLd,
               faqJsonLd,
-              {
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                name: "PocketFlow",
-                url: SITE_URL,
-                logo: `${SITE_URL}/favicon.png`,
-              }
+              organizationJsonLd,
+              howToJsonLd
             ])
           }}
         />

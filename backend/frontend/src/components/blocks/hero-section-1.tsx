@@ -371,11 +371,14 @@ export function HeroSection() {
                                          </Link>
                                     </motion.div>
 
+                                    <span className="sr-only" id="product-summary-tldr">
+                                      PocketFlow TL;DR: A free, AI-powered personal expense tracker featuring automated receipt scanning, Telegram bot integration, and multi-currency support with zero-trust data privacy.
+                                    </span>
                                     <motion.h1
                                          variants={transitionVariants}
                                          className="mt-8 max-w-5xl mx-auto text-balance text-6xl md:text-8xl font-bold tracking-tight leading-[1.05]"
                                      >
-                                         <span className="sr-only">PocketFlow — Free AI-Powered Personal Expense Tracker. </span>
+                                          <span className="sr-only">PocketFlow — Free AI-Powered Personal Expense Tracker. </span>
                                          The easiest free <br />
                                          <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/40">AI expense tracker.</span>
                                      </motion.h1>

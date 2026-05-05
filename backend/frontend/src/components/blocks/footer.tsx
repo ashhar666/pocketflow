@@ -45,7 +45,14 @@ export const Footer = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-12 sm:gap-24 w-full lg:w-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-12 sm:gap-24 w-full lg:w-auto">
+            <div className="flex flex-col gap-5">
+              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-600 italic">Product</span>
+              <Link href="#features" className="text-zinc-400 hover:text-white transition-colors text-xs font-medium">Features</Link>
+              <Link href="#process" className="text-zinc-400 hover:text-white transition-colors text-xs font-medium">How it Works</Link>
+              <Link href="#comparison" className="text-zinc-400 hover:text-white transition-colors text-xs font-medium">Competitors</Link>
+              <Link href="#faq" className="text-zinc-400 hover:text-white transition-colors text-xs font-medium">FAQ</Link>
+            </div>
             <div className="flex flex-col gap-5">
               <span className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-600 italic">Legal</span>
               <Link href="/legal/tos" className="text-zinc-400 hover:text-white transition-colors text-xs font-medium">Terms & Conditions</Link>

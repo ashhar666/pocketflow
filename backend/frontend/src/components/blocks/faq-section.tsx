@@ -7,19 +7,19 @@ import { cn } from "@/lib/utils";
 const faqs = [
   {
     question: "How do I log expenses with the Telegram bot?",
-    answer: "It's easy. Connect your account to @PaisaTrackerBot. Then, send a text (like 'Lunch 10') or a photo of your receipt. It updates your app right away.",
+    answer: "Connect your account to @PaisaTrackerBot and send a text or receipt photo for instant AI parsing and dashboard syncing.",
   },
   {
     question: "Is my financial data secure?",
-    answer: "Yes. We use the best security to keep your data safe. Only you can see your money information.",
+    answer: "Yes, PocketFlow uses bank-grade AES-256 encryption and a zero-trust architecture to ensure only you can access your data.",
   },
   {
     question: "How does the multi-currency conversion work?",
-    answer: "We work with over 150 currencies. If you spend money in another country, we convert it to your main currency automatically.",
+    answer: "Our system supports over 150 currencies, automatically converting international spending to your primary currency using real-time exchange rates.",
   },
   {
     question: "Can I export my data for accounting?",
-    answer: "Yes. You can download all your spending as an Excel file. This makes it easy to do your taxes or use other money tools.",
+    answer: "Yes, you can export all transaction data as a CSV or Excel file for use with external accounting tools or tax preparation.",
   },
 ];
 

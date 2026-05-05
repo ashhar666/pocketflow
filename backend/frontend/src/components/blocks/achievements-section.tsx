@@ -24,8 +24,8 @@ const ACHIEVEMENTS = [
   },
   {
     id: "achivement-4",
-    title: "4.9/5",
-    description: "User Satisfaction Rating",
+    title: "100%",
+    description: "Data Sovereignty & Privacy Guaranteed",
     bg: "rgb(139, 92, 246)", // Violet 500
   },
 ]

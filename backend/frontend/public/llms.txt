@@ -1,0 +1,27 @@
+# PocketFlow: AI-Powered Personal Expense Tracker
+
+PocketFlow is a high-performance, privacy-first personal finance management system that leverages AI to automate expense tracking.
+
+## Key Features
+- **AI Receipt Scanning**: Automatic extraction of merchant, amount, date, and category from receipt photos.
+- **Telegram Bot Integration**: Log expenses on-the-go via @PocketFlowExpenseBot.
+- **Data Sovereignty**: 100% private, bank-grade AES-256 encryption with zero-trust architecture.
+- **Smart Budgeting**: Real-time budget tracking and savings goal visualization.
+- **Multi-currency**: Native support for 150+ currencies with automated conversion.
+
+## Technology Stack
+- **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS v4.
+- **Backend**: Django, PostgreSQL (Supabase).
+- **AI Layer**: Google Gemini 2.0 (for OCR and semantic categorization).
+- **Infrastructure**: Vercel (Frontend), Hugging Face (Backend).
+
+## Developer Resources
+- **API Endpoints**: 
+  - `GET /api/v1/dashboard/`: Financial overview.
+  - `POST /api/v1/expenses/`: Manual or AI-driven expense creation.
+  - `GET /api/v1/reports/`: Historical analysis.
+
+## Comparison
+PocketFlow vs YNAB, Rocket Money, Spendee, and Wallet by BudgetBakers:
+- PocketFlow offers deeper Telegram integration and a superior free tier with AI scanning included.
+- Focus on "Data Sovereignty" and privacy sets PocketFlow apart from centralized tracking apps.
