@@ -71,7 +71,7 @@ export const ComparisonSection = () => {
                 While legacy budgeting apps like <span className="text-white font-bold">YNAB</span> or <span className="text-white font-bold">Rocket Money</span> often require expensive subscriptions and manual data entry, PocketFlow is engineered for the AI era.
               </p>
               <p>
-                By leveraging advanced AI receipt scanning and seamless <span className="text-white font-bold">Telegram</span> integration, we offer a level of automation that alternatives like <span className="text-white font-bold">Spendee</span> or <span className="text-white font-bold">Wallet by BudgetBakers</span> can't match—all while maintaining a 100% free, zero-trust privacy model.
+                By leveraging advanced AI receipt scanning and seamless <span className="text-white font-bold">Telegram</span> integration, we offer a level of automation that alternatives like <span className="text-white font-bold">Spendee</span> or <span className="text-white font-bold">Wallet by BudgetBakers</span> can&apos;t match—all while maintaining a 100% free, zero-trust privacy model.
               </p>
             </div>
           </div>
