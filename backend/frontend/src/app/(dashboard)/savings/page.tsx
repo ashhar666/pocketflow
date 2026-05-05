@@ -9,8 +9,14 @@ import api from '@/lib/api';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { useAuth } from '@/context/AuthContext';
+import { formatCurrency } from '@/lib/utils';
+import { Select } from '@/components/ui/Select';
 
 export default function SavingsPage() {
+  const { user } = useAuth();
+  const preferredCurrency = user?.preferred_currency || 'INR';
+  
   const [savings, setSavings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -25,6 +31,7 @@ export default function SavingsPage() {
     title: '',
     target_amount: '',
     current_amount: '0',
+    currency: preferredCurrency,
     target_date: '',
   });
 
@@ -53,6 +60,7 @@ export default function SavingsPage() {
         title: goal.title,
         target_amount: goal.target_amount,
         current_amount: goal.current_amount,
+        currency: goal.currency || preferredCurrency,
         target_date: goal.deadline || '',
       });
     } else {
@@ -61,6 +69,7 @@ export default function SavingsPage() {
         title: '',
         target_amount: '',
         current_amount: '0',
+        currency: preferredCurrency,
         target_date: '',
       });
     }
@@ -81,6 +90,7 @@ export default function SavingsPage() {
         title: formData.title,
         target_amount: formData.target_amount,
         current_amount: formData.current_amount,
+        currency: formData.currency,
         deadline: formData.target_date, 
       };
       
@@ -130,7 +140,6 @@ export default function SavingsPage() {
     }
   };
 
-  const formatCurrency = (val: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val);
 
   return (
     <div className="space-y-12">
@@ -204,12 +213,12 @@ export default function SavingsPage() {
                     <div className="flex flex-col">
                         <div className="flex items-baseline gap-2">
                            <span className="text-3xl font-bold text-foreground tracking-tighter">
-                            {current.toLocaleString('en-IN').replace('₹', '')}
+                            {formatCurrency(current, goal.currency).replace(/[^\d.,-]/g, '')}
                            </span>
-                           <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">INR Saved</span>
+                           <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{goal.currency} Saved</span>
                         </div>
                         <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mt-1">
-                            Target: {formatCurrency(target)}
+                            Target: {formatCurrency(target, goal.currency)}
                         </p>
                     </div>
                     {!isCompleted && (
@@ -229,7 +238,7 @@ export default function SavingsPage() {
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                     <span className="text-muted-foreground/80">Progress: {percentage.toFixed(1)}%</span>
-                    {!isCompleted && <span className="text-muted-foreground/60">{formatCurrency(target - current)} TO GO</span>}
+                    {!isCompleted && <span className="text-muted-foreground/60">{formatCurrency(target - current, goal.currency)} TO GO</span>}
                     {isCompleted && <span className="text-emerald-500">Savings Completed!</span>}
                   </div>
                 </div>
@@ -255,7 +264,7 @@ export default function SavingsPage() {
           />
           <div className="grid grid-cols-2 gap-4">
             <Input 
-              label="Target Amount (₹)" 
+              label={`Target Amount (${formData.currency})`} 
               type="number"
               step="0.01"
               value={formData.target_amount} 
@@ -264,23 +273,39 @@ export default function SavingsPage() {
               placeholder="10000.00"
             />
             <Input 
-              label="Current Amount (₹)" 
+              label={`Current Amount (${formData.currency})`} 
               type="number"
               step="0.01"
               value={formData.current_amount} 
               onChange={e => setFormData({...formData, current_amount: e.target.value})} 
               required
-              disabled={!editingId} // Usually start at 0 but allow edit if needed
+              disabled={!editingId} 
             />
           </div>
-          
-          <Input 
-            label="Target Date" 
-            type="date"
-            value={formData.target_date} 
-            onChange={e => setFormData({...formData, target_date: e.target.value})} 
-            required
-          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Select
+              label="Currency"
+              value={formData.currency}
+              onChange={e => setFormData({...formData, currency: e.target.value})}
+              options={[
+                { value: 'INR', label: 'INR (₹)' },
+                { value: 'USD', label: 'USD ($)' },
+                { value: 'EUR', label: 'EUR (€)' },
+                { value: 'GBP', label: 'GBP (£)' },
+                { value: 'JPY', label: 'JPY (¥)' },
+                { value: 'CAD', label: 'CAD ($)' },
+                { value: 'AUD', label: 'AUD ($)' },
+              ]}
+            />
+            <Input 
+              label="Target Date" 
+              type="date"
+              value={formData.target_date} 
+              onChange={e => setFormData({...formData, target_date: e.target.value})} 
+              required
+            />
+          </div>
 
           <div className="pt-4 flex justify-end gap-3">
             <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>Cancel</Button>
@@ -300,7 +325,7 @@ export default function SavingsPage() {
       >
         <form onSubmit={handleFundSubmit} className="space-y-4 pt-4">
           <Input 
-            label="Amount to Add (₹)" 
+            label={`Amount to Add (${savings.find(s => s.id === fundingId)?.currency || 'INR'})`} 
             type="number"
             step="0.01"
             value={fundAmount} 

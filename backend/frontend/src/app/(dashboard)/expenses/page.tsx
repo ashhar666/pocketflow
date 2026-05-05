@@ -7,9 +7,11 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Modal } from '@/components/ui/Modal';
+import { cn, formatCurrency } from '@/lib/utils';
 import api from '@/lib/api';
 import { formatScanFailure } from '@/lib/scanError';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/context/AuthContext';
 import {
   TrendingDown,
   Wallet,
@@ -29,6 +31,8 @@ import {
 } from 'recharts';
 
 export default function ExpensesPage() {
+  const { user } = useAuth();
+  const preferredCurrency = user?.preferred_currency || 'INR';
   const [expenses, setExpenses] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>(null);
@@ -52,6 +56,7 @@ export default function ExpensesPage() {
   const [formData, setFormData] = useState({
     title: '',
     amount: '',
+    currency: 'INR',
     category_id: '',
     date: new Date().toISOString().split('T')[0],
     notes: '',
@@ -128,6 +133,7 @@ export default function ExpensesPage() {
       setFormData({
         title: expense.title,
         amount: expense.amount,
+        currency: expense.currency || 'INR',
         category_id: expense.category?.id?.toString() || '',
         date: expense.date,
         notes: expense.notes || '',
@@ -139,6 +145,7 @@ export default function ExpensesPage() {
       setFormData({
         title: '',
         amount: '',
+        currency: 'INR',
         category_id: categories.length > 0 ? categories[0].id.toString() : '',
         date: new Date().toISOString().split('T')[0],
         notes: '',
@@ -285,7 +292,7 @@ export default function ExpensesPage() {
             <div>
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Monthly Spend</p>
               <h3 className="text-xl font-bold tracking-tight tabular-nums">
-                ₹{parseFloat(summary?.current_month_total || 0).toLocaleString('en-IN')}
+                {formatCurrency(parseFloat(summary?.current_month_total || 0), preferredCurrency)}
               </h3>
             </div>
           </div>
@@ -299,7 +306,7 @@ export default function ExpensesPage() {
             <div>
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Avg. Entry</p>
               <h3 className="text-xl font-bold tracking-tight tabular-nums">
-                ₹{(expenses.length > 0 ? (parseFloat(summary?.current_month_total || 0) / expenses.length) : 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                {formatCurrency((expenses.length > 0 ? (parseFloat(summary?.current_month_total || 0) / expenses.length) : 0), preferredCurrency)}
               </h3>
             </div>
           </div>
@@ -441,7 +448,7 @@ export default function ExpensesPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap font-semibold tabular-nums text-red-500">
-                        ₹{parseFloat(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        {formatCurrency(expense.amount, expense.currency || 'INR')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -507,7 +514,7 @@ export default function ExpensesPage() {
             </div>
             <div>
               <p className="font-medium">{autoSavedData?.title}</p>
-              <p className="text-2xl font-bold">₹{autoSavedData?.amount}</p>
+              <p className="text-2xl font-bold">{formatCurrency(autoSavedData?.amount, autoSavedData?.currency)}</p>
               <p className="text-xs text-muted-foreground mt-1">{autoSavedData?.category_name}</p>
             </div>
           </div>
@@ -526,14 +533,35 @@ export default function ExpensesPage() {
               placeholder="e.g. Grocery store"
             />
             <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="Amount (₹)"
-                type="number"
-                step="0.01"
-                value={formData.amount}
-                onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                required
-              />
+              <div className="grid grid-cols-3 gap-2">
+                <div className="col-span-1">
+                  <Select
+                    label="CCY"
+                    value={formData.currency}
+                    onChange={e => setFormData({ ...formData, currency: e.target.value })}
+                    required
+                    options={[
+                      { value: 'INR', label: 'INR' },
+                      { value: 'USD', label: 'USD' },
+                      { value: 'EUR', label: 'EUR' },
+                      { value: 'GBP', label: 'GBP' },
+                      { value: 'JPY', label: 'JPY' },
+                      { value: 'CAD', label: 'CAD' },
+                      { value: 'AUD', label: 'AUD' },
+                    ]}
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Input
+                    label="Amount"
+                    type="number"
+                    step="0.01"
+                    value={formData.amount}
+                    onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
               <Input
                 label="Date"
                 type="date"

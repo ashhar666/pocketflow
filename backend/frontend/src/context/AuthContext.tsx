@@ -16,6 +16,7 @@ interface User {
   email: string;
   first_name: string;
   last_name: string;
+  preferred_currency: string;
 }
 
 interface AuthContextType {

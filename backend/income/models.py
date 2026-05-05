@@ -15,6 +15,7 @@ class Income(models.Model):
     category = models.ForeignKey('categories.Category', on_delete=models.SET_NULL, null=True, blank=True, related_name='incomes')
     source = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.CharField(max_length=3, default='INR')
     date = models.DateField()
     description = models.TextField(blank=True, null=True)
     is_recurring = models.BooleanField(default=False)
@@ -28,7 +29,7 @@ class Income(models.Model):
             models.Index(fields=['user', 'date']),
             models.Index(fields=['user', 'category']),
             models.Index(fields=['user', 'is_recurring']),
-            models.Index(fields=['date', 'amount']),
+            models.Index(fields=['date', 'amount', 'currency']),
         ]
 
     def __str__(self):

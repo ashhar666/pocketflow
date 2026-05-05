@@ -16,6 +16,7 @@ class Expense(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='expenses')
     title = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.CharField(max_length=3, default='INR')
     date = models.DateField()
     notes = models.TextField(blank=True, null=True)
     is_recurring = models.BooleanField(default=False)
@@ -29,7 +30,7 @@ class Expense(models.Model):
             models.Index(fields=['user', 'date']),
             models.Index(fields=['user', 'category']),
             models.Index(fields=['user', 'is_recurring']),
-            models.Index(fields=['date', 'amount']),
+            models.Index(fields=['date', 'amount', 'currency']),
         ]
 
     def __str__(self):

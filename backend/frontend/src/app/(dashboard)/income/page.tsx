@@ -23,7 +23,9 @@ import {
   Loader2
 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { cn, formatCurrency } from '@/lib/utils';
 import api from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend
@@ -31,6 +33,8 @@ import {
 import toast from 'react-hot-toast';
 
 export default function IncomePage() {
+  const { user } = useAuth();
+  const preferredCurrency = user?.preferred_currency || 'INR';
   const [incomes, setIncomes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -44,6 +48,7 @@ export default function IncomePage() {
   const [formData, setFormData] = useState({
     source: '',
     amount: '',
+    currency: 'INR',
     category_id: '',
     date: new Date().toISOString().split('T')[0],
     description: '',
@@ -146,6 +151,7 @@ export default function IncomePage() {
       setFormData({
         source: income.source,
         amount: income.amount.toString(),
+        currency: income.currency || 'INR',
         category_id: income.category?.id?.toString() || '',
         date: income.date,
         description: income.description || '',
@@ -157,6 +163,7 @@ export default function IncomePage() {
       setFormData({
         source: '',
         amount: '',
+        currency: 'INR',
         category_id: '',
         date: new Date().toISOString().split('T')[0],
         description: '',
@@ -230,16 +237,16 @@ export default function IncomePage() {
         <Card className="p-4 border-black/10 dark:border-white/10 dark:bg-black shadow-sm min-w-[180px] flex-shrink-0">
           <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Total Revenue</p>
           <h3 className="text-2xl font-bold tracking-tight tabular-nums flex items-baseline gap-1">
-            ₹{parseFloat(viewMode === 'monthly' ? (summary?.current_income_total || 0) : (summary?.all_time_income || 0)).toLocaleString('en-IN')}
-            <span className="text-[10px] text-zinc-500">INR</span>
+            {formatCurrency(parseFloat(viewMode === 'monthly' ? (summary?.current_income_total || 0) : (summary?.all_time_income || 0)), preferredCurrency)}
+            <span className="text-[10px] text-zinc-500">{preferredCurrency}</span>
           </h3>
         </Card>
 
         <Card className="p-4 border-black/10 dark:border-white/10 dark:bg-black shadow-sm min-w-[180px] flex-shrink-0">
           <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Avg. Entry</p>
           <h3 className="text-2xl font-bold tracking-tight tabular-nums flex items-baseline gap-1">
-            ₹{(incomes.length > 0 ? (parseFloat(viewMode === 'monthly' ? (summary?.current_income_total || 0) : (summary?.all_time_income || 0)) / incomes.length) : 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-            <span className="text-[10px] text-zinc-500">INR</span>
+            {formatCurrency((incomes.length > 0 ? (parseFloat(viewMode === 'monthly' ? (summary?.current_income_total || 0) : (summary?.all_time_income || 0)) / incomes.length) : 0), preferredCurrency)}
+            <span className="text-[10px] text-zinc-500">{preferredCurrency}</span>
           </h3>
         </Card>
 
@@ -335,7 +342,7 @@ export default function IncomePage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                        +₹{parseFloat(income.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        +{formatCurrency(income.amount, income.currency || 'INR')}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -405,23 +412,42 @@ export default function IncomePage() {
             className="text-sm"
           />
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Amount (INR)"
-              type="number"
-              step="0.01"
-              value={formData.amount}
-              onChange={e => setFormData({ ...formData, amount: e.target.value })}
-              required
-              placeholder="0.00"
-              className="text-sm"
-            />
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-1">
+                <Select
+                  label="CCY"
+                  value={formData.currency}
+                  onChange={e => setFormData({ ...formData, currency: e.target.value })}
+                  required
+                  options={[
+                    { value: 'INR', label: 'INR' },
+                    { value: 'USD', label: 'USD' },
+                    { value: 'EUR', label: 'EUR' },
+                    { value: 'GBP', label: 'GBP' },
+                    { value: 'JPY', label: 'JPY' },
+                    { value: 'CAD', label: 'CAD' },
+                    { value: 'AUD', label: 'AUD' },
+                  ]}
+                />
+              </div>
+              <div className="col-span-2">
+                <Input
+                  label="Amount"
+                  type="number"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                  required
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
             <Input
               label="Date"
               type="date"
               value={formData.date}
               onChange={e => setFormData({ ...formData, date: e.target.value })}
               required
-              className="text-sm"
             />
           </div>
 

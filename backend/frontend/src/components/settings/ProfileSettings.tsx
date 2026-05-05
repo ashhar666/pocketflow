@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -15,7 +16,8 @@ export default function ProfileSettings() {
     first_name: '',
     last_name: '',
     email: '',
-    username: ''
+    username: '',
+    preferred_currency: 'INR'
   });
 
   useEffect(() => {
@@ -24,7 +26,8 @@ export default function ProfileSettings() {
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         email: user.email || '',
-        username: user.username || ''
+        username: user.username || '',
+        preferred_currency: user.preferred_currency || 'INR'
       });
     }
   }, [user]);
@@ -85,6 +88,23 @@ export default function ProfileSettings() {
             value={data.username}
             onChange={e => setData({ ...data, username: e.target.value })}
             placeholder="username"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Select
+            label="Preferred Currency"
+            value={data.preferred_currency}
+            onChange={e => setData({ ...data, preferred_currency: e.target.value })}
+            options={[
+              { value: 'INR', label: 'Indian Rupee (INR)' },
+              { value: 'USD', label: 'US Dollar (USD)' },
+              { value: 'EUR', label: 'Euro (EUR)' },
+              { value: 'GBP', label: 'British Pound (GBP)' },
+              { value: 'JPY', label: 'Japanese Yen (JPY)' },
+              { value: 'CAD', label: 'Canadian Dollar (CAD)' },
+              { value: 'AUD', label: 'Australian Dollar (AUD)' },
+            ]}
           />
         </div>
 

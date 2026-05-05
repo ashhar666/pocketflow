@@ -26,6 +26,8 @@ import {
   Loader2
 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { useAuth } from '@/context/AuthContext';
+import { formatCurrency as globalFormatCurrency } from '@/lib/utils';
 
 interface ComparisonItem {
   category: string;
@@ -45,12 +47,10 @@ interface ComparisonData {
   comparison: ComparisonItem[];
 }
 
-const formatCurrency = (val: number | string | undefined | null) => {
-  const num = typeof val === 'string' ? parseFloat(val) : (val || 0);
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(num));
-};
 
 export default function ReportsPage() {
+  const { user } = useAuth();
+  const preferredCurrency = user?.preferred_currency || 'INR';
   const [data, setData] = useState<ComparisonData | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -162,7 +162,7 @@ export default function ReportsPage() {
             <div>
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">This Month</p>
               <h3 className="text-xl font-bold tracking-tight tabular-nums">
-                {formatCurrency(thisMonthTotal)}
+               {globalFormatCurrency(thisMonthTotal, preferredCurrency)}
               </h3>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function ReportsPage() {
             <div>
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Previous</p>
               <h3 className="text-xl font-bold tracking-tight tabular-nums">
-                {formatCurrency(lastMonthTotal)}
+                {globalFormatCurrency(lastMonthTotal, preferredCurrency)}
               </h3>
             </div>
           </div>
@@ -248,7 +248,7 @@ export default function ReportsPage() {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: '#71717a', fontSize: 9, fontWeight: 700 }}
-                  tickFormatter={(val) => `₹${val >= 1000 ? (val/1000).toFixed(0) + 'K' : val}`}
+                  tickFormatter={(val) => `${val >= 1000 ? (val/1000).toFixed(0) + 'K' : val}`}
                 />
                 <Tooltip 
                   cursor={{ fill: 'rgba(255,255,255,0.015)' }}
@@ -262,7 +262,7 @@ export default function ReportsPage() {
                     padding: '12px'
                   }}
                   itemStyle={{ padding: '2px 0' }}
-                  formatter={(value: any) => [`₹${parseFloat(value).toLocaleString()}`, '']}
+                  formatter={(value: any) => [globalFormatCurrency(value, preferredCurrency), '']}
                 />
                 <Bar 
                   dataKey="last_month" 
@@ -304,7 +304,7 @@ export default function ReportsPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-[11px] font-bold tracking-tighter text-foreground">
-                      {formatCurrency(row.this_month)}
+                      {globalFormatCurrency(row.this_month, preferredCurrency)}
                     </p>
                     <div className={`flex items-center justify-end gap-1 text-[8px] font-bold uppercase ${isUp ? 'text-red-500' : 'text-emerald-500'}`}>
                       {isUp ? '+' : '-'}{Math.abs(row.diff_percent).toFixed(1)}%

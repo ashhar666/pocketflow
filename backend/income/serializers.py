@@ -11,7 +11,7 @@ class IncomeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Income
-        fields = ['id', 'source', 'amount', 'category', 'category_id', 'date', 'description', 'is_recurring', 'recurrence_type', 'created_at']
+        fields = ['id', 'source', 'amount', 'currency', 'category', 'category_id', 'date', 'description', 'is_recurring', 'recurrence_type', 'created_at']
         read_only_fields = ['id', 'created_at']
 
     def __init__(self, *args, **kwargs):

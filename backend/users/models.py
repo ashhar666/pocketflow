@@ -40,6 +40,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     # AbstractUser has a username field which we will relax by not requiring it for auth
     email = models.EmailField(unique=True, max_length=255)
+    preferred_currency = models.CharField(max_length=3, default='INR')
 
     # Telegram integration fields
     telegram_chat_id    = models.CharField(max_length=64,  null=True, blank=True, unique=True)

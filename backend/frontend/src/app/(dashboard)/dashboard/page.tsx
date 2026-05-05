@@ -1,5 +1,7 @@
 'use client';
 
+import { cn, formatCurrency } from "@/lib/utils"
+
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Card } from '@/components/ui/Card';
@@ -28,6 +30,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/Input';
 import { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { useAuth } from '@/context/AuthContext';
 
 interface MonthlySummary {
   current_month_total: number;
@@ -73,10 +76,6 @@ const WeeklyBreakdownChart = dynamic(
   }
 );
 
-const formatCurrency = (val: number | string | undefined | null) => {
-  const num = typeof val === 'string' ? parseFloat(val) : (val || 0);
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(num));
-};
 export default function DashboardPage() {
   const [monthly, setMonthly] = useState<MonthlySummary | null>(null);
   const [weekly, setWeekly] = useState<any[]>([]);
@@ -97,6 +96,8 @@ export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<'monthly' | 'all'>('monthly');
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const { theme } = useTheme();
+  const { user } = useAuth();
+  const preferredCurrency = user?.preferred_currency || 'INR';
 
   const handleDownloadReport = async () => {
     setDownloading(true);
@@ -336,7 +337,7 @@ export default function DashboardPage() {
               <div className="text-center">
                 <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500/60 mb-1">Receipt Saved</p>
                 <p className="text-xs sm:text-sm font-bold uppercase tracking-tight text-white mb-1 truncate max-w-[160px] sm:max-w-[200px]">{autoSavedData?.title}</p>
-                <p className="text-xl sm:text-2xl font-bold text-white tracking-tighter">₹{autoSavedData?.amount}</p>
+                <p className="text-xl sm:text-2xl font-bold text-white tracking-tighter">{formatCurrency(autoSavedData?.amount, autoSavedData?.currency)}</p>
                 <div className="mt-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-zinc-400 border border-white/10 px-3 py-1 rounded-full bg-white/5">
                   {autoSavedData?.category_name}
                 </div>
@@ -506,9 +507,9 @@ export default function DashboardPage() {
             <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Balance</span>
             <div className="flex items-baseline gap-1">
               <span className="text-lg font-bold tracking-tight tabular-nums">
-                {monthly ? formatCurrency(monthly.total_balance).replace('₹', '') : '---'}
+                {monthly ? formatCurrency(monthly.total_balance, preferredCurrency).replace(/[^\d.,-]/g, '') : '---'}
               </span>
-              <span className="text-[8px] text-zinc-500 font-medium">INR</span>
+              <span className="text-[8px] text-zinc-500 font-medium uppercase">{preferredCurrency}</span>
             </div>
           </div>
         </Card>
@@ -520,9 +521,9 @@ export default function DashboardPage() {
             </span>
             <div className="flex items-baseline gap-1">
               <span className="text-lg font-bold tracking-tight tabular-nums text-indigo-600 dark:text-indigo-400">
-                {monthly ? formatCurrency(viewMode === 'all' ? monthly.all_time_income : monthly.current_income_total).replace('₹', '') : '---'}
+                {monthly ? formatCurrency(viewMode === 'all' ? monthly.all_time_income : monthly.current_income_total, preferredCurrency).replace(/[^\d.,-]/g, '') : '---'}
               </span>
-              <span className="text-[8px] text-zinc-500 font-medium">INR</span>
+              <span className="text-[8px] text-zinc-500 font-medium">{preferredCurrency}</span>
             </div>
           </div>
         </Card>
@@ -534,9 +535,9 @@ export default function DashboardPage() {
             </span>
             <div className="flex items-baseline gap-1">
               <span className="text-lg font-bold tracking-tight tabular-nums text-rose-600 dark:text-rose-400">
-                {monthly ? formatCurrency(viewMode === 'all' ? monthly.all_time_expenses : monthly.current_month_total).replace('₹', '') : '---'}
+                {monthly ? formatCurrency(viewMode === 'all' ? monthly.all_time_expenses : monthly.current_month_total, preferredCurrency).replace(/[^\d.,-]/g, '') : '---'}
               </span>
-              <span className="text-[8px] text-zinc-500 font-medium">INR</span>
+              <span className="text-[8px] text-zinc-500 font-medium">{preferredCurrency}</span>
             </div>
           </div>
         </Card>
@@ -546,9 +547,9 @@ export default function DashboardPage() {
             <span className="text-[9px] font-bold uppercase tracking-widest text-blue-500">Savings</span>
             <div className="flex items-baseline gap-1">
               <span className="text-lg font-bold tracking-tight tabular-nums text-blue-600 dark:text-blue-400">
-                {monthly ? formatCurrency(monthly.total_savings).replace('₹', '') : '---'}
+                {monthly ? formatCurrency(monthly.total_savings, preferredCurrency).replace(/[^\d.,-]/g, '') : '---'}
               </span>
-              <span className="text-[8px] text-zinc-500 font-medium">INR</span>
+              <span className="text-[8px] text-zinc-500 font-medium">{preferredCurrency}</span>
             </div>
           </div>
         </Card>
@@ -624,7 +625,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                    <span className={`font-bold text-[10px] tracking-tight ${item.type === 'income' ? 'text-emerald-500' : 'text-foreground'}`}>
-                     {item.type === 'income' ? '+' : '-'}{formatCurrency(item.amount).replace('₹', '')} <span className="text-[8px] text-zinc-500">INR</span>
+                     {item.type === 'income' ? '+' : '-'}{formatCurrency(item.amount, item.currency || 'INR').replace(/[^\d.,]/g, '')} <span className="text-[8px] text-zinc-500">{item.currency || 'INR'}</span>
                    </span>
                 </div>
               ))

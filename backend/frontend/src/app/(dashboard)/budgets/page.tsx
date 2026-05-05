@@ -16,8 +16,13 @@ import {
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
+import { formatCurrency } from '@/lib/utils';
 
 export default function BudgetsPage() {
+  const { user } = useAuth();
+  const preferredCurrency = user?.preferred_currency || 'INR';
+  
   const [budgets, setBudgets] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -201,8 +206,8 @@ export default function BudgetsPage() {
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-baseline">
-                      <span className="text-xl font-bold tracking-tight">₹{spent.toLocaleString('en-IN')}</span>
-                      <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">of ₹{limit.toLocaleString('en-IN')} limit</span>
+                      <span className="text-xl font-bold tracking-tight">{formatCurrency(spent, preferredCurrency)}</span>
+                      <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">of {formatCurrency(limit, preferredCurrency)} limit</span>
                     </div>
 
                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
@@ -214,7 +219,7 @@ export default function BudgetsPage() {
                     
                     <div className="flex justify-between items-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                       <span>{Math.round((spent/limit)*100)}% Spent</span>
-                      <span>{isOver ? `₹${Math.abs(limit - spent).toLocaleString('en-IN')} Over` : `₹${remaining.toLocaleString('en-IN')} Left`}</span>
+                      <span>{isOver ? `${formatCurrency(Math.abs(limit - spent), preferredCurrency)} Over` : `${formatCurrency(remaining, preferredCurrency)} Left`}</span>
                     </div>
                   </div>
                 </Card>
@@ -249,7 +254,7 @@ export default function BudgetsPage() {
           )}
 
           <Input
-            label="Budget Limit (INR)"
+            label={`Budget Limit (${preferredCurrency})`}
             type="number"
             step="0.01"
             value={formData.monthly_limit}
