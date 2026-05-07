@@ -89,6 +89,8 @@ TELEGRAM_WEBHOOK_SECRET = os.getenv('TELEGRAM_WEBHOOK_SECRET', '')
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    'pocket-flow.app',
+    'www.pocket-flow.app',
     '.hf.space',
     'proxy.spaces.internal.huggingface.tech',
 ]
@@ -109,9 +111,11 @@ if DEBUG:
     CSRF_TRUSTED_ORIGINS.extend(tunnels)
 
 DJANGO_APPS = [
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
 
@@ -144,6 +148,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -321,7 +326,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'PocketFlow <pocketflow.app
 SUPPORT_EMAIL = os.getenv('SUPPORT_EMAIL', 'pocketflow.app@gmail.com')
 
 # Frontend URL — used to build password reset links sent in emails
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://www.pocket-flow.app' if not DEBUG else 'http://localhost:3000')
 
 # Email backend: Gmail SMTP (development & production)
 # Set EMAIL_HOST_USER to your Gmail address to enable real emails.

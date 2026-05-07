@@ -117,7 +117,7 @@ def _send_reset_email_async(to_email: str, reset_link: str):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'preferred_currency')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'preferred_currency', 'is_staff')
 
 
 class RegisterSerializer(serializers.ModelSerializer):

@@ -8,6 +8,7 @@ from .dashboard_views import (
 )
 from .report_views import DownloadReportView, ComparisonReportView
 from .comparison_views import ComparisonSummaryView
+from .admin_views import AdminStatsView, AdminSupportMessagesView
 
 urlpatterns = [
     path('activity/', RecentActivityView.as_view(), name='recent-activity'),
@@ -20,4 +21,8 @@ urlpatterns = [
     path('export/', DownloadReportView.as_view(), name='download-report'),
     path('comparison/', ComparisonSummaryView.as_view(), name='comparison-summary'),
     path('comparison-report/', ComparisonReportView.as_view(), name='comparison-report'),
+    
+    # Admin Portal Endpoints
+    path('admin-stats/', AdminStatsView.as_view(), name='admin-stats'),
+    path('admin-messages/', AdminSupportMessagesView.as_view(), name='admin-messages'),
 ]

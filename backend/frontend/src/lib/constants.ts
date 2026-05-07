@@ -25,4 +25,5 @@ export const PROTECTED_PREFIXES = [
   '/savings',
   '/reports',
   '/telegram',
+  '/admin',
 ];
