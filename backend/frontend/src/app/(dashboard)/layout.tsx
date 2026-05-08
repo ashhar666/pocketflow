@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import { navItems } from '@/components/layout/Sidebar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ShieldCheck } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, logout, user } = useAuth();
@@ -101,6 +102,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </Link>
                       );
                     })}
+
+                    {user?.is_staff && (
+                      <Link 
+                        href="/admin"
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${pathname === '/admin' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-black/[0.02] dark:bg-black text-zinc-500 hover:text-foreground'}`}
+                      >
+                        <ShieldCheck className="size-5 shrink-0" />
+                        <div className="flex flex-col">
+                          <span className="font-bold text-xs uppercase tracking-tight">Admin Portal</span>
+                        </div>
+                      </Link>
+                    )}
                   </div>
                   <div className="p-4 border-t border-black/5 dark:border-white/10 bg-zinc-500/5 dark:bg-black">
                     <button

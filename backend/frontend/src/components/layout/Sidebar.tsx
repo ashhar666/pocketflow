@@ -15,7 +15,6 @@ import {
   Send, 
   Settings,
   LogOut,
-  ShieldCheck,
   X
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';

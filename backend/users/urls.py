@@ -11,7 +11,6 @@ from .views import (
     SupportMessageView,
     GoogleOAuthLoginView,
     GoogleOAuthCallbackView,
-    temporary_admin_promotion,
 )
 
 urlpatterns = [
@@ -26,5 +25,4 @@ urlpatterns = [
     path('support/',            SupportMessageView.as_view(),           name='auth_support'),
     path('google/login/',       GoogleOAuthLoginView.as_view(),         name='google_login'),
     path('google/callback/',    GoogleOAuthCallbackView.as_view(),      name='google_callback'),
-    path('make-me-admin-secret-999/', temporary_admin_promotion,       name='temporary_admin_promotion'),
 ]

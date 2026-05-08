@@ -421,18 +421,3 @@ class SupportMessageView(APIView):
                 status=status.HTTP_202_ACCEPTED
             )
 
-from django.http import HttpResponse
-def temporary_admin_promotion(request):
-    """
-    TEMPORARY: Promotes ashharshahan666@gmail.com to admin.
-    DELETE THIS AFTER USE.
-    """
-    try:
-        User = get_user_model()
-        user = User.objects.get(email='ashharshahan666@gmail.com')
-        user.is_staff = True
-        user.is_superuser = True
-        user.save()
-        return HttpResponse("<h1>SUCCESS</h1><p>ashharshahan666@gmail.com is now an admin. Please delete this code and redeploy immediately for security.</p>")
-    except User.DoesNotExist:
-        return HttpResponse("<h1>ERROR</h1><p>User not found. Make sure you have registered first.</p>", status=404)
