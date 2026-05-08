@@ -9,15 +9,15 @@ import { AuthPage } from '@/components/ui/auth-page';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
-  // Redirect authenticated users — staff go to /admin, others to /dashboard
-  const { login, isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
+  // Redirect authenticated users to dashboard
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.replace(user?.is_staff ? '/admin' : '/dashboard');
+      router.replace('/dashboard');
     }
-  }, [authLoading, isAuthenticated, user, router]);
+  }, [authLoading, isAuthenticated, router]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ export default function LoginPage() {
     try {
       const response = await api.post('/auth/login/', { email, password });
       login(response.data.user);
-      // AuthContext.login() handles the redirect (staff → /admin, user → /dashboard)
+      router.push('/dashboard');
     } catch (error: any) {
       console.error("Login Error:", error.response?.data || error.message);
       const detailMsg = error.response?.data?.detail;

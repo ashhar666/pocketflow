@@ -19,14 +19,12 @@ export function middleware(request: NextRequest) {
     currentPath.startsWith(prefix)
   );
 
-  // LOGGING (Visible in server logs/Vercel logs)
-  // console.log(`[MIDDLEWARE] Path: ${currentPath} | Public: ${isPublicRoute} | Protected: ${isProtectedRoute} | Auth: ${!!accessToken}`);
-
   // If it's a public route, always allow access
   if (isPublicRoute) {
-    // If user has a token and is on login/register, let the client-side
-    // AuthContext handle the redirect (it knows if user is staff → /admin, else → /dashboard).
-    // Do NOT redirect here to avoid overriding the smart client-side redirect.
+    // Exception: If user has token and is on login/register → redirect to dashboard
+    if ((currentPath === '/login' || currentPath === '/register') && accessToken) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
     return NextResponse.next();
   }
 
