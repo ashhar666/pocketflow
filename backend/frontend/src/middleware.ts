@@ -24,10 +24,9 @@ export function middleware(request: NextRequest) {
 
   // If it's a public route, always allow access
   if (isPublicRoute) {
-    // Exception: If user has token and is on login/register → redirect to dashboard
-    if ((currentPath === '/login' || currentPath === '/register') && accessToken) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
+    // If user has a token and is on login/register, let the client-side
+    // AuthContext handle the redirect (it knows if user is staff → /admin, else → /dashboard).
+    // Do NOT redirect here to avoid overriding the smart client-side redirect.
     return NextResponse.next();
   }
 
