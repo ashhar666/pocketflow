@@ -12,7 +12,7 @@ export default function LoginPage() {
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Redirect authenticated users to dashboard
+  // Redirect already-authenticated users away from the login page
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       router.replace('/dashboard');
@@ -33,8 +33,8 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const response = await api.post('/auth/login/', { email, password });
+      // login() sets user state + shows Welcome toast + pushes /dashboard
       login(response.data.user);
-      router.push('/dashboard');
     } catch (error: any) {
       console.error("Login Error:", error.response?.data || error.message);
       const detailMsg = error.response?.data?.detail;
