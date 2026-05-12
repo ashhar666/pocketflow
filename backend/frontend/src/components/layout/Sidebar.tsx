@@ -55,9 +55,7 @@ export const Sidebar = () => {
 
         <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto custom-scrollbar">
           <div className="px-3 mb-3">
-            <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-zinc-700">
-              {user?.is_staff ? 'Admin System' : 'Main Menu'}
-            </span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-zinc-700">Main Menu</span>
           </div>
 
           {user?.is_staff && (
@@ -77,12 +75,7 @@ export const Sidebar = () => {
             </Link>
           )}
 
-          {navItems
-            .filter(item => {
-              if (user?.is_staff) return item.role === 'both';
-              return true;
-            })
-            .map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
 
@@ -135,12 +128,7 @@ export const Sidebar = () => {
       <nav className="md:hidden fixed bottom-4 inset-x-4 z-[10001] bg-background/80 dark:bg-black backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl safe-area-bottom px-2 transition-colors duration-400">
         <div className="flex items-center h-16 relative overflow-x-auto no-scrollbar gap-2 px-2">
           
-          {navItems
-            .filter(item => {
-              if (user?.is_staff) return item.role === 'both';
-              return true;
-            })
-            .map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
