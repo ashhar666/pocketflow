@@ -47,6 +47,10 @@ if _admin_pw:
 else:
     run_command("python manage.py promote_admin pocketflow.app@gmail.com")
 
+# 3b. Ensure regular users are NOT admins (clean up old migrations)
+log("Ensuring regular users are demoted...")
+run_command("python manage.py demote_admin ashharshahan666@gmail.com")
+
 # 4. Final Handover to Gunicorn
 log("Starting Gunicorn on 0.0.0.0:7860...")
 # Using os.execvp perfectly hands over PID 1 to Gunicorn
