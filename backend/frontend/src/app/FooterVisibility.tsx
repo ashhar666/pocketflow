@@ -16,7 +16,9 @@ const HIDE_FOOTER_PATHS = [
   '/settings',
   '/income',
   '/telegram',
-  '/reports'
+  '/reports',
+  '/admin-login',
+  '/admin'
 ];
 
 export default function FooterVisibility() {

@@ -98,7 +98,10 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col md:flex-row items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 italic text-center md:text-left">
-            <span>© {currentYear} PocketFlow Studio</span>
+            <span>
+              © {currentYear} PocketFlow Studio
+              <Link href="/admin-login" className="hover:text-emerald-500/50 transition-colors cursor-default">.</Link>
+            </span>
             <span className="hidden md:block opacity-30">•</span>
             <span>All rights reserved</span>
             <span className="hidden md:block opacity-30">•</span>

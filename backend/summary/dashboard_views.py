@@ -4,8 +4,11 @@ from datetime import timedelta
 import calendar
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.contrib.auth import get_user_model
 from itertools import chain
+
+User = get_user_model()
 
 from expenses.models import Expense
 from budgets.models import Budget
@@ -342,3 +345,66 @@ class InsightsSummaryView(APIView):
             })
 
         return Response(insights)
+
+class AdminStatsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        try:
+            total_users = User.objects.count()
+            total_expenses = Expense.objects.count()
+            total_income = Income.objects.count()
+            total_amount_spent = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
+            
+            # Active users in last 30 days
+            thirty_days_ago = timezone.now() - timedelta(days=30)
+            active_users = User.objects.filter(last_login__gte=thirty_days_ago).count()
+
+            # Growth data (last 6 months)
+            growth_data = []
+            today = timezone.now().date()
+            for i in range(5, -1, -1):
+                y = today.year
+                m = today.month - i
+                while m <= 0:
+                    m += 12
+                    y -= 1
+                
+                month_name = calendar.month_abbr[m]
+                month_users = User.objects.filter(date_joined__year=y, date_joined__month=m).count()
+                growth_data.append({
+                    'month': f"{month_name} {y}",
+                    'users': month_users
+                })
+
+            # Recent users
+            recent_users = User.objects.all().order_by('-date_joined')[:10]
+            recent_users_data = [{
+                'email': u.email,
+                'date_joined': u.date_joined.strftime("%Y-%m-%d"),
+                'is_active': u.is_active,
+                'is_staff': u.is_staff
+            } for u in recent_users]
+
+            # Recent support messages
+            from users.models import SupportMessage
+            recent_messages = SupportMessage.objects.all().order_by('-created_at')[:5]
+            recent_messages_data = [{
+                'sender': m.sender_email or "Anonymous",
+                'message': m.message[:100] + "..." if len(m.message) > 100 else m.message,
+                'created_at': m.created_at.strftime("%Y-%m-%d %H:%M")
+            } for m in recent_messages]
+
+            return Response({
+                'platform_stats': {
+                    'total_users': total_users,
+                    'active_users_30d': active_users,
+                    'total_transactions': total_expenses + total_income,
+                    'total_volume': float(total_amount_spent)
+                },
+                'user_growth': growth_data,
+                'recent_users': recent_users_data,
+                'recent_messages': recent_messages_data
+            })
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)

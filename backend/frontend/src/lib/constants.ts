@@ -10,6 +10,7 @@ export const PUBLIC_ROUTES = [
   '/legal/privacy-policy',
   '/legal/tos',
   '/legal/cookie-policy',
+  '/admin-login',
 ];
 
 /**

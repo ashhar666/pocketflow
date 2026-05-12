@@ -4,7 +4,8 @@ from .dashboard_views import (
     MonthlySummaryView, 
     WeeklySummaryView, 
     TrendSummaryView, 
-    InsightsSummaryView
+    InsightsSummaryView,
+    AdminStatsView
 )
 from .report_views import DownloadReportView, ComparisonReportView
 from .comparison_views import ComparisonSummaryView
@@ -20,4 +21,5 @@ urlpatterns = [
     path('export/', DownloadReportView.as_view(), name='download-report'),
     path('comparison/', ComparisonSummaryView.as_view(), name='comparison-summary'),
     path('comparison-report/', ComparisonReportView.as_view(), name='comparison-report'),
+    path('admin-stats/', AdminStatsView.as_view(), name='admin-stats'),
 ]

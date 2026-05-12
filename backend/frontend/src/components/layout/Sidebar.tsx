@@ -15,21 +15,22 @@ import {
   Send, 
   Settings,
   LogOut,
-  X
+  X,
+  ShieldCheck
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 
 export const navItems = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Reports', href: '/reports', icon: BarChart3 },
-  { name: 'Income', href: '/income', icon: CircleArrowUp },
-  { name: 'Expenses', href: '/expenses', icon: CircleArrowDown },
-  { name: 'Categories', href: '/categories', icon: Tags },
-  { name: 'Budgets', href: '/budgets', icon: Wallet },
-  { name: 'Savings', href: '/savings', icon: PiggyBank },
-  { name: 'Telegram', href: '/telegram', icon: Send },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, role: 'user' },
+  { name: 'Reports', href: '/reports', icon: BarChart3, role: 'user' },
+  { name: 'Income', href: '/income', icon: CircleArrowUp, role: 'user' },
+  { name: 'Expenses', href: '/expenses', icon: CircleArrowDown, role: 'user' },
+  { name: 'Categories', href: '/categories', icon: Tags, role: 'user' },
+  { name: 'Budgets', href: '/budgets', icon: Wallet, role: 'user' },
+  { name: 'Savings', href: '/savings', icon: PiggyBank, role: 'user' },
+  { name: 'Telegram', href: '/telegram', icon: Send, role: 'user' },
+  { name: 'Settings', href: '/settings', icon: Settings, role: 'both' },
 ];
 
 export const Sidebar = () => {
@@ -54,9 +55,34 @@ export const Sidebar = () => {
 
         <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto custom-scrollbar">
           <div className="px-3 mb-3">
-            <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-zinc-700">Main Menu</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-zinc-700">
+              {user?.is_staff ? 'Admin System' : 'Main Menu'}
+            </span>
           </div>
-          {navItems.map((item) => {
+
+          {user?.is_staff && (
+            <Link href="/admin">
+              <div className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-500 group ${pathname === '/admin' ? 'text-foreground' : 'text-zinc-500 hover:text-foreground hover:bg-zinc-500/5 dark:hover:bg-white/[0.02]'}`}>
+                {pathname === '/admin' && (
+                  <motion.div
+                    layoutId="sidebar-active"
+                    className="absolute inset-0 bg-red-500/5 border border-red-500/10 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.05)]"
+                    initial={false}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <ShieldCheck className={`size-4 relative z-10 transition-colors duration-500 ${pathname === '/admin' ? 'text-red-500' : 'group-hover:text-red-400'}`} strokeWidth={pathname === '/admin' ? 2.5 : 2} />
+                <span className="font-bold text-xs uppercase tracking-widest relative z-10">Command Center</span>
+              </div>
+            </Link>
+          )}
+
+          {navItems
+            .filter(item => {
+              if (user?.is_staff) return item.role === 'both';
+              return true;
+            })
+            .map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
 
@@ -109,7 +135,12 @@ export const Sidebar = () => {
       <nav className="md:hidden fixed bottom-4 inset-x-4 z-[10001] bg-background/80 dark:bg-black backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl safe-area-bottom px-2 transition-colors duration-400">
         <div className="flex items-center h-16 relative overflow-x-auto no-scrollbar gap-2 px-2">
           
-          {navItems.map((item) => {
+          {navItems
+            .filter(item => {
+              if (user?.is_staff) return item.role === 'both';
+              return true;
+            })
+            .map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
@@ -126,6 +157,20 @@ export const Sidebar = () => {
               </Link>
             );
           })}
+
+          {user?.is_staff && (
+            <Link href="/admin" className="flex flex-col items-center justify-center min-w-[70px] h-full relative transition-all duration-300">
+              {pathname === '/admin' && (
+                <motion.div layoutId="mobile-active" className="absolute inset-0 bg-red-500/5 -z-10" />
+              )}
+              <motion.div whileTap={{ scale: 0.8 }} className="flex flex-col items-center">
+                <ShieldCheck className={`size-5 mb-1 transition-all duration-300 ${pathname === '/admin' ? 'text-red-500 scale-110' : 'text-zinc-600'}`} />
+                <span className={`text-[8px] font-bold uppercase tracking-widest leading-none transition-colors duration-300 ${pathname === '/admin' ? 'text-red-500' : 'text-zinc-600'}`}>
+                  Admin
+                </span>
+              </motion.div>
+            </Link>
+          )}
 
         </div>
       </nav>
