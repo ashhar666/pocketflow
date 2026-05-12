@@ -24,7 +24,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (userData: User) => void;
+  login: (userData: User, redirectTo?: string) => void;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
 }
@@ -124,11 +124,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [pathname, isAuthenticated, isLoading, router]);
 
   // ── Login ─────────────────────────────────────────────────────────────────
-  const login = (userData: User) => {
+  const login = (userData: User, redirectTo?: string) => {
     setUser(userData);
     setIsAuthenticated(true);
     toast.success('Welcome!');
-    router.push('/dashboard');
+    router.push(redirectTo || '/dashboard');
   };
 
   // ── Logout ────────────────────────────────────────────────────────────────

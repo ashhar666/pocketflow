@@ -41,9 +41,8 @@ export default function AdminLoginPage() {
         return;
       }
 
-      login(userData);
+      login(userData, '/admin');
       toast.success("Uplink established. Welcome, Administrator.");
-      router.push('/admin');
     } catch (error: any) {
       console.error("Admin Login Error:", error.response?.data || error.message);
       toast.error("Authentication failed. Connection terminated.");
