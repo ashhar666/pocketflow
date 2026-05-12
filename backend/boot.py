@@ -38,7 +38,11 @@ run_command("python manage.py collectstatic --no-input")
 log("Applying database migrations...")
 run_command("python manage.py migrate --no-input")
 
-# 3. Final Handover to Gunicorn
+# 3. Promote production admin account
+log("Ensuring admin account is promoted...")
+run_command("python manage.py promote_admin pocketflow.app@gmail.com")
+
+# 4. Final Handover to Gunicorn
 log("Starting Gunicorn on 0.0.0.0:7860...")
 # Using os.execvp perfectly hands over PID 1 to Gunicorn
 os.execvp("gunicorn", [
