@@ -38,9 +38,14 @@ run_command("python manage.py collectstatic --no-input")
 log("Applying database migrations...")
 run_command("python manage.py migrate --no-input")
 
-# 3. Promote production admin account
+# 3. Promote production admin account (also sets password for Google OAuth accounts)
 log("Ensuring admin account is promoted...")
-run_command("python manage.py promote_admin pocketflow.app@gmail.com")
+import os as _os
+_admin_pw = _os.getenv('ADMIN_PORTAL_PASSWORD', '')
+if _admin_pw:
+    run_command(f"python manage.py promote_admin pocketflow.app@gmail.com --password {_admin_pw}")
+else:
+    run_command("python manage.py promote_admin pocketflow.app@gmail.com")
 
 # 4. Final Handover to Gunicorn
 log("Starting Gunicorn on 0.0.0.0:7860...")
