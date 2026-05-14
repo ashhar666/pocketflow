@@ -26,9 +26,13 @@ import {
   Filter
 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import {
-  PieChart, Pie, Cell, ResponsiveContainer
-} from 'recharts';
+import dynamic from 'next/dynamic';
+
+// Lazy-load recharts — it's a large library and the mini pie chart is non-critical
+const MiniCategoryPie = dynamic(() => import('./MiniCategoryPie'), {
+  ssr: false,
+  loading: () => <div className="h-[40px] w-full animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded" />,
+});
 
 export default function ExpensesPage() {
   const { user } = useAuth();
@@ -316,28 +320,7 @@ export default function ExpensesPage() {
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Category Mix</p>
-              <div className="h-[40px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={summary?.by_category?.length > 0 ? summary.by_category : [{ name: 'No Data', amount: 1 }]}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={12}
-                      outerRadius={20}
-                      paddingAngle={2}
-                      dataKey="amount"
-                    >
-                      {summary?.by_category?.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={entry.color || '#f43f5e'} />
-                      ))}
-                      {(!summary?.by_category || summary.by_category.length === 0) && (
-                        <Cell fill="var(--muted)" />
-                      )}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <MiniCategoryPie data={summary?.by_category} />
             </div>
             <div className="text-right">
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Entries</p>

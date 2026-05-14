@@ -9,4 +9,8 @@ User = get_user_model()
 
 print(f"Total users: {User.objects.count()}")
 for user in User.objects.all():
-    print(f"- {user.email} (ID: {user.id})")
+    status = []
+    if user.is_staff: status.append("Staff")
+    if user.is_superuser: status.append("Superuser")
+    status_str = f" [{', '.join(status)}]" if status else ""
+    print(f"- {user.email} (ID: {user.id}){status_str}")
