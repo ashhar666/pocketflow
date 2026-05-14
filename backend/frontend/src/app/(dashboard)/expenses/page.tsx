@@ -28,9 +28,15 @@ import {
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import dynamic from 'next/dynamic';
 
+interface CategoryEntry {
+  name: string;
+  amount: number;
+  color?: string;
+}
+
 // Lazy-load recharts - it's a large library and the mini pie chart is non-critical
 const PieSkeleton = () => <div className="h-[40px] w-full animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded" />;
-const MiniCategoryPie = dynamic(() => import('./MiniCategoryPie'), {
+const MiniCategoryPie = dynamic<{ data?: CategoryEntry[] }>(() => import('./MiniCategoryPie'), {
   ssr: false,
   loading: PieSkeleton,
 });
